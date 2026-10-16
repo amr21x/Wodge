@@ -1,5 +1,7 @@
 import { produce } from "immer";
-import { DrObj, Page, PageSchema, TEAM_MEMBERS_ROLE } from "../../..";
+import { DrObj } from "../../..";
+import { Page, PageSchema } from "@wodge/domain/pages";
+import { TEAM_MEMBERS_ROLE } from "@wodge/domain/constants";
 import { WorkspaceStructure } from "../../../schemas/workspace.schema";
 import { group } from "console";
 

@@ -11,7 +11,7 @@ import { DialogClose } from "@/components/ui/dialog";
 import { nanoid } from "nanoid";
 import { useParams } from "next/navigation";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { MAX_OPTIONS, MIN_OPTIONS } from "@repo/data";
+import { MAX_OPTIONS, MIN_OPTIONS } from "@wodge/data";
 import { useCurrentRoomRep } from "@/hooks/use-room-rep";
 import { useCurrentThreadRep } from "@/hooks/use-thread-rep";
 import { toast } from "sonner";

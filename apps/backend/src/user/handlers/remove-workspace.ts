@@ -5,7 +5,7 @@ import {
   REPLICACHE_VERSIONS_KEY,
   UserWorkspacesStore,
   makeWorkspacesStoreKey,
-} from "@repo/data";
+} from "@wodge/data";
 import { Context } from "hono";
 
 export async function removeWorkspace(party: UserParty, c: Context) {

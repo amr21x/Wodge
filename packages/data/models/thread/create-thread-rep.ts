@@ -5,7 +5,7 @@ import {
   PushRequest,
   Replicache,
 } from "replicache";
-import { env } from "@repo/env/client";
+import { env } from "@wodge/env/client";
 import { replicacheWrapper } from "../../lib/browser-utils";
 import { threadMutators } from "./thread-mutators";
 

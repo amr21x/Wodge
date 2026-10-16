@@ -1,9 +1,9 @@
 import { RunnerParams } from "../lib/replicache";
-import { EditThreadMessageArg, ThreadMessage, ThreadPost } from "@repo/data";
+import { EditThreadMessageArg, ThreadMessage, ThreadPost } from "@wodge/data";
 import { produce } from "immer";
 import ThreadParty from "./thread-party";
-import { editCommentMutation } from "@repo/data/models/thread/mutators/edit-comment";
-import { editPostMutation } from "@repo/data/models/thread/mutators/edit-post";
+import { editCommentMutation } from "@wodge/data/models/thread/mutators/edit-comment";
+import { editPostMutation } from "@wodge/data/models/thread/mutators/edit-post";
 
 export async function editPost(party: ThreadParty, params: RunnerParams) {
   const { newContent, ...post } = params.mutation.args as ThreadPost & {

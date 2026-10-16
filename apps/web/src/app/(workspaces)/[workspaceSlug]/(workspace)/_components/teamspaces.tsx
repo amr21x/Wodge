@@ -3,7 +3,8 @@ import * as React from "react";
 import { SidebarItem } from "./sidebar-item";
 
 import { SidebarItemBtn } from "./sidebar-item-btn";
-import { ChannelsTypes, DrObj, Team } from "@repo/data";
+import { ChannelsTypes } from "@wodge/domain/channels";
+import { DrObj, Team } from "@wodge/data";
 import {
   SortableContext,
   useSortable,

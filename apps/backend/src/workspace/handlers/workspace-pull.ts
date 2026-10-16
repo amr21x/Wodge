@@ -1,7 +1,10 @@
 import WorkspaceParty from "../workspace-party";
 import { PatcherParams, repPull } from "../../lib/replicache";
 import { PatchOperation } from "replicache";
-import { makeWorkspaceMembersKey, makeWorkspaceStructureKey } from "@repo/data";
+import {
+  makeWorkspaceMembersKey,
+  makeWorkspaceStructureKey,
+} from "@wodge/data";
 import { Context } from "hono";
 
 export async function workspacePull(party: WorkspaceParty, c: Context) {

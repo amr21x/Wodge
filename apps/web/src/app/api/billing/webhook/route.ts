@@ -1,6 +1,6 @@
 import { getStripe } from "@/lib/utils/get-stripe";
 import { createDb, revertWorkspace, upgradeWorkspace } from "@/lib/data-server";
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 import { NextRequest } from "next/server";
 import Stripe from "stripe";
 

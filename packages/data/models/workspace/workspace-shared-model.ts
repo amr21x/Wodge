@@ -3,7 +3,7 @@ import {
   ID_LENGTH,
   TEAM_MEMBERS_ROLE,
   WORKSPACE_TEAM_ID_LENGTH,
-} from "../../schemas/config";
+} from "@wodge/domain/constants";
 import { Folder, Team } from "../../schemas/team.schema";
 import {
   Invite,
@@ -12,7 +12,7 @@ import {
   WorkspaceStructure,
 } from "../../schemas/workspace.schema";
 import { Room } from "../../schemas/room.schema";
-import { Page } from "../../schemas/page.schema";
+import { Page } from "@wodge/domain/pages";
 import { Thread } from "../../schemas/thread.schema";
 
 export const createWelcomePage = (): Page => ({

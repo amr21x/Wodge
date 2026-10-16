@@ -1,11 +1,11 @@
 import {
   TeamUpdate,
   teamUpdateRunner,
-} from "@repo/data/models/workspace/mutators/team-update-runner";
+} from "@wodge/data/models/workspace/mutators/team-update-runner";
 import { RunnerParams } from "../../lib/replicache";
 import WorkspaceParty from "../workspace-party";
-import { WorkspaceStructure, makeWorkspaceStructureKey } from "@repo/data";
-import { TeamUpdateArgs } from "@repo/data/models/workspace/workspace-mutators";
+import { WorkspaceStructure, makeWorkspaceStructureKey } from "@wodge/data";
+import { TeamUpdateArgs } from "@wodge/data/models/workspace/workspace-mutators";
 import { PushAuth } from "../handlers/workspace-push";
 import { produce } from "immer";
 

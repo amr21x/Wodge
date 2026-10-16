@@ -11,7 +11,7 @@ import { deleteTeam } from "../mutators/delete-team";
 import { createPage } from "../mutators/create-page";
 import { createRoom } from "../mutators/create-room";
 import { createThread } from "../mutators/create-thread";
-import { isAdmin, isOwner, isTeamModerator } from "@repo/data";
+import { isAdmin, isOwner, isTeamModerator } from "@wodge/data";
 import { deleteChannel } from "../mutators/delete-channel";
 import { updatePage } from "../mutators/update-page";
 import { updateRoom } from "../mutators/update-room";

@@ -15,7 +15,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { PublicUserType, UpdateUserSchema } from "@repo/data";
+import { PublicUserType, UpdateUserSchema } from "@wodge/data";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AvatarBtn } from "../../../components/avatar-btn";
 import { useUpload } from "@/hooks/use-upload";

@@ -2,7 +2,7 @@ import { Request } from "partykit/server";
 import UserParty from "../user-party";
 import { PatcherParams, repPull } from "../../lib/replicache";
 import { PatchOperation } from "replicache";
-import { makeWorkspacesStoreKey } from "@repo/data";
+import { makeWorkspacesStoreKey } from "@wodge/data";
 import { Context } from "hono";
 
 export async function userPull(party: UserParty, c: Context) {

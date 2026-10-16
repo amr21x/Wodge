@@ -1,8 +1,8 @@
 import { RunnerParams } from "../lib/replicache";
-import { ThreadPost } from "@repo/data";
+import { ThreadPost } from "@wodge/data";
 import { produce } from "immer";
 import ThreadParty from "./thread-party";
-import { createPostMutation } from "@repo/data/models/thread/mutators/create-post";
+import { createPostMutation } from "@wodge/data/models/thread/mutators/create-post";
 
 export async function createPost(
   party: ThreadParty,

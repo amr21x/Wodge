@@ -1,12 +1,6 @@
 import { Context, Next } from "hono";
-import {
-  canEdit,
-  canView,
-  ChannelsTypes,
-  isAdmin,
-  isOwner,
-  isTeamMember,
-} from "@repo/data";
+import { canEdit, canView, isAdmin, isOwner, isTeamMember } from "@wodge/data";
+import { ChannelsTypes } from "@wodge/domain/channels";
 import WorkspaceParty from "../workspace-party";
 import { unauthorized } from "../../lib/http-utils";
 

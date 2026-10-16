@@ -1,5 +1,5 @@
 {
-  "name": "@repo/env",
+  "name": "@wodge/env",
   "version": "0.1.0",
   "private": true,
   "main": "index.js",
@@ -9,7 +9,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@repo/ts": "workspace:*",
+    "@wodge/ts": "workspace:*",
     "@types/node": "^20.11.20",
     "eslint": "^8",
     "typescript": "^5"

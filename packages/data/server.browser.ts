@@ -1,2 +1,2 @@
 export {};
-throw new Error("@repo/data/server is available only in server bundles");
+throw new Error("@wodge/data/server is available only in server bundles");

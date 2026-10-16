@@ -1,6 +1,6 @@
 import BlockEditor from "@/components/editor/block-editor/block-editor";
 import { useYDoc } from "@/hooks/use-y-doc";
-import { users } from "@repo/data";
+import { users } from "@wodge/data";
 
 export function PageEditor({
   channelId,

@@ -1,7 +1,7 @@
-import { deleteTeamMutation } from "@repo/data/models/workspace/mutators/delete-team";
+import { deleteTeamMutation } from "@wodge/data/models/workspace/mutators/delete-team";
 import { RunnerParams } from "../../lib/replicache";
 import WorkspaceParty from "../workspace-party";
-import { makeWorkspaceStructureKey } from "@repo/data";
+import { makeWorkspaceStructureKey } from "@wodge/data";
 import { PushAuth } from "../handlers/workspace-push";
 import { produce } from "immer";
 

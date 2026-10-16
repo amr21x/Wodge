@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { useCurrentWorkspace } from "@/components/workspace-provider";
 import { cn } from "@/lib/utils";
-import { Workspace } from "@repo/data";
+import { Workspace } from "@wodge/data";
 import { useMutation } from "@tanstack/react-query";
 import { CheckCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation";

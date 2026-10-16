@@ -1,12 +1,8 @@
 import { GroupMultiSelect } from "@/components/group-multi-select";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Channel,
-  ChannelSchema,
-  ID_LENGTH,
-  Page,
-  PageSchema,
-} from "@repo/data";
+import { Channel, ChannelSchema } from "@wodge/domain/channels";
+import { ID_LENGTH } from "@wodge/domain/constants";
+import { Page, PageSchema } from "@wodge/domain/pages";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Dialog,

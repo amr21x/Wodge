@@ -10,7 +10,7 @@ import {
   REPLICACHE_VERSIONS_KEY,
   Workspace,
   WORKSPACE_PRESENCE_KEY,
-} from "@repo/data";
+} from "@wodge/data";
 import { produce } from "immer";
 import { Context } from "hono";
 import { CreateBucketCommand } from "@aws-sdk/client-s3";

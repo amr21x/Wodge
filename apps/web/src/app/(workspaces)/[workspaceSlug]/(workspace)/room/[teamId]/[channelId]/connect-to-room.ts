@@ -1,5 +1,5 @@
 import { jotaiStore } from "@/components/providers";
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 import { Room } from "livekit-client";
 import {
   callQualityAtom,

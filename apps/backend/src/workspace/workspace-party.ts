@@ -11,7 +11,7 @@ import {
   PresenceMap,
 } from "../types";
 
-import { Invites, PokeMessage } from "@repo/data";
+import { Invites, PokeMessage } from "@wodge/data";
 import { Hono } from "hono";
 import { startFn } from "./start-fn";
 import { cors } from "hono/cors";

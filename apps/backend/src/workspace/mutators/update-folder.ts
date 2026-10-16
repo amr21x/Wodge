@@ -1,14 +1,14 @@
 import WorkspaceParty from "../workspace-party";
 import { RunnerParams } from "../../lib/replicache";
-import { makeWorkspaceStructureKey } from "@repo/data";
+import { makeWorkspaceStructureKey } from "@wodge/data";
 import {
   NewFolderArgs,
   NewRoomArgs,
   NewThreadArgs,
-} from "@repo/data/models/workspace/workspace-mutators";
-import { updateRoomMutation } from "@repo/data/models/workspace/mutators/update-room";
-import { updateThreadMutation } from "@repo/data/models/workspace/mutators/update-thread";
-import { updateFolderMutation } from "@repo/data/models/workspace/mutators/update-folder";
+} from "@wodge/data/models/workspace/workspace-mutators";
+import { updateRoomMutation } from "@wodge/data/models/workspace/mutators/update-room";
+import { updateThreadMutation } from "@wodge/data/models/workspace/mutators/update-thread";
+import { updateFolderMutation } from "@wodge/data/models/workspace/mutators/update-folder";
 import { PushAuth } from "../handlers/workspace-push";
 import { produce } from "immer";
 

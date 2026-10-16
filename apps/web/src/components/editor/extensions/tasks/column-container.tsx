@@ -4,7 +4,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import TaskCard from "./task-card";
 import { Check, MoreHorizontal, Pencil, Plus, Trash2, X } from "lucide-react";
 
-import { Column, DrObj, pageMutators, Task } from "@repo/data";
+import { Column, Task } from "@wodge/domain/pages";
+import { DrObj } from "@wodge/data";
+import { pageMutators } from "@/client/sync/pages";
 import { Replicache } from "replicache";
 import { nanoid } from "nanoid";
 import { Editor } from "@tiptap/react";

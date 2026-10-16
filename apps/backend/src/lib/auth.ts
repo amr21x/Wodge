@@ -5,7 +5,8 @@ import type * as Party from "partykit/server";
 import { badRequest, error, getRoute, ok, unauthorized } from "./http-utils";
 import WorkspaceParty from "../workspace/workspace-party";
 import { AuthChannelResponse } from "../workspace/handlers/auth-channel";
-import { ChannelsTypes, UserType } from "@repo/data";
+import { ChannelsTypes } from "@wodge/domain/channels";
+import { UserType } from "@wodge/data";
 import * as jose from "jose";
 import queryString from "query-string";
 /**

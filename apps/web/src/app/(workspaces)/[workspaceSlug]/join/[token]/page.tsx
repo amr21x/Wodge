@@ -7,7 +7,7 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/server";
-import { invites, memberships, users, workspaces } from "@repo/data";
+import { invites, memberships, users, workspaces } from "@wodge/data";
 import { createDb } from "@/lib/data-server";
 import { and, eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/sqlite-core";

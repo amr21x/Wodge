@@ -1,5 +1,5 @@
-import { DrObj, Thread, ThreadMessage, ThreadPost } from "@repo/data";
-import { threadMutators } from "@repo/data/browser";
+import { DrObj, Thread, ThreadMessage, ThreadPost } from "@wodge/data";
+import { threadMutators } from "@wodge/data/browser";
 import { format } from "date-fns";
 import { SafeDiv } from "../../../../../../../components/safe-div";
 import { useMember } from "@/hooks/use-member";

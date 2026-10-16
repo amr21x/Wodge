@@ -1,4 +1,4 @@
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 import Stripe from "stripe";
 
 export function getStripe() {

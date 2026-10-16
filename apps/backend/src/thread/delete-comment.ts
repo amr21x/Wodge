@@ -1,8 +1,8 @@
 import { RunnerParams } from "../lib/replicache";
-import { ThreadMessage } from "@repo/data";
+import { ThreadMessage } from "@wodge/data";
 import { produce } from "immer";
 import ThreadParty from "./thread-party";
-import { deleteCommentMutation } from "@repo/data/models/thread/mutators/delete-comment";
+import { deleteCommentMutation } from "@wodge/data/models/thread/mutators/delete-comment";
 
 export async function deleteComment(
   party: ThreadParty,

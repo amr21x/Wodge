@@ -1,6 +1,6 @@
 import { sign } from "@/lib/utils/sign";
 import { getUserById } from "@/lib/data-server";
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 import { redirect } from "next/navigation";
 
 export async function GET(

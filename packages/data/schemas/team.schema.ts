@@ -3,10 +3,10 @@ import {
   BRAND_COLOR,
   WORKSPACE_GROUP_ID_LENGTH,
   WORKSPACE_TEAM_ID_LENGTH,
-} from "./config";
+} from "@wodge/domain/constants";
 import { ThreadSchema } from "./thread.schema";
 import { RoomSchema } from "./room.schema";
-import { PageSchema } from "./page.schema";
+import { PageSchema } from "@wodge/domain/pages";
 
 // export const TagSchema = z.object({
 //   name: z.string().max(70),

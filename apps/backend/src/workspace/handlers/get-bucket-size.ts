@@ -1,7 +1,7 @@
 import { Context } from "hono";
 import WorkspaceParty from "../workspace-party";
 import { ListObjectsV2Command } from "@aws-sdk/client-s3";
-import { getBucketAddress } from "@repo/data";
+import { getBucketAddress } from "@wodge/data";
 import { getS3Client } from "../../lib/get-s3-client";
 
 export async function calculateBucketSize(party: WorkspaceParty, c: Context) {

@@ -1,8 +1,8 @@
 import { RunnerParams } from "../lib/replicache";
-import { EditThreadMessageArg, ThreadMessage } from "@repo/data";
+import { EditThreadMessageArg, ThreadMessage } from "@wodge/data";
 import { produce } from "immer";
 import ThreadParty from "./thread-party";
-import { editCommentMutation } from "@repo/data/models/thread/mutators/edit-comment";
+import { editCommentMutation } from "@wodge/data/models/thread/mutators/edit-comment";
 
 export async function editComment(party: ThreadParty, params: RunnerParams) {
   const { comment, postId, newContent } = params.mutation

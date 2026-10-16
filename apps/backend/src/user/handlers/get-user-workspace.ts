@@ -1,7 +1,7 @@
 import type * as Party from "partykit/server";
 import UserParty from "../user-party";
 import { badRequest, json } from "../../lib/http-utils";
-import { Workspace } from "@repo/data";
+import { Workspace } from "@wodge/data";
 import { Context } from "hono";
 
 export async function getUserWorkspaces(party: UserParty, c: Context) {

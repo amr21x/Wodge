@@ -2,7 +2,7 @@ import { Context } from "hono";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { HeadObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getS3Client } from "../../lib/get-s3-client";
-import { makeUserAvatarKey, PublicUserType, UserType } from "@repo/data";
+import { makeUserAvatarKey, PublicUserType, UserType } from "@wodge/data";
 import UserParty from "../user-party";
 
 export async function deleteAvatar(party: UserParty, c: Context) {

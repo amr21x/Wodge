@@ -10,7 +10,7 @@ import {
   addWorkspaceMember,
   makeWorkspaceMembersKey,
   makeWorkspaceStructureKey,
-} from "@repo/data";
+} from "@wodge/data";
 import { isMemberInWorkspace } from "../../lib/utils";
 import { produce } from "immer";
 import { Context } from "hono";

@@ -1,8 +1,8 @@
 import WorkspaceParty from "../workspace-party";
 import { RunnerParams } from "../../lib/replicache";
-import { makeWorkspaceStructureKey } from "@repo/data";
-import { NewRoomArgs } from "@repo/data/models/workspace/workspace-mutators";
-import { updateRoomMutation } from "@repo/data/models/workspace/mutators/update-room";
+import { makeWorkspaceStructureKey } from "@wodge/data";
+import { NewRoomArgs } from "@wodge/data/models/workspace/workspace-mutators";
+import { updateRoomMutation } from "@wodge/data/models/workspace/mutators/update-room";
 import { PushAuth } from "../handlers/workspace-push";
 import { produce } from "immer";
 

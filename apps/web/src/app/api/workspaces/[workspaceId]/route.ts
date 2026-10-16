@@ -1,7 +1,7 @@
 // This temporary as partykit does not support bindings yet
 
 import { deleteWorkspace, removeMember } from "@/lib/data-server";
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 import { sign } from "../../../../lib/utils/sign";
 import { isWorkspaceAdmin } from "../is-workspace-admin";
 

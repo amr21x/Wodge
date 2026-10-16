@@ -1,4 +1,5 @@
-import { DrObj, Page, Room, Thread } from "@repo/data";
+import { DrObj, Room, Thread } from "@wodge/data";
+import { Page } from "@wodge/domain/pages";
 import { format } from "date-fns";
 import { useSetAtom } from "jotai";
 import {

@@ -5,7 +5,7 @@ import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client
 import {
   localStoragePersister,
   queryClient,
-} from "@repo/data/lib/query-client";
+} from "@wodge/data/lib/query-client";
 import { WorkspaceProvider } from "@/components/workspace-provider";
 import { LayoutContextProvider } from "@livekit/components-react";
 import { createStore, Provider } from "jotai";

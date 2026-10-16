@@ -3,7 +3,7 @@ import { Context } from "hono";
 import { getS3Client } from "../../lib/get-s3-client";
 import WorkspaceParty from "../workspace-party";
 import { GetObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
-import { getBucketAddress } from "@repo/data";
+import { getBucketAddress } from "@wodge/data";
 
 export async function downloadFile(party: WorkspaceParty, c: Context) {
   if (!c.req.param("path") || !c.req.param("teamId"))

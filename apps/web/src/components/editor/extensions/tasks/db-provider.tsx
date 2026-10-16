@@ -1,6 +1,8 @@
 import { useCurrentPageRep } from "@/hooks/use-page-rep";
 import { useSubscribe } from "@/hooks/use-subscribe";
-import { Column, DrObj, pageMutators, Task } from "@repo/data";
+import { Column, Task } from "@wodge/domain/pages";
+import { DrObj } from "@wodge/data";
+import { pageMutators } from "@/client/sync/pages";
 import { createContext, useContext } from "react";
 import { ReadTransaction, Replicache } from "replicache";
 

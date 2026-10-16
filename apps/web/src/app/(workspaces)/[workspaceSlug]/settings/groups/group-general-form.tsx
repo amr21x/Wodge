@@ -1,12 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   BRAND_COLOR,
-  DrObj,
-  Group,
-  GroupSchema,
   WORKSPACE_GROUP_ID_LENGTH,
   WORKSPACE_TEAM_ID_LENGTH,
-} from "@repo/data";
+} from "@wodge/domain/constants";
+import { DrObj, Group, GroupSchema } from "@wodge/data";
 
 import { useForm } from "react-hook-form";
 import { useEffect, useRef, useState } from "react";

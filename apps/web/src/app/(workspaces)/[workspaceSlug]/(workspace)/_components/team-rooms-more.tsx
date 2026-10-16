@@ -13,7 +13,7 @@ import { SidebarItemBtn } from "./sidebar-item-btn";
 
 import { useCurrentWorkspace } from "@/components/workspace-provider";
 import { nanoid } from "nanoid";
-import { ID_LENGTH } from "@repo/data";
+import { ID_LENGTH } from "@wodge/domain/constants";
 import Link from "next/link";
 import { AddRoomForm } from "./add-room-form";
 import { toast } from "sonner";

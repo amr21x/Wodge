@@ -1,4 +1,4 @@
-import { Channel, ChannelSchema } from "../../..";
+import { Channel, ChannelSchema } from "@wodge/domain/channels";
 import { WorkspaceChannelMutation } from "./types";
 import { produce } from "immer";
 

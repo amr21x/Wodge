@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useMember } from "@/hooks/use-member";
-import { type Member as MemberType } from "@repo/data";
+import { type Member as MemberType } from "@wodge/data";
 
 interface MembersComboboxProps {
   members: readonly DeepReadonlyObject<MemberType>[];

@@ -1,4 +1,4 @@
-import { isAdmin, isOwner } from "@repo/data";
+import { isAdmin, isOwner } from "@wodge/data";
 import { useCurrentUser } from "./use-current-user";
 import { useEffect, useState } from "react";
 import { useCurrentWorkspace } from "@/components/workspace-provider";

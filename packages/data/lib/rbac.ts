@@ -3,8 +3,9 @@ import {
   WorkspaceMembers,
   WorkspaceStructure,
 } from "../schemas/workspace.schema";
-import { ChannelsTypes } from "../schemas/channel.schema";
-import { DrObj, Page, Room, Thread } from "..";
+import { ChannelsTypes } from "@wodge/domain/channels";
+import { DrObj, Room, Thread } from "..";
+import { Page } from "@wodge/domain/pages";
 
 interface Common {
   structure: WorkspaceStructure | DrObj<WorkspaceStructure>;

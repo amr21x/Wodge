@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useCurrentUser } from "./use-current-user";
-import { isOwner } from "@repo/data";
+import { isOwner } from "@wodge/data";
 import { useCurrentWorkspace } from "@/components/workspace-provider";
 
 export function useIsOwner() {

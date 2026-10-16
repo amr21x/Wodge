@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { SettingsContentHeader, SettingsContentSection } from "../settings";
-import { DrObj, Team } from "@repo/data";
+import { DrObj, Team } from "@wodge/data";
 import { TeamGeneralForm } from "./team-general-form";
 import { GeneralMembersTable } from "../general-members-table";
 import { useTable } from "../use-table";

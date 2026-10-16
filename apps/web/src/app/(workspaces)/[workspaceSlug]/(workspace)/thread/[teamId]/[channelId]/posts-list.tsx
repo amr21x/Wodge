@@ -1,5 +1,5 @@
-import { DrObj, Team, ThreadPost } from "@repo/data";
-import { threadMutators } from "@repo/data/browser";
+import { DrObj, Team, ThreadPost } from "@wodge/data";
+import { threadMutators } from "@wodge/data/browser";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TabsContent } from "@/components/ui/tabs";
 import { useMemo } from "react";

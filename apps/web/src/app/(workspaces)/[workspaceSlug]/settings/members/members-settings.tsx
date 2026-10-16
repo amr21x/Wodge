@@ -6,14 +6,14 @@ import { InviteLink } from "./invite-sections";
 import { useTable } from "../use-table";
 import { membersColumns } from "./members-columns";
 import { Mutable } from "@/lib/utils";
-import { DrObj, Member } from "@repo/data";
+import { DrObj, Member } from "@wodge/data";
 import { SettingsSearchInput } from "../settings-search-input";
 import { DataTable } from "@/components/data-table/data-table";
 import { useCurrentWorkspace } from "@/components/workspace-provider";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 import { useMembersInfo } from "@/hooks/use-members-info";
 
 export function MembersSettings() {

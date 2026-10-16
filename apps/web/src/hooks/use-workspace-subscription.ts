@@ -13,9 +13,9 @@ import {
   defaultWorkspaceStructure,
   makeWorkspaceMembersKey,
   makeWorkspaceStructureKey,
-} from "@repo/data";
+} from "@wodge/data";
 
-import { workspaceMutators } from "@repo/data/models/workspace/workspace-mutators";
+import { workspaceMutators } from "@wodge/data/models/workspace/workspace-mutators";
 import { useParams, usePathname, useRouter } from "next/navigation";
 
 export function useWorkspaceSubscription() {

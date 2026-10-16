@@ -1,6 +1,6 @@
-import { invites, workspaces } from "@repo/data";
+import { invites, workspaces } from "@wodge/data";
 import { createDb } from "@/lib/data-server";
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 import { eq, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { NextRequest, NextResponse } from "next/server";

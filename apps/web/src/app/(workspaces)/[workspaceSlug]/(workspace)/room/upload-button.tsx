@@ -14,10 +14,10 @@ import { Dashboard } from "@uppy/react";
 import { useSetAtom } from "jotai";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useQueryClient } from "@tanstack/react-query";
-import { Message } from "@repo/data";
-import { roomMutators } from "@repo/data/browser";
+import { Message } from "@wodge/data";
+import { roomMutators } from "@wodge/data/browser";
 import { Replicache } from "replicache";
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 import Webcam from "@uppy/webcam";
 
 import Audio from "@uppy/audio";

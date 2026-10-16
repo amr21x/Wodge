@@ -1,4 +1,4 @@
-import { isTeamMember, isTeamModerator } from "@repo/data";
+import { isTeamMember, isTeamModerator } from "@wodge/data";
 import { useCurrentUser } from "./use-current-user";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";

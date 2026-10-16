@@ -8,7 +8,7 @@ importers:
 
   .:
     devDependencies:
-      '@repo/ts':
+      '@wodge/ts':
         specifier: workspace:*
         version: link:config/ts
       eslint:
@@ -41,15 +41,18 @@ importers:
       '@aws-sdk/s3-request-presigner':
         specifier: ^3.554.0
         version: 3.554.0
-      '@repo/backend-protocol':
-        specifier: workspace:*
-        version: link:../../packages/backend-protocol
-      '@repo/data':
-        specifier: workspace:*
-        version: link:../../packages/data
       '@supabase/supabase-js':
         specifier: 2.39.8
         version: 2.39.8
+      '@wodge/backend-protocol':
+        specifier: workspace:*
+        version: link:../../packages/backend-protocol
+      '@wodge/data':
+        specifier: workspace:*
+        version: link:../../packages/data
+      '@wodge/domain':
+        specifier: workspace:*
+        version: link:../../packages/domain
       cookie-parse:
         specifier: ^0.4.0
         version: 0.4.0
@@ -99,12 +102,18 @@ importers:
       '@cloudflare/workers-types':
         specifier: 4.20260424.1
         version: 4.20260424.1
-      '@repo/ts':
-        specifier: workspace:*
-        version: link:../../config/ts
       '@types/lodash':
         specifier: ^4.14.202
         version: 4.17.0
+      '@wodge/ts':
+        specifier: workspace:*
+        version: link:../../config/ts
+      fake-indexeddb:
+        specifier: ^5.0.2
+        version: 5.0.2
+      jsdom:
+        specifier: ^24.0.0
+        version: 24.0.0
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -213,12 +222,6 @@ importers:
       '@react-hook/latest':
         specifier: ^1.0.3
         version: 1.0.3(react@18.2.0)
-      '@repo/data':
-        specifier: workspace:*
-        version: link:../../packages/data
-      '@repo/env':
-        specifier: workspace:*
-        version: link:../../packages/env
       '@stripe/stripe-js':
         specifier: ^4.0.0
         version: 4.0.0
@@ -249,6 +252,18 @@ importers:
       '@tippyjs/react':
         specifier: ^4.2.6
         version: 4.2.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      '@tiptap-pro/extension-drag-handle-react':
+        specifier: ^2.7.6
+        version: 2.8.1(@tiptap-pro/extension-drag-handle@2.8.1(@tiptap-pro/extension-node-range@2.8.1(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0))(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/extension-collaboration@2.3.0(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)(y-prosemirror@1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14)))(@tiptap/pm@2.3.0)(y-prosemirror@1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14)))(@tiptap/pm@2.3.0)(@tiptap/react@2.3.0(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      '@tiptap-pro/extension-emoji':
+        specifier: ^2.7.6
+        version: 2.8.1(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)(@tiptap/suggestion@2.3.0(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0))(emojibase@15.3.0)
+      '@tiptap-pro/extension-file-handler':
+        specifier: ^2.7.6
+        version: 2.8.1(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)
+      '@tiptap-pro/extension-table-of-contents':
+        specifier: ^2.7.6
+        version: 2.8.1(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)
       '@tiptap/core':
         specifier: ^2.2.4
         version: 2.3.0(@tiptap/pm@2.3.0)
@@ -387,6 +402,15 @@ importers:
       '@uppy/xhr-upload':
         specifier: ^3.6.4
         version: 3.6.4(@uppy/core@3.10.1)
+      '@wodge/data':
+        specifier: workspace:*
+        version: link:../../packages/data
+      '@wodge/domain':
+        specifier: workspace:*
+        version: link:../../packages/domain
+      '@wodge/env':
+        specifier: workspace:*
+        version: link:../../packages/env
       array-move:
         specifier: ^4.0.0
         version: 4.0.0
@@ -558,18 +582,6 @@ importers:
       zustand:
         specifier: ^4.5.2
         version: 4.5.2(@types/react@18.2.78)(immer@10.0.4)(react@18.2.0)
-      '@tiptap-pro/extension-drag-handle-react':
-        specifier: ^2.7.6
-        version: 2.8.1(@tiptap-pro/extension-drag-handle@2.8.1(@tiptap-pro/extension-node-range@2.8.1(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0))(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/extension-collaboration@2.3.0(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)(y-prosemirror@1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14)))(@tiptap/pm@2.3.0)(y-prosemirror@1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14)))(@tiptap/pm@2.3.0)(@tiptap/react@2.3.0(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      '@tiptap-pro/extension-emoji':
-        specifier: ^2.7.6
-        version: 2.8.1(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)(@tiptap/suggestion@2.3.0(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0))(emojibase@15.3.0)
-      '@tiptap-pro/extension-file-handler':
-        specifier: ^2.7.6
-        version: 2.8.1(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)
-      '@tiptap-pro/extension-table-of-contents':
-        specifier: ^2.7.6
-        version: 2.8.1(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)
     devDependencies:
       '@cloudflare/next-on-pages':
         specifier: ^1.10.0
@@ -577,9 +589,6 @@ importers:
       '@cloudflare/workers-types':
         specifier: 4.20260424.1
         version: 4.20260424.1
-      '@repo/ts':
-        specifier: workspace:*
-        version: link:../../config/ts
       '@tanstack/eslint-plugin-query':
         specifier: ^5.27.7
         version: 5.28.11(eslint@8.57.0)(typescript@5.3.3)
@@ -604,6 +613,9 @@ importers:
       '@types/react-dom':
         specifier: ^18.2.21
         version: 18.2.25
+      '@wodge/ts':
+        specifier: workspace:*
+        version: link:../../config/ts
       autoprefixer:
         specifier: ^10.4.18
         version: 10.4.19(postcss@8.4.38)
@@ -688,7 +700,7 @@ importers:
       '@cloudflare/workers-types':
         specifier: 4.20260424.1
         version: 4.20260424.1
-      '@repo/ts':
+      '@wodge/ts':
         specifier: workspace:*
         version: link:../../config/ts
       drizzle-kit:
@@ -700,9 +712,6 @@ importers:
 
   packages/data:
     dependencies:
-      '@repo/env':
-        specifier: workspace:*
-        version: link:../env
       '@tanstack/query-sync-storage-persister':
         specifier: ^5.27.5
         version: 5.29.0
@@ -712,6 +721,12 @@ importers:
       '@tanstack/react-query-persist-client':
         specifier: ^5.27.5
         version: 5.29.2(@tanstack/react-query@5.29.2(react@18.2.0))(react@18.2.0)
+      '@wodge/domain':
+        specifier: workspace:*
+        version: link:../domain
+      '@wodge/env':
+        specifier: workspace:*
+        version: link:../env
       array-move:
         specifier: ^4.0.0
         version: 4.0.0
@@ -752,9 +767,6 @@ importers:
       '@cloudflare/workers-types':
         specifier: 4.20260424.1
         version: 4.20260424.1
-      '@repo/ts':
-        specifier: workspace:*
-        version: link:../../config/ts
       '@testing-library/react':
         specifier: ^14.2.1
         version: 14.3.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -770,6 +782,9 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^4.2.1
         version: 4.2.1(vite@5.2.8(@types/node@20.12.7)(terser@5.31.1))
+      '@wodge/ts':
+        specifier: workspace:*
+        version: link:../../config/ts
       drizzle-kit:
         specifier: 0.31.4
         version: 0.31.4
@@ -789,6 +804,25 @@ importers:
         specifier: ^1.3.1
         version: 1.5.0(@edge-runtime/vm@3.1.7)(@types/node@20.12.7)(jsdom@24.0.0)(terser@5.31.1)
 
+  packages/domain:
+    dependencies:
+      array-move:
+        specifier: ^4.0.0
+        version: 4.0.0
+      immer:
+        specifier: ^10.0.3
+        version: 10.0.4
+      zod:
+        specifier: ^3.22.4
+        version: 3.22.4
+    devDependencies:
+      '@wodge/ts':
+        specifier: workspace:*
+        version: link:config/ts
+      typescript:
+        specifier: ^5.3.3
+        version: 5.3.3
+
   packages/env:
     dependencies:
       '@t3-oss/env-nextjs':
@@ -798,12 +832,12 @@ importers:
         specifier: ^3.22.4
         version: 3.22.4
     devDependencies:
-      '@repo/ts':
-        specifier: workspace:*
-        version: link:../../config/ts
       '@types/node':
         specifier: ^20.11.20
         version: 20.12.7
+      '@wodge/ts':
+        specifier: workspace:*
+        version: link:../../config/ts
       eslint:
         specifier: ^8
         version: 8.57.0
@@ -4622,6 +4656,49 @@ packages:
       react: '>=16.8'
       react-dom: '>=16.8'
 
+  '@tiptap-pro/extension-drag-handle-react@2.8.1':
+    resolution: {integrity: sha512-WD2OYBAqAdVEmRC61SEpryqwSEblBN4UiCdOeJY6o2eKI1q2olJ3cumC+109nv1bZJg97XISNvUGad945W3mQw==}
+    peerDependencies:
+      '@tiptap-pro/extension-drag-handle': ^2.7.7
+      '@tiptap/pm': ^2.0.0
+      '@tiptap/react': ^2.0.0
+      react: ^17.0.0 || ^18.0.0
+      react-dom: ^17.0.0 || ^18.0.0
+
+  '@tiptap-pro/extension-drag-handle@2.8.1':
+    resolution: {integrity: sha512-j745s4AEjmO0JnkVc72MQwBKk9iRJxamjXqSiqSUSLtAlIZTad6XB4Gw450gVIQaN+KG6VxX0K2iKzXaPOG9Zg==}
+    peerDependencies:
+      '@tiptap-pro/extension-node-range': ^2.7.7
+      '@tiptap/core': ^2.0.0
+      '@tiptap/extension-collaboration': ^2.0.0
+      '@tiptap/pm': ^2.0.0
+      y-prosemirror: ^1.2.1
+
+  '@tiptap-pro/extension-emoji@2.8.1':
+    resolution: {integrity: sha512-+BzeDGu+rDvcW4k3egnXVsW2oAntfcrStyvENPs7eQNiAc7VJo0mWRGQtjkkE29DtEp4ly1FtoLfl73L0It1qA==}
+    peerDependencies:
+      '@tiptap/core': ^2.0.0
+      '@tiptap/pm': ^2.0.0
+      '@tiptap/suggestion': ^2.0.0
+
+  '@tiptap-pro/extension-file-handler@2.8.1':
+    resolution: {integrity: sha512-hstfckLetUL172utY6GF833+hKhcfGVj2pvztMDG98JwaKoI2YvDBB7+ymEiMYH+ZBLFHFUTlucmjPSZpgd+tA==}
+    peerDependencies:
+      '@tiptap/core': ^2.0.0
+      '@tiptap/pm': ^2.0.0
+
+  '@tiptap-pro/extension-node-range@2.8.1':
+    resolution: {integrity: sha512-PLvR028gfiG8rIrhbygq++B6qNp1EcYBUcOZG8pi3tlBiaXu/GZqFy9jG7RCrQ1ECWd3gaMgcmcfMIlTJy30lA==}
+    peerDependencies:
+      '@tiptap/core': ^2.0.0
+      '@tiptap/pm': ^2.0.0
+
+  '@tiptap-pro/extension-table-of-contents@2.8.1':
+    resolution: {integrity: sha512-CjClH8LD0n4OsT378cpbRW5cua79RxCgJLUhsXGt6ZWP8DxY7r8ilWi2Esgjb63dgALrmcEfWx0crWJhYchKQg==}
+    peerDependencies:
+      '@tiptap/core': ^2.0.0
+      '@tiptap/pm': ^2.0.0
+
   '@tiptap/core@2.3.0':
     resolution: {integrity: sha512-Gk2JN3i5CMkYGmsbyFI7cBUftWa+F7QYmeCLTWfbuy+hCM2OBsnYVKxhggFPGXRL5KLBEgBWeCeWMHfIw3B2MA==}
     peerDependencies:
@@ -6327,11 +6404,22 @@ packages:
   embla-carousel@8.0.0-rc22:
     resolution: {integrity: sha512-MeXnPT1LShfgAu8qXj3CskayV0R6OkHx7w3cPTx+Q5ZWKyShKpIuu7qVQJ5BoFegalE4n6yxqoQaRuGFbK9pYw==}
 
+  emoji-regex@10.3.0:
+    resolution: {integrity: sha512-QpLs9D9v9kArv4lfDEgg1X/gN5XLnf/A6l9cs8SPZLRZR3ZkY9+kwIQTxm+fsSej5UMYGE8fdoaZVIBlqG0XTw==}
+
   emoji-regex@8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
 
   emoji-regex@9.2.2:
     resolution: {integrity: sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==}
+
+  emojibase-data@7.0.1:
+    resolution: {integrity: sha512-BLZpOdwyFpZ7lzBWyDtnxmKVm/SJMYgAfp1if3o6n1TVUMSXAf0nikONXl90LZuJ/m3XWPBkkubgCet2BsCGGQ==}
+    peerDependencies:
+      emojibase: '*'
+
+  emojibase@15.3.0:
+    resolution: {integrity: sha512-lFdQb14hoznwDh1xDoOFzkPdeeexmbuJdhUUjDaJZf/+jK+6Z3HkI5hWOemWfEdaMxtTujc1vNRx9DKtdtiOXA==}
 
   emojis-list@3.0.0:
     resolution: {integrity: sha512-/kyM18EfinwXZbno9FyUGeFh87KC8HRQBQGildHZbEuRyWFOmv1U10o9BBp8XVZDVNNuQKyIGIu5ZYAAXJ0V2Q==}
@@ -7384,6 +7472,9 @@ packages:
     resolution: {integrity: sha512-eljcgEDlEns/7AXFosB5K/2nCM4P7FQPkGc/DWLy5rmFEWvZayGrik1d9/QIY5nJ4f9YsVvBkA6kJpHn9rISdQ==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     hasBin: true
+
+  is-emoji-supported@0.0.5:
+    resolution: {integrity: sha512-WOlXUhDDHxYqcSmFZis+xWhhqXiK2SU0iYiqmth5Ip0FHLZQAt9rKL5ahnilE8/86WH8tZ3bmNNNC+bTzamqlw==}
 
   is-extglob@2.1.1:
     resolution: {integrity: sha512-SbKbANkN603Vi4jEZv49LeVJMn4yGwsbzZworEoyEiutsN3nJYdbO36zfhGJ6QEDpOZIFkDtnq5JRxmvl3jsoQ==}
@@ -9780,6 +9871,10 @@ packages:
     deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
+  uuid@8.3.2:
+    resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
+    hasBin: true
+
   uuid@9.0.1:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
     deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
@@ -10301,67 +10396,6 @@ packages:
         optional: true
       react:
         optional: true
-
-  '@tiptap-pro/extension-drag-handle-react@2.8.1':
-    resolution: {integrity: sha512-WD2OYBAqAdVEmRC61SEpryqwSEblBN4UiCdOeJY6o2eKI1q2olJ3cumC+109nv1bZJg97XISNvUGad945W3mQw==}
-    peerDependencies:
-      '@tiptap-pro/extension-drag-handle': ^2.7.7
-      '@tiptap/pm': ^2.0.0
-      '@tiptap/react': ^2.0.0
-      react: ^17.0.0 || ^18.0.0
-      react-dom: ^17.0.0 || ^18.0.0
-
-  '@tiptap-pro/extension-drag-handle@2.8.1':
-    resolution: {integrity: sha512-j745s4AEjmO0JnkVc72MQwBKk9iRJxamjXqSiqSUSLtAlIZTad6XB4Gw450gVIQaN+KG6VxX0K2iKzXaPOG9Zg==}
-    peerDependencies:
-      '@tiptap-pro/extension-node-range': ^2.7.7
-      '@tiptap/core': ^2.0.0
-      '@tiptap/extension-collaboration': ^2.0.0
-      '@tiptap/pm': ^2.0.0
-      y-prosemirror: ^1.2.1
-
-  '@tiptap-pro/extension-emoji@2.8.1':
-    resolution: {integrity: sha512-+BzeDGu+rDvcW4k3egnXVsW2oAntfcrStyvENPs7eQNiAc7VJo0mWRGQtjkkE29DtEp4ly1FtoLfl73L0It1qA==}
-    peerDependencies:
-      '@tiptap/core': ^2.0.0
-      '@tiptap/pm': ^2.0.0
-      '@tiptap/suggestion': ^2.0.0
-
-  '@tiptap-pro/extension-file-handler@2.8.1':
-    resolution: {integrity: sha512-hstfckLetUL172utY6GF833+hKhcfGVj2pvztMDG98JwaKoI2YvDBB7+ymEiMYH+ZBLFHFUTlucmjPSZpgd+tA==}
-    peerDependencies:
-      '@tiptap/core': ^2.0.0
-      '@tiptap/pm': ^2.0.0
-
-  '@tiptap-pro/extension-node-range@2.8.1':
-    resolution: {integrity: sha512-PLvR028gfiG8rIrhbygq++B6qNp1EcYBUcOZG8pi3tlBiaXu/GZqFy9jG7RCrQ1ECWd3gaMgcmcfMIlTJy30lA==}
-    peerDependencies:
-      '@tiptap/core': ^2.0.0
-      '@tiptap/pm': ^2.0.0
-
-  '@tiptap-pro/extension-table-of-contents@2.8.1':
-    resolution: {integrity: sha512-CjClH8LD0n4OsT378cpbRW5cua79RxCgJLUhsXGt6ZWP8DxY7r8ilWi2Esgjb63dgALrmcEfWx0crWJhYchKQg==}
-    peerDependencies:
-      '@tiptap/core': ^2.0.0
-      '@tiptap/pm': ^2.0.0
-
-  emoji-regex@10.3.0:
-    resolution: {integrity: sha512-QpLs9D9v9kArv4lfDEgg1X/gN5XLnf/A6l9cs8SPZLRZR3ZkY9+kwIQTxm+fsSej5UMYGE8fdoaZVIBlqG0XTw==}
-
-  emojibase-data@7.0.1:
-    resolution: {integrity: sha512-BLZpOdwyFpZ7lzBWyDtnxmKVm/SJMYgAfp1if3o6n1TVUMSXAf0nikONXl90LZuJ/m3XWPBkkubgCet2BsCGGQ==}
-    peerDependencies:
-      emojibase: '*'
-
-  emojibase@15.3.0:
-    resolution: {integrity: sha512-lFdQb14hoznwDh1xDoOFzkPdeeexmbuJdhUUjDaJZf/+jK+6Z3HkI5hWOemWfEdaMxtTujc1vNRx9DKtdtiOXA==}
-
-  is-emoji-supported@0.0.5:
-    resolution: {integrity: sha512-WOlXUhDDHxYqcSmFZis+xWhhqXiK2SU0iYiqmth5Ip0FHLZQAt9rKL5ahnilE8/86WH8tZ3bmNNNC+bTzamqlw==}
-
-  uuid@8.3.2:
-    resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
-    hasBin: true
 
 snapshots:
 
@@ -14323,6 +14357,50 @@ snapshots:
       react-dom: 18.2.0(react@18.2.0)
       tippy.js: 6.3.7
 
+  '@tiptap-pro/extension-drag-handle-react@2.8.1(@tiptap-pro/extension-drag-handle@2.8.1(@tiptap-pro/extension-node-range@2.8.1(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0))(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/extension-collaboration@2.3.0(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)(y-prosemirror@1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14)))(@tiptap/pm@2.3.0)(y-prosemirror@1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14)))(@tiptap/pm@2.3.0)(@tiptap/react@2.3.0(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
+    dependencies:
+      '@tiptap-pro/extension-drag-handle': 2.8.1(@tiptap-pro/extension-node-range@2.8.1(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0))(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/extension-collaboration@2.3.0(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)(y-prosemirror@1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14)))(@tiptap/pm@2.3.0)(y-prosemirror@1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14))
+      '@tiptap/pm': 2.3.0
+      '@tiptap/react': 2.3.0(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+
+  '@tiptap-pro/extension-drag-handle@2.8.1(@tiptap-pro/extension-node-range@2.8.1(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0))(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/extension-collaboration@2.3.0(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)(y-prosemirror@1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14)))(@tiptap/pm@2.3.0)(y-prosemirror@1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14))':
+    dependencies:
+      '@tiptap-pro/extension-node-range': 2.8.1(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)
+      '@tiptap/core': 2.3.0(@tiptap/pm@2.3.0)
+      '@tiptap/extension-collaboration': 2.3.0(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)(y-prosemirror@1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14))
+      '@tiptap/pm': 2.3.0
+      tippy.js: 6.3.7
+      y-prosemirror: 1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14)
+
+  '@tiptap-pro/extension-emoji@2.8.1(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)(@tiptap/suggestion@2.3.0(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0))(emojibase@15.3.0)':
+    dependencies:
+      '@tiptap/core': 2.3.0(@tiptap/pm@2.3.0)
+      '@tiptap/pm': 2.3.0
+      '@tiptap/suggestion': 2.3.0(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)
+      emoji-regex: 10.3.0
+      emojibase-data: 7.0.1(emojibase@15.3.0)
+      is-emoji-supported: 0.0.5
+    transitivePeerDependencies:
+      - emojibase
+
+  '@tiptap-pro/extension-file-handler@2.8.1(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)':
+    dependencies:
+      '@tiptap/core': 2.3.0(@tiptap/pm@2.3.0)
+      '@tiptap/pm': 2.3.0
+
+  '@tiptap-pro/extension-node-range@2.8.1(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)':
+    dependencies:
+      '@tiptap/core': 2.3.0(@tiptap/pm@2.3.0)
+      '@tiptap/pm': 2.3.0
+
+  '@tiptap-pro/extension-table-of-contents@2.8.1(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)':
+    dependencies:
+      '@tiptap/core': 2.3.0(@tiptap/pm@2.3.0)
+      '@tiptap/pm': 2.3.0
+      uuid: 8.3.2
+
   '@tiptap/core@2.3.0(@tiptap/pm@2.3.0)':
     dependencies:
       '@tiptap/pm': 2.3.0
@@ -14369,6 +14447,12 @@ snapshots:
     dependencies:
       '@tiptap/core': 2.3.0(@tiptap/pm@2.3.0)
       y-prosemirror: 1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.7(yjs@13.6.14))(yjs@13.6.14)
+
+  '@tiptap/extension-collaboration@2.3.0(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)(y-prosemirror@1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14))':
+    dependencies:
+      '@tiptap/core': 2.3.0(@tiptap/pm@2.3.0)
+      '@tiptap/pm': 2.3.0
+      y-prosemirror: 1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14)
 
   '@tiptap/extension-collaboration@2.3.0(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)(y-prosemirror@1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.7(yjs@13.6.14))(yjs@13.6.14))':
     dependencies:
@@ -16187,9 +16271,17 @@ snapshots:
 
   embla-carousel@8.0.0-rc22: {}
 
+  emoji-regex@10.3.0: {}
+
   emoji-regex@8.0.0: {}
 
   emoji-regex@9.2.2: {}
+
+  emojibase-data@7.0.1(emojibase@15.3.0):
+    dependencies:
+      emojibase: 15.3.0
+
+  emojibase@15.3.0: {}
 
   emojis-list@3.0.0: {}
 
@@ -17579,6 +17671,8 @@ snapshots:
       has-tostringtag: 1.0.2
 
   is-docker@3.0.0: {}
+
+  is-emoji-supported@0.0.5: {}
 
   is-extglob@2.1.1: {}
 
@@ -20088,6 +20182,8 @@ snapshots:
 
   uuid@3.3.2: {}
 
+  uuid@8.3.2: {}
+
   uuid@9.0.1: {}
 
   v8-compile-cache-lib@3.0.1: {}
@@ -20674,6 +20770,15 @@ snapshots:
       y-protocols: 1.0.7(yjs@13.6.14)
       yjs: 13.6.14
 
+  y-prosemirror@1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14):
+    dependencies:
+      lib0: 0.2.93
+      prosemirror-model: 1.20.0
+      prosemirror-state: 1.4.3
+      prosemirror-view: 1.33.4
+      y-protocols: 1.0.6(yjs@13.6.14)
+      yjs: 13.6.14
+
   y-prosemirror@1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.7(yjs@13.6.14))(yjs@13.6.14):
     dependencies:
       lib0: 0.2.93
@@ -20781,73 +20886,3 @@ snapshots:
       '@types/react': 18.2.78
       immer: 10.0.4
       react: 18.2.0
-  '@tiptap-pro/extension-drag-handle-react@2.8.1(@tiptap-pro/extension-drag-handle@2.8.1(@tiptap-pro/extension-node-range@2.8.1(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0))(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/extension-collaboration@2.3.0(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)(y-prosemirror@1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14)))(@tiptap/pm@2.3.0)(y-prosemirror@1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14)))(@tiptap/pm@2.3.0)(@tiptap/react@2.3.0(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
-    dependencies:
-      '@tiptap-pro/extension-drag-handle': 2.8.1(@tiptap-pro/extension-node-range@2.8.1(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0))(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/extension-collaboration@2.3.0(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)(y-prosemirror@1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14)))(@tiptap/pm@2.3.0)(y-prosemirror@1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14))
-      '@tiptap/pm': 2.3.0
-      '@tiptap/react': 2.3.0(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-
-  '@tiptap-pro/extension-drag-handle@2.8.1(@tiptap-pro/extension-node-range@2.8.1(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0))(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/extension-collaboration@2.3.0(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)(y-prosemirror@1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14)))(@tiptap/pm@2.3.0)(y-prosemirror@1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14))':
-    dependencies:
-      '@tiptap-pro/extension-node-range': 2.8.1(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)
-      '@tiptap/core': 2.3.0(@tiptap/pm@2.3.0)
-      '@tiptap/extension-collaboration': 2.3.0(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)(y-prosemirror@1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14))
-      '@tiptap/pm': 2.3.0
-      tippy.js: 6.3.7
-      y-prosemirror: 1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14)
-
-  '@tiptap-pro/extension-emoji@2.8.1(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)(@tiptap/suggestion@2.3.0(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0))(emojibase@15.3.0)':
-    dependencies:
-      '@tiptap/core': 2.3.0(@tiptap/pm@2.3.0)
-      '@tiptap/pm': 2.3.0
-      '@tiptap/suggestion': 2.3.0(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)
-      emoji-regex: 10.3.0
-      emojibase-data: 7.0.1(emojibase@15.3.0)
-      is-emoji-supported: 0.0.5
-    transitivePeerDependencies:
-      - emojibase
-
-  '@tiptap-pro/extension-file-handler@2.8.1(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)':
-    dependencies:
-      '@tiptap/core': 2.3.0(@tiptap/pm@2.3.0)
-      '@tiptap/pm': 2.3.0
-
-  '@tiptap-pro/extension-node-range@2.8.1(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)':
-    dependencies:
-      '@tiptap/core': 2.3.0(@tiptap/pm@2.3.0)
-      '@tiptap/pm': 2.3.0
-
-  '@tiptap-pro/extension-table-of-contents@2.8.1(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)':
-    dependencies:
-      '@tiptap/core': 2.3.0(@tiptap/pm@2.3.0)
-      '@tiptap/pm': 2.3.0
-      uuid: 8.3.2
-
-  '@tiptap/extension-collaboration@2.3.0(@tiptap/core@2.3.0(@tiptap/pm@2.3.0))(@tiptap/pm@2.3.0)(y-prosemirror@1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14))':
-    dependencies:
-      '@tiptap/core': 2.3.0(@tiptap/pm@2.3.0)
-      '@tiptap/pm': 2.3.0
-      y-prosemirror: 1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14)
-
-  emoji-regex@10.3.0: {}
-
-  emojibase-data@7.0.1(emojibase@15.3.0):
-    dependencies:
-      emojibase: 15.3.0
-
-  emojibase@15.3.0: {}
-
-  is-emoji-supported@0.0.5: {}
-
-  uuid@8.3.2: {}
-
-  y-prosemirror@1.2.3(prosemirror-model@1.20.0)(prosemirror-state@1.4.3)(prosemirror-view@1.33.4)(y-protocols@1.0.6(yjs@13.6.14))(yjs@13.6.14):
-    dependencies:
-      lib0: 0.2.93
-      prosemirror-model: 1.20.0
-      prosemirror-state: 1.4.3
-      prosemirror-view: 1.33.4
-      y-protocols: 1.0.6(yjs@13.6.14)
-      yjs: 13.6.14

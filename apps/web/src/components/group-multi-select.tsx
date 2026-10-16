@@ -1,4 +1,5 @@
-import { BRAND_COLOR, DrObj, Group } from "@repo/data";
+import { BRAND_COLOR } from "@wodge/domain/constants";
+import { DrObj, Group } from "@wodge/data";
 import { Button, buttonVariants } from "@/components/ui/button";
 
 import { Check, ChevronDown } from "lucide-react";

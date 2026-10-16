@@ -10,8 +10,8 @@ import {
   Message,
   Board,
   ThreadPost,
-  Db,
-} from "@repo/data";
+} from "@wodge/data";
+import { Db } from "@wodge/domain/pages";
 import WorkspaceParty from "./workspace/workspace-party";
 
 /**

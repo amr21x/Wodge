@@ -1,7 +1,7 @@
-import { sendMessageMutation } from "@repo/data/models/room/mutators/send-msg";
+import { sendMessageMutation } from "@wodge/data/models/room/mutators/send-msg";
 import { RunnerParams } from "../lib/replicache";
 import RoomParty from "./room-party";
-import { Message } from "@repo/data";
+import { Message } from "@wodge/data";
 import { produce } from "immer";
 
 export async function sendMessage(party: RoomParty, params: RunnerParams) {

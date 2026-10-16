@@ -17,7 +17,7 @@
 // } from "../../schemas/workspace.schema";
 // import { UserId } from "../tests";
 // import { nanoid } from "nanoid";
-// import { ID_LENGTH } from "../../schemas/config";
+// import { ID_LENGTH } from "@wodge/domain/constants";
 // import {
 //   makeWorkspaceKey,
 //   makeWorkspaceMembersKey,

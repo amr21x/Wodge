@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
-import { canEdit, ChannelsTypes } from "@repo/data";
+import { canEdit } from "@wodge/data";
+import { ChannelsTypes } from "@wodge/domain/channels";
 
 import { useCurrentUser } from "./use-current-user";
 import { useIsOwnerOrAdmin } from "./use-is-owner-or-admin";

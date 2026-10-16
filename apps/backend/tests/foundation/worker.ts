@@ -1,9 +1,9 @@
 // Local compatibility fixture, separate from the production router.
 import { Server } from "partyserver";
 import { YServer } from "y-partyserver";
-import { betterAuth, mcp, drizzleAdapter, z } from "@repo/backend-protocol";
-import { NewWorkspaceSchema, WorkspaceSchema } from "@repo/data";
-import { createDb } from "@repo/data/server";
+import { betterAuth, mcp, drizzleAdapter, z } from "@wodge/backend-protocol";
+import { NewWorkspaceSchema, WorkspaceSchema } from "@wodge/data";
+import { createDb } from "@wodge/data/server";
 import {
   createBackendData,
   type DataBindings,

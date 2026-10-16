@@ -6,7 +6,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { useRecentlyVisited } from "@/hooks/use-recently-visited";
-import { ChannelsTypes } from "@repo/data";
+import { ChannelsTypes } from "@wodge/domain/channels";
 import { RecentItem } from "./recent-item";
 
 export function RecentCarousel({ filter }: { filter?: ChannelsTypes }) {

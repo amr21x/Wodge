@@ -1,5 +1,5 @@
 import * as React from "react";
-import { BRAND_COLOR } from "@repo/data";
+import { BRAND_COLOR } from "@wodge/domain/constants";
 
 import { useState } from "react";
 import { HexColorInput, HexColorPicker } from "react-colorful";

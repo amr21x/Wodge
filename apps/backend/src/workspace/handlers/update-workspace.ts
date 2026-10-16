@@ -1,6 +1,6 @@
 import type * as Party from "partykit/server";
 import WorkspaceParty from "../workspace-party";
-import { REPLICACHE_VERSIONS_KEY, WorkspaceSchema } from "@repo/data";
+import { REPLICACHE_VERSIONS_KEY, WorkspaceSchema } from "@wodge/data";
 import { badRequest, ok } from "../../lib/http-utils";
 import { Context } from "hono";
 

@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ID_LENGTH, NewWorkspaceSchema, type NewWorkspace } from "@repo/data";
-import { env } from "@repo/env";
+import { ID_LENGTH } from "@wodge/domain/constants";
+import { NewWorkspaceSchema, type NewWorkspace } from "@wodge/data";
+import { env } from "@wodge/env";
 
 import { nanoid } from "nanoid";
 import { useRouter } from "next/navigation";

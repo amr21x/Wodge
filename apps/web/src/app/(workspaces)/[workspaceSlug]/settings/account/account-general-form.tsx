@@ -16,7 +16,7 @@ import {
   UserSchema,
   Workspace,
   WorkspaceSchema,
-} from "@repo/data";
+} from "@wodge/data";
 import { useCurrentWorkspace } from "@/components/workspace-provider";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef, useState } from "react";
@@ -24,7 +24,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 import { useCurrentUser } from "@/hooks/use-current-user";
 
 export function AccountGeneralForm() {

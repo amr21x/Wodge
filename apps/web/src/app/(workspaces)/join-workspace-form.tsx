@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { JoinWorkspaceSchema } from "@repo/data";
+import { JoinWorkspaceSchema } from "@wodge/data";
 
 import { nanoid } from "nanoid";
 import { useRouter } from "next/navigation";

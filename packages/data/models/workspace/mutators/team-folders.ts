@@ -1,10 +1,5 @@
-import {
-  Folder,
-  FolderSchema,
-  Team,
-  TEAM_MEMBERS_ROLE,
-  TeamSchema,
-} from "../../..";
+import { Folder, FolderSchema, Team, TeamSchema } from "../../..";
+import { TEAM_MEMBERS_ROLE } from "@wodge/domain/constants";
 import { WorkspaceTeamMutation } from "./types";
 import { produce } from "immer";
 

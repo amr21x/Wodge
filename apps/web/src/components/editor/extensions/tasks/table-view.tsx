@@ -1,7 +1,7 @@
 import { useTable } from "@/app/(workspaces)/[workspaceSlug]/settings/use-table";
 import { DataTable } from "@/components/data-table/data-table";
 import { Button } from "@/components/ui/button";
-import { Task } from "@repo/data";
+import { Task } from "@wodge/domain/pages";
 import { Editor } from "@tiptap/react";
 import { Plus } from "lucide-react";
 import { nanoid } from "nanoid";

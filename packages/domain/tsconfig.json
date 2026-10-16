@@ -1,0 +1,4 @@
+{
+  "extends": "@wodge/ts/tsconfig.json",
+  "include": ["src/**/*.ts"]
+}

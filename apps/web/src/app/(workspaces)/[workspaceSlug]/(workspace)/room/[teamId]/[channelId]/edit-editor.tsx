@@ -1,5 +1,5 @@
 import { SafeDiv } from "@/components/safe-div";
-import { Message } from "@repo/data";
+import { Message } from "@wodge/data";
 import { Button } from "@/components/ui/button";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useEffect } from "react";

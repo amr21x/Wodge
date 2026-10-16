@@ -5,11 +5,11 @@ import { devtools } from "zustand/middleware";
 import { Replicache } from "replicache";
 import PartySocket from "partysocket";
 import { Room } from "livekit-client";
-import { workspaceMutators } from "@repo/data/models/workspace/workspace-mutators";
-import { userMutators } from "@repo/data/models/user/user-mutators";
-import { pageMutators } from "@repo/data";
-import { roomMutators, threadMutators } from "@repo/data/browser";
-import { env } from "@repo/env";
+import { workspaceMutators } from "@wodge/data/models/workspace/workspace-mutators";
+import { userMutators } from "@wodge/data/models/user/user-mutators";
+import { pageMutators } from "@/client/sync/pages";
+import { roomMutators, threadMutators } from "@wodge/data/browser";
+import { env } from "@wodge/env";
 
 import { createSocket } from "./create-socket";
 import { createWorkspaceRep } from "./create-workspace-rep";

@@ -1,5 +1,5 @@
 {
-  "extends": "@repo/ts/tsconfig.json",
+  "extends": "@wodge/ts/tsconfig.json",
   "compilerOptions": {
     "strictPropertyInitialization": false,
     "paths": {

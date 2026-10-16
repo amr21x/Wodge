@@ -1,6 +1,6 @@
 import { useMember } from "@/hooks/use-member";
 import { differenceInMinutes, format } from "date-fns";
-import { DrObj, Message as MessageType } from "@repo/data";
+import { DrObj, Message as MessageType } from "@wodge/data";
 import React, { memo, useRef } from "react";
 import { SafeAvatar } from "@/components/safe-avatar";
 import { SafeDiv } from "@/components/safe-div";

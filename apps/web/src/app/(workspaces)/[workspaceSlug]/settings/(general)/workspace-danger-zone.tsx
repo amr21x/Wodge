@@ -1,7 +1,7 @@
 import { useIsOwnerOrAdmin } from "@/hooks/use-is-owner-or-admin";
 import { SettingsContentAction } from "../settings";
 import { useIsOwner } from "@/hooks/use-is-owner";
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 import { useCurrentWorkspace } from "@/components/workspace-provider";
 import { toast } from "@/components/ui/toast";
 import { useRouter } from "next/navigation";

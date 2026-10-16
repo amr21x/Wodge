@@ -10,7 +10,7 @@ import { useEffect, useMemo, useState } from "react";
 import { PollOptions } from "./poll-options";
 import { useParams } from "next/navigation";
 import { useCurrentWorkspace } from "@/components/workspace-provider";
-import { Thread, ThreadPost } from "@repo/data";
+import { Thread, ThreadPost } from "@wodge/data";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useCurrentRoomRep } from "@/hooks/use-room-rep";
 import { useCurrentThreadRep } from "@/hooks/use-thread-rep";

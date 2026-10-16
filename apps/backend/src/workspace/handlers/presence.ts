@@ -1,7 +1,7 @@
 import type * as Party from "partykit/server";
 import WorkspaceParty from "../workspace-party";
 import { badRequest, ok, unauthorized } from "../../lib/http-utils";
-import { PresenceRequestSchema, WORKSPACE_PRESENCE_KEY } from "@repo/data";
+import { PresenceRequestSchema, WORKSPACE_PRESENCE_KEY } from "@wodge/data";
 import { checkMembership } from "../../lib/auth";
 import { Context } from "hono";
 

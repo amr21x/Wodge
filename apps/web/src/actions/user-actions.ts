@@ -5,7 +5,7 @@ import { z } from "zod";
 import { redirect } from "next/navigation";
 
 import { updateUserById } from "@/lib/data-server";
-import { UpdateUserSchema } from "@repo/data";
+import { UpdateUserSchema } from "@wodge/data";
 import { currentUser } from "@/lib/supabase/current-user";
 
 export async function updateProfile(rawData: z.infer<typeof UpdateUserSchema>) {

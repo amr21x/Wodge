@@ -1,8 +1,8 @@
 import { RunnerParams } from "../lib/replicache";
 import RoomParty from "./room-party";
-import { Message } from "@repo/data";
+import { Message } from "@wodge/data";
 import { produce } from "immer";
-import { deleteMessageMutation } from "@repo/data/models/room/mutators/delete-msg";
+import { deleteMessageMutation } from "@wodge/data/models/room/mutators/delete-msg";
 
 export async function deleteMessage(
   party: RoomParty,

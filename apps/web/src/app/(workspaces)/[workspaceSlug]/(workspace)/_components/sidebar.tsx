@@ -17,7 +17,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAtom, useAtomValue } from "jotai";
 import { isSidebarOpenAtom } from "@/store/global-atoms";
 import { Teamspaces } from "./teamspaces";
-import { ChannelsTypes } from "@repo/data";
+import { ChannelsTypes } from "@wodge/domain/channels";
 import { useIsOwnerOrAdmin } from "@/hooks/use-is-owner-or-admin";
 import { activeSidebarAtom } from "./sidebar-atoms";
 

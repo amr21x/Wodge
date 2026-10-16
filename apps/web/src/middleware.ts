@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { updateSession } from "./lib/supabase/middleware";
 import { createDb, getUserById } from "@/lib/data-server";
-import { users } from "@repo/data";
+import { users } from "@wodge/data";
 import {
   apiPrefix,
   authRoutes,

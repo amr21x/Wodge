@@ -10,7 +10,7 @@ import {
 } from "@dnd-kit/core";
 import { restrictToHorizontalAxis } from "@dnd-kit/modifiers";
 import { SortableContext } from "@dnd-kit/sortable";
-import { Column, Task } from "@repo/data";
+import { Column, Task } from "@wodge/domain/pages";
 import { Editor } from "@tiptap/react";
 import { useMemo, useState } from "react";
 import ColumnContainer, { ColumnTitle } from "./column-container";

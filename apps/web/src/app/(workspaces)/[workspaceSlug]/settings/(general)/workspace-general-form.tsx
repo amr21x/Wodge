@@ -9,7 +9,7 @@ import {
 import { SettingsContentAction, SettingsContentSection } from "../settings";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
-import { Workspace, WorkspaceSchema } from "@repo/data";
+import { Workspace, WorkspaceSchema } from "@wodge/data";
 import { useCurrentWorkspace } from "@/components/workspace-provider";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef, useState } from "react";
@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/toast";
 import { Info } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 import { useRouter } from "next/navigation";
 
 export function WorkspaceGeneralForm() {

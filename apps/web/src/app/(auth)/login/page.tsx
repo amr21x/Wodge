@@ -6,8 +6,8 @@ import { useEffect } from "react";
 import {
   localStoragePersister,
   queryClient,
-} from "@repo/data/lib/query-client";
-import { env } from "@repo/env";
+} from "@wodge/data/lib/query-client";
+import { env } from "@wodge/env";
 
 function LoginPage() {
   useEffect(() => {

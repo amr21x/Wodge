@@ -1,4 +1,4 @@
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 import * as jose from "jose";
 
 export async function sign(data?: any, duration: string = "5m") {

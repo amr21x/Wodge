@@ -1,6 +1,6 @@
 import { Context } from "hono";
 import WorkspaceParty from "../workspace-party";
-import { makeWorkspaceMembersKey } from "@repo/data";
+import { makeWorkspaceMembersKey } from "@wodge/data";
 import { ok, unauthorized } from "../../lib/http-utils";
 import { produce } from "immer";
 

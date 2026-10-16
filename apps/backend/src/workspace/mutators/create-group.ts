@@ -1,7 +1,7 @@
-import { createGroupMutation } from "@repo/data/models/workspace/mutators/create-group";
+import { createGroupMutation } from "@wodge/data/models/workspace/mutators/create-group";
 import { RunnerParams } from "../../lib/replicache";
 import WorkspaceParty from "../workspace-party";
-import { Group, makeWorkspaceStructureKey } from "@repo/data";
+import { Group, makeWorkspaceStructureKey } from "@wodge/data";
 import { PushAuth } from "../handlers/workspace-push";
 import { produce } from "immer";
 

@@ -1,9 +1,9 @@
-import { DrObj, Message } from "@repo/data";
+import { DrObj, Message } from "@wodge/data";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { Download, File } from "lucide-react";
 import { SidebarItemBtn } from "../../../_components/sidebar-item-btn";
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 import { download, getSrcLink } from "@/lib/utils";
 import { useState } from "react";
 

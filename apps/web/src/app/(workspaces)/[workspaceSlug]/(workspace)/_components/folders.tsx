@@ -2,7 +2,7 @@ import * as React from "react";
 
 import { SidebarItem } from "./sidebar-item";
 import { FolderIcon } from "lucide-react";
-import { DrObj, type Folder as FolderType } from "@repo/data";
+import { DrObj, type Folder as FolderType } from "@wodge/data";
 import {
   SortableContext,
   useSortable,

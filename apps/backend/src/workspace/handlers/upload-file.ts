@@ -2,7 +2,7 @@ import WorkspaceParty from "../workspace-party";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { nanoid } from "nanoid";
 import { Context } from "hono";
-import { getBucketAddress, REPLICACHE_VERSIONS_KEY } from "@repo/data";
+import { getBucketAddress, REPLICACHE_VERSIONS_KEY } from "@wodge/data";
 import { getS3Client } from "../../lib/get-s3-client";
 
 export async function uploadFile(party: WorkspaceParty, c: Context) {

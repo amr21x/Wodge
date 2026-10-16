@@ -1,5 +1,5 @@
 import { getSrcLink } from "@/lib/utils";
-import { DrObj, Message } from "@repo/data";
+import { DrObj, Message } from "@wodge/data";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 

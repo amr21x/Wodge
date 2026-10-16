@@ -9,7 +9,7 @@
 // import { updateChannelInfoMutation } from "../../models/workspace/mutators/channel-info";
 // import { deleteChannelMutation } from "../../models/workspace/mutators/delete-channel";
 // import { nanoid } from "nanoid";
-// import { WORKSPACE_TEAM_ID_LENGTH } from "../..";
+// import { WORKSPACE_TEAM_ID_LENGTH } from "@wodge/domain/constants";
 
 // describe("Workspace channels' unit mutations", () => {
 //   test("Create a channel", async () => {

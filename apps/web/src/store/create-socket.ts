@@ -1,7 +1,7 @@
 import PartySocket from "partysocket";
-import { PokeMessage } from "@repo/data";
-import { env } from "@repo/env";
-import { queryClient } from "@repo/data/lib/query-client";
+import { PokeMessage } from "@wodge/data";
+import { env } from "@wodge/env";
+import { queryClient } from "@wodge/data/lib/query-client";
 
 import { useAppStore } from "./store";
 

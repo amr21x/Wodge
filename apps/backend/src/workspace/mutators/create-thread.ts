@@ -1,8 +1,8 @@
-import { NewThreadArgs } from "@repo/data/models/workspace/workspace-mutators";
+import { NewThreadArgs } from "@wodge/data/models/workspace/workspace-mutators";
 import { RunnerParams } from "../../lib/replicache";
 import WorkspaceParty from "../workspace-party";
-import { makeWorkspaceStructureKey } from "@repo/data";
-import { createThreadMutation } from "@repo/data/models/workspace/mutators/create-thread";
+import { makeWorkspaceStructureKey } from "@wodge/data";
+import { createThreadMutation } from "@wodge/data/models/workspace/mutators/create-thread";
 import { PushAuth } from "../handlers/workspace-push";
 import { produce } from "immer";
 

@@ -7,7 +7,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn, focusElement } from "@/lib/utils";
 
-import { Column, pageMutators, Task } from "@repo/data";
+import { Column, Task } from "@wodge/domain/pages";
+import { pageMutators } from "@/client/sync/pages";
 import { Editor } from "@tiptap/react";
 import { Check, MoreHorizontal, PencilLine, Trash2, X } from "lucide-react";
 import { forwardRef, useEffect, useRef } from "react";

@@ -1,6 +1,9 @@
 import "server-only";
 import { getRequestContext } from "@cloudflare/next-on-pages";
-import { createDataModels, createDb as createBoundDb } from "@repo/data/server";
+import {
+  createDataModels,
+  createDb as createBoundDb,
+} from "@wodge/data/server";
 
 export function createDb() {
   return createBoundDb(getRequestContext().env.DB);

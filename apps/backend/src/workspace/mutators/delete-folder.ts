@@ -2,8 +2,8 @@ import { produce } from "immer";
 import { RunnerParams } from "../../lib/replicache";
 import { PushAuth } from "../handlers/workspace-push";
 import WorkspaceParty from "../workspace-party";
-import { makeWorkspaceStructureKey } from "@repo/data";
-import { deleteFolderMutation } from "@repo/data/models/workspace/mutators/delete-folder";
+import { makeWorkspaceStructureKey } from "@wodge/data";
+import { deleteFolderMutation } from "@wodge/data/models/workspace/mutators/delete-folder";
 
 export async function deleteFolder(
   party: WorkspaceParty,

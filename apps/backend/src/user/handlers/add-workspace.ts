@@ -5,7 +5,7 @@ import {
   REPLICACHE_VERSIONS_KEY,
   UserWorkspacesStore,
   makeWorkspacesStoreKey,
-} from "@repo/data";
+} from "@wodge/data";
 import { produce } from "immer";
 import { Context } from "hono";
 

@@ -7,7 +7,7 @@ import {
   REPLICACHE_VERSIONS_KEY,
   WORKSPACE_INVITES_KEY,
   WORKSPACE_PRESENCE_KEY,
-} from "@repo/data";
+} from "@wodge/data";
 import WorkspaceParty from "./workspace-party";
 import {
   PresenceMap,

@@ -1,11 +1,11 @@
 import { sign } from "@/lib/utils/sign";
-import { memberships, Workspace } from "@repo/data";
+import { memberships, Workspace } from "@wodge/data";
 import {
   addWorkspaceMember,
   createDb,
   updateWorkspaceById,
 } from "@/lib/data-server";
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 import { and, eq } from "drizzle-orm";
 
 export async function POST(

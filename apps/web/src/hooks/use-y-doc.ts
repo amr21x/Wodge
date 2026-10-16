@@ -1,4 +1,4 @@
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 import useYProvider from "y-partykit/react";
 
 import * as Y from "yjs";

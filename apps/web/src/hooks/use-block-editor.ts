@@ -6,7 +6,7 @@ import CollaborationCursor from "@tiptap/extension-collaboration-cursor";
 import * as Y from "yjs";
 
 import YPartyKitProvider from "y-partykit/provider";
-import { UserType } from "@repo/data";
+import { UserType } from "@wodge/data";
 import { randomElement, userColors } from "@/lib/utils";
 import ExtensionKit from "@/components/editor/extensions/extension-kit";
 import { EditorUser } from "@/components/editor/block-editor/types";

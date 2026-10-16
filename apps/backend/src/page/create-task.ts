@@ -1,8 +1,8 @@
 import { RunnerParams } from "../lib/replicache";
 import { produce } from "immer";
 import PageParty from "./page-party";
-import { CreateTaskArgs } from "@repo/data";
-import { createTaskMutation } from "@repo/data/models/page/mutators/create-task";
+import { CreateTaskArgs } from "@wodge/domain/pages";
+import { createTaskMutation } from "@wodge/domain/pages";
 
 export async function createTask(party: PageParty, params: RunnerParams) {
   const args = params.mutation.args as CreateTaskArgs;

@@ -1,7 +1,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Replicache } from "replicache";
-import { roomMutators, createRoomRep } from "@repo/data/browser";
+import { roomMutators, createRoomRep } from "@wodge/data/browser";
 
 import { useCurrentUser } from "./use-current-user";
 import { useCurrentWorkspace } from "@/components/workspace-provider";

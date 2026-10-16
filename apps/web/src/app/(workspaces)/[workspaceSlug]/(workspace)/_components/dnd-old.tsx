@@ -30,7 +30,8 @@ import {
   SidebarItem,
   SidebarItemProps,
 } from "@/app/(workspaces)/[workspaceSlug]/(workspace)/_components/sidebar-item";
-import { Channel, Team } from "@repo/data";
+import { Channel } from "@wodge/domain/channels";
+import { Team } from "@wodge/data";
 import { RiDraggable } from "react-icons/ri";
 import { clear } from "console";
 import { Teamspaces } from "@/app/(workspaces)/[workspaceSlug]/(workspace)/_components/teamspaces";

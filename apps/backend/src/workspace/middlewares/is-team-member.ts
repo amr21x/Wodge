@@ -1,5 +1,5 @@
 import { Context, Next } from "hono";
-import { isTeamMember } from "@repo/data";
+import { isTeamMember } from "@wodge/data";
 import WorkspaceParty from "../workspace-party";
 import { unauthorized } from "../../lib/http-utils";
 

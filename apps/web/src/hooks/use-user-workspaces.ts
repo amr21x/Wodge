@@ -1,7 +1,7 @@
 "use client";
 
 import { useCurrentUser } from "./use-current-user";
-import { Workspace } from "@repo/data";
+import { Workspace } from "@wodge/data";
 import { useQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 

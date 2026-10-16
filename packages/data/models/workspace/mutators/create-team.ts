@@ -1,11 +1,6 @@
 import { produce } from "immer";
-import {
-  DrObj,
-  TEAM_MEMBERS_ROLE,
-  Team,
-  TeamSchema,
-  WorkspaceStructure,
-} from "../../..";
+import { DrObj, Team, TeamSchema, WorkspaceStructure } from "../../..";
+import { TEAM_MEMBERS_ROLE } from "@wodge/domain/constants";
 
 interface CreateTeamArgs {
   // Any to account for the backend mutation runner - relay on zod to validate the data

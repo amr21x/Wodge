@@ -1,4 +1,4 @@
-import { ChannelsTypes } from "@repo/data";
+import { ChannelsTypes } from "@wodge/domain/channels";
 import { atomWithStorage } from "jotai/utils";
 
 export const activeSidebarAtom = atomWithStorage<ChannelsTypes | "home">(

@@ -7,9 +7,9 @@ import {
   Replicache,
 } from "replicache";
 
-import { env } from "@repo/env";
-import { ChannelsTypes } from "@repo/data";
-import { replicacheWrapper } from "@repo/data/browser";
+import { env } from "@wodge/env";
+import { ChannelsTypes } from "@wodge/domain/channels";
+import { replicacheWrapper } from "@wodge/data/browser";
 
 export interface CreateChannelArgs {
   userId: string;

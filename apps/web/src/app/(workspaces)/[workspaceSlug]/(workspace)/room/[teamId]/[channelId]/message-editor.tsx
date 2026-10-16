@@ -8,7 +8,7 @@ import { useParams } from "next/navigation";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useCanEdit } from "@/hooks/use-can-edit";
 import { Replicache } from "replicache";
-import { roomMutators } from "@repo/data/browser";
+import { roomMutators } from "@wodge/data/browser";
 import { nanoid } from "nanoid";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { PollMaker } from "../../../../../../../components/poll-maker";

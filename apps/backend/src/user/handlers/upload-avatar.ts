@@ -1,6 +1,6 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { Context } from "hono";
-import { makeUserAvatarKey, REPLICACHE_VERSIONS_KEY } from "@repo/data";
+import { makeUserAvatarKey, REPLICACHE_VERSIONS_KEY } from "@wodge/data";
 import UserParty from "../user-party";
 import { getS3Client } from "../../lib/get-s3-client";
 import { nanoid } from "nanoid";

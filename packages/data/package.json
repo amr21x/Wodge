@@ -1,5 +1,5 @@
 {
-  "name": "@repo/data",
+  "name": "@wodge/data",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -8,7 +8,7 @@
     "db:drop": "drizzle-kit drop"
   },
   "dependencies": {
-    "@repo/env": "workspace:*",
+    "@wodge/env": "workspace:*",
     "@tanstack/query-sync-storage-persister": "^5.27.5",
     "@tanstack/react-query": "^5.27.5",
     "@tanstack/react-query-persist-client": "^5.27.5",
@@ -22,12 +22,13 @@
     "react": "^18.2.0",
     "replicache": "^14.1.0",
     "replicache-react": "^5.0.1",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "@wodge/domain": "workspace:*"
   },
   "devDependencies": {
     "@auth/core": "^0.26.3",
     "@cloudflare/workers-types": "4.20260424.1",
-    "@repo/ts": "workspace:*",
+    "@wodge/ts": "workspace:*",
     "@testing-library/react": "^14.2.1",
     "@types/lodash": "^4.14.202",
     "@types/node": "^20",

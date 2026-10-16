@@ -6,7 +6,7 @@ import {
   Replicache,
 } from "replicache";
 import { roomMutators } from "./room-mutators";
-import { env } from "@repo/env/client";
+import { env } from "@wodge/env/client";
 import { replicacheWrapper } from "../../lib/browser-utils";
 
 export function createRoomRep({

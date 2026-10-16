@@ -1,8 +1,8 @@
 import { RunnerParams } from "../lib/replicache";
-import { ThreadPost } from "@repo/data";
+import { ThreadPost } from "@wodge/data";
 import { produce } from "immer";
 import ThreadParty from "./thread-party";
-import { deletePostMutation } from "@repo/data/models/thread/mutators/delete-post";
+import { deletePostMutation } from "@wodge/data/models/thread/mutators/delete-post";
 
 export async function deletePost(
   party: ThreadParty,

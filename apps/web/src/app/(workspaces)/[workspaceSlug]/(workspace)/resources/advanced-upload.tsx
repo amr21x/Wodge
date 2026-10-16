@@ -12,7 +12,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import XHRUpload from "@uppy/xhr-upload";
 import { Dashboard } from "@uppy/react";
 import { useParams } from "next/navigation";
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useQuery } from "@tanstack/react-query";

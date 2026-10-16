@@ -3,7 +3,7 @@ import { SafeAvatar } from "@/components/safe-avatar";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { Send } from "lucide-react";
 import { nanoid } from "nanoid";
-import { threadMutators } from "@repo/data/browser";
+import { threadMutators } from "@wodge/data/browser";
 import { Replicache } from "replicache";
 import { TooltipWrapper } from "@/components/tooltip-wrapper";
 import { useThreadEditor } from "@/hooks/use-thread-editor";

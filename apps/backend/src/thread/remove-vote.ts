@@ -1,7 +1,7 @@
 import { RunnerParams } from "@/lib/replicache";
-import { removePostVoteMutation } from "@repo/data/models/thread/mutators/remove-vote";
+import { removePostVoteMutation } from "@wodge/data/models/thread/mutators/remove-vote";
 import ThreadParty from "./thread-party";
-import { PostVoteArgs } from "@repo/data";
+import { PostVoteArgs } from "@wodge/data";
 import { produce } from "immer";
 
 export async function removeVote(party: ThreadParty, params: RunnerParams) {

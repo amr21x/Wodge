@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { WorkspaceSchema, Workspace } from "@repo/data";
+import { WorkspaceSchema, Workspace } from "@wodge/data";
 
 import {
   SettingsContentDescription,
@@ -16,7 +16,7 @@ import { WorkspaceGeneralForm } from "./workspace-general-form";
 import { useIsOwnerOrAdmin } from "@/hooks/use-is-owner-or-admin";
 import { AvatarBtn } from "@/components/avatar-btn";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 import { toast } from "@/components/ui/toast";
 import { useAvatarUrl } from "@/hooks/use-avatar-url";
 import { useUpload } from "@/hooks/use-upload";

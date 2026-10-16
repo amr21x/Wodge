@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { env } from "@repo/env";
-import { PublicUserType } from "@repo/data";
+import { env } from "@wodge/env";
+import { PublicUserType } from "@wodge/data";
 import { useCurrentWorkspace } from "@/components/workspace-provider";
 
 export function useMembersInfo() {

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { SettingsContentHeader, SettingsContentSection } from "../settings";
-import { DrObj, Group } from "@repo/data";
+import { DrObj, Group } from "@wodge/data";
 
 import { GroupMembersSettings } from "./group-members-settings";
 import { GroupGeneralForm } from "./group-general-form";

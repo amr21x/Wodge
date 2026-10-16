@@ -2,7 +2,7 @@ import {
   Thread,
   ThreadMessage as ThreadMessageType,
   ThreadPost,
-} from "@repo/data";
+} from "@wodge/data";
 import { useMember } from "@/hooks/use-member";
 import { ThreadAction } from "./thread-actions";
 import { format } from "date-fns";

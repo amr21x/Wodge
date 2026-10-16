@@ -1,8 +1,8 @@
 import { RunnerParams } from "../lib/replicache";
 import { produce } from "immer";
 import PageParty from "./page-party";
-import { CreateColumnArgs } from "@repo/data";
-import { deleteColumnMutation } from "@repo/data/models/page/mutators/delete-column";
+import { CreateColumnArgs } from "@wodge/domain/pages";
+import { deleteColumnMutation } from "@wodge/domain/pages";
 
 export async function deleteColumn(party: PageParty, params: RunnerParams) {
   const args = params.mutation.args as CreateColumnArgs;

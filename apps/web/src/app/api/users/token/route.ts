@@ -1,5 +1,5 @@
 import { sign } from "@/lib/utils/sign";
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 
 export async function GET(req: Request) {
   // console.log(req.headers);

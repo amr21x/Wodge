@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { PublicUserType, users } from "@repo/data";
+import { PublicUserType, users } from "@wodge/data";
 import { usePathname } from "next/navigation";
 
 import { createUserRep } from "@/store/create-user-rep";

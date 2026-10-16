@@ -1,8 +1,8 @@
 import { RunnerParams } from "../lib/replicache";
-import { ThreadMessage } from "@repo/data";
+import { ThreadMessage } from "@wodge/data";
 import { produce } from "immer";
 import ThreadParty from "./thread-party";
-import { createCommentMutation } from "@repo/data/models/thread/mutators/create-comment";
+import { createCommentMutation } from "@wodge/data/models/thread/mutators/create-comment";
 
 export async function createComment(
   party: ThreadParty,

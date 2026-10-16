@@ -1,8 +1,8 @@
 import { RunnerParams } from "../lib/replicache";
 import { produce } from "immer";
 import PageParty from "./page-party";
-import { editTaskMutation } from "@repo/data/models/page/mutators/edit-task";
-import { EditTaskArgs } from "@repo/data/models/page/page-mutators";
+import { editTaskMutation } from "@wodge/domain/pages";
+import { EditTaskArgs } from "@wodge/domain/pages";
 
 export async function editTask(party: PageParty, params: RunnerParams) {
   const args = params.mutation.args as EditTaskArgs;

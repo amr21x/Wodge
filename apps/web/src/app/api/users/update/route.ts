@@ -1,8 +1,8 @@
 import { currentUser } from "@/lib/supabase/current-user";
 import { sign } from "@/lib/utils/sign";
-import { UpdateUserSchema } from "@repo/data";
+import { UpdateUserSchema } from "@wodge/data";
 import { updateUserById } from "@/lib/data-server";
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 import { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {

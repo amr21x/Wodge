@@ -1,7 +1,7 @@
 import WorkspaceParty from "../workspace-party";
-import { createTeamMutation } from "@repo/data/models/workspace/mutators/create-team";
+import { createTeamMutation } from "@wodge/data/models/workspace/mutators/create-team";
 import { RunnerParams } from "../../lib/replicache";
-import { Team, makeWorkspaceStructureKey } from "@repo/data";
+import { Team, makeWorkspaceStructureKey } from "@wodge/data";
 import { PushAuth } from "../handlers/workspace-push";
 import { produce } from "immer";
 

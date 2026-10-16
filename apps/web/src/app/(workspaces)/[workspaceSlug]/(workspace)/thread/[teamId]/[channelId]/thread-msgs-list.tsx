@@ -2,8 +2,8 @@ import {
   Thread,
   ThreadMessage as ThreadMessageType,
   ThreadPost,
-} from "@repo/data";
-import { threadMutators } from "@repo/data/browser";
+} from "@wodge/data";
+import { threadMutators } from "@wodge/data/browser";
 import { memo, useEffect } from "react";
 import { ReadTransaction, Replicache } from "replicache";
 import { useSubscribe } from "@/hooks/use-subscribe";

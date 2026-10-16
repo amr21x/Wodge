@@ -1,5 +1,6 @@
 import { cn, focusElement } from "@/lib/utils";
-import { pageMutators, Task } from "@repo/data";
+import { pageMutators } from "@/client/sync/pages";
+import { Task } from "@wodge/domain/pages";
 import { useEffect, useRef } from "react";
 import { Replicache } from "replicache";
 import { useEditable } from "use-editable";

@@ -18,7 +18,7 @@ import {
 import { teamUpdateRunner } from "../../models/workspace/mutators/team-update-runner";
 import { createGroupMutation } from "../../models/workspace/mutators/create-group";
 import { nanoid } from "nanoid";
-import { ID_LENGTH, WORKSPACE_TEAM_ID_LENGTH } from "../../schemas/config";
+import { ID_LENGTH, WORKSPACE_TEAM_ID_LENGTH } from "@wodge/domain/constants";
 import { createPageMutation } from "../../models/workspace/mutators/create-page";
 import { groupUpdateRunner } from "../../models/workspace/mutators/group-update-runner";
 

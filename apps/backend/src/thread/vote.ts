@@ -1,8 +1,8 @@
 import { RunnerParams } from "@/lib/replicache";
-import { voteMutation } from "@repo/data/models/room/mutators/vote";
+import { voteMutation } from "@wodge/data/models/room/mutators/vote";
 import ThreadParty from "./thread-party";
-import { PostVoteArgs } from "@repo/data/models/thread/thread-mutators";
-import { postVoteMutation } from "@repo/data/models/thread/mutators/vote";
+import { PostVoteArgs } from "@wodge/data/models/thread/thread-mutators";
+import { postVoteMutation } from "@wodge/data/models/thread/mutators/vote";
 import { produce } from "immer";
 
 export async function vote(party: ThreadParty, params: RunnerParams) {

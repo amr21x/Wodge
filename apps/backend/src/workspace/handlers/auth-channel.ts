@@ -3,11 +3,11 @@ import { json, unauthorized } from "../../lib/http-utils";
 import {
   canEdit,
   canView,
-  ChannelsTypes,
   isAdmin,
   isTeamMember,
   isTeamModerator,
-} from "@repo/data";
+} from "@wodge/data";
+import { ChannelsTypes } from "@wodge/domain/channels";
 import { Context } from "hono";
 
 export interface AuthChannelResponse {

@@ -1,7 +1,7 @@
 import { GeneralMembersTable } from "../general-members-table";
 import { useTable } from "../use-table";
 import { Mutable } from "@/lib/utils";
-import { DrObj, Group, Member } from "@repo/data";
+import { DrObj, Group, Member } from "@wodge/data";
 import { useCurrentWorkspace } from "@/components/workspace-provider";
 import { useMembersInfo } from "@/hooks/use-members-info";
 import { useMemo } from "react";

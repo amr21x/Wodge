@@ -1,4 +1,4 @@
-import { DrObj, Member } from "@repo/data";
+import { DrObj, Member } from "@wodge/data";
 import { useTable } from "./use-table";
 import { Mutable } from "@/lib/utils";
 import { Table } from "@tanstack/react-table";

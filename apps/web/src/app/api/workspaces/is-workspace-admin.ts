@@ -1,5 +1,5 @@
 import { sign } from "@/lib/utils/sign";
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 
 export async function isWorkspaceAdmin(userId: string, workspaceId: string) {
   const token = await sign({ userId });

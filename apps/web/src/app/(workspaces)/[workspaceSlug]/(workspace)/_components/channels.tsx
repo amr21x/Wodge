@@ -13,12 +13,10 @@ import {
 import { SidebarItemBtn } from "./sidebar-item-btn";
 import {
   ChannelsTypes,
-  DrObj,
-  Page,
-  Room,
-  Thread,
   type Channel as ChannelType,
-} from "@repo/data";
+} from "@wodge/domain/channels";
+import { DrObj, Room, Thread } from "@wodge/data";
+import { Page } from "@wodge/domain/pages";
 import {
   SortableContext,
   useSortable,

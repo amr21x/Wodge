@@ -1,6 +1,6 @@
 import { produce } from "immer";
 import { WorkspaceChannelMutation } from "./types";
-import { ChannelsTypes } from "../../../schemas/channel.schema";
+import { ChannelsTypes } from "@wodge/domain/channels";
 import { WorkspaceStructure } from "../../../schemas/workspace.schema";
 
 export function deleteChannelMutation({

@@ -1,7 +1,7 @@
 import WorkspaceParty from "../workspace-party";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { Context } from "hono";
-import { makeWorkspaceAvatarKey, REPLICACHE_VERSIONS_KEY } from "@repo/data";
+import { makeWorkspaceAvatarKey, REPLICACHE_VERSIONS_KEY } from "@wodge/data";
 import { getS3Client } from "../../lib/get-s3-client";
 import { nanoid } from "nanoid";
 

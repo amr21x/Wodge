@@ -1,6 +1,6 @@
 import { produce } from "immer";
-import { DrObj } from "../../..";
-import { Column, Task } from "../../../schemas/page.schema";
+import type { DrObj } from "../../types";
+import { Column, Task } from "../schema";
 
 export function createTaskMutation({
   colId,

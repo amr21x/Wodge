@@ -1,7 +1,7 @@
 import { sign } from "@/lib/utils/sign";
-import { Workspace, workspaces, WorkspaceSchema } from "@repo/data";
+import { Workspace, workspaces, WorkspaceSchema } from "@wodge/data";
 import { createDb, createWorkspace } from "@/lib/data-server";
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 import { eq } from "drizzle-orm";
 
 export async function POST(req: Request) {

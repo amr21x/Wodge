@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 import { getStripe } from "@/lib/utils/get-stripe";
 import { isWorkspaceAdmin } from "../../../is-workspace-admin";
 import { getWorkspaceById } from "@/lib/data-server";

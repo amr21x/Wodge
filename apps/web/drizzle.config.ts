@@ -3,10 +3,10 @@ import crypto from "node:crypto";
 
 const baseConfig: Partial<Config> = {
   schema: [
-    "./node_modules/@repo/data/schemas/auth.schema.ts",
-    "./node_modules/@repo/data/schemas/workspace.schema.ts",
+    "./node_modules/@wodge/data/schemas/auth.schema.ts",
+    "./node_modules/@wodge/data/schemas/workspace.schema.ts",
   ],
-  out: "./node_modules/@repo/data/migrations",
+  out: "./node_modules/@wodge/data/migrations",
 };
 
 export default {

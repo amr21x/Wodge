@@ -1,8 +1,8 @@
 import { Request } from "partykit/server";
 import UserParty from "../user-party";
 import { RunnerParams, repPush } from "../../lib/replicache";
-import { NewWorkspaceSchema } from "@repo/data";
-import { makeWorkspacesStoreKey } from "@repo/data";
+import { NewWorkspaceSchema } from "@wodge/data";
+import { makeWorkspacesStoreKey } from "@wodge/data";
 import { Context } from "hono";
 
 export async function userPush(party: UserParty, c: Context) {

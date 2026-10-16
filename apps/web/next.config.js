@@ -11,7 +11,7 @@ const withPWA = require("next-pwa")({
 
 const jiti = require("jiti")(__filename);
 
-jiti("./node_modules/@repo/env/index.ts");
+jiti("./node_modules/@wodge/env/index.ts");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = withPWA({}) || {};

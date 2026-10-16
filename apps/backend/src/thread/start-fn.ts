@@ -1,4 +1,4 @@
-import { REPLICACHE_VERSIONS_KEY } from "@repo/data";
+import { REPLICACHE_VERSIONS_KEY } from "@wodge/data";
 import { Versions } from "../types";
 import ThreadParty from "./thread-party";
 

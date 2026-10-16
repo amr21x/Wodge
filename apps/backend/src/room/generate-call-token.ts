@@ -6,7 +6,7 @@ import {
   Room,
   RoomServiceClient,
 } from "livekit-server-sdk";
-import { UserType } from "@repo/data";
+import { UserType } from "@wodge/data";
 import { json } from "../lib/http-utils";
 import { Context } from "hono";
 

@@ -1,5 +1,5 @@
 import type { D1Database } from "@cloudflare/workers-types";
-import { createDataServer } from "@repo/data/server";
+import { createDataServer } from "@wodge/data/server";
 
 export interface DataBindings {
   DB: D1Database;

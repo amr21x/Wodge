@@ -9,7 +9,8 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { SidebarItemBtn } from "./sidebar-item-btn";
-import { DrObj, type Channel as ChannelType } from "@repo/data";
+import { DrObj } from "@wodge/data";
+import { type Channel as ChannelType } from "@wodge/domain/channels";
 import {
   SortableContext,
   useSortable,

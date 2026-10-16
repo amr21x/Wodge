@@ -1,8 +1,8 @@
 import { RunnerParams } from "@/lib/replicache";
 import RoomParty from "./room-party";
-import { voteMutation } from "@repo/data/models/room/mutators/vote";
+import { voteMutation } from "@wodge/data/models/room/mutators/vote";
 import { produce } from "immer";
-import { VoteArgs } from "@repo/data";
+import { VoteArgs } from "@wodge/data";
 
 export async function vote(party: RoomParty, params: RunnerParams) {
   const vote = params.mutation.args as VoteArgs;

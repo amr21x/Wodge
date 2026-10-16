@@ -1,11 +1,7 @@
 import { GroupMultiSelect } from "@/components/group-multi-select";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Folder,
-  FolderSchema,
-  ID_LENGTH,
-  WORKSPACE_GROUP_ID_LENGTH,
-} from "@repo/data";
+import { Folder, FolderSchema } from "@wodge/data";
+import { ID_LENGTH, WORKSPACE_GROUP_ID_LENGTH } from "@wodge/domain/constants";
 import { Button } from "@/components/ui/button";
 import { DialogClose, DialogContent } from "@/components/ui/dialog";
 import {

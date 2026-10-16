@@ -5,7 +5,7 @@ import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { useSearchParams } from "next/navigation";
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 
 export function OAuth() {
   const supabase = createClient();

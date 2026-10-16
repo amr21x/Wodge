@@ -1,5 +1,5 @@
-import { DrObj, Member, PublicUserType } from "@repo/data";
-import { queryClient } from "@repo/data/lib/query-client";
+import { DrObj, Member, PublicUserType } from "@wodge/data";
+import { queryClient } from "@wodge/data/lib/query-client";
 import { DataTableActions } from "@/components/data-table/data-table-action";
 
 import { Header } from "@/components/data-table/header";

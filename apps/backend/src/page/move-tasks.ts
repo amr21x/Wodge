@@ -1,8 +1,8 @@
 import { RunnerParams } from "../lib/replicache";
 import { produce } from "immer";
 import PageParty from "./page-party";
-import { MoveTasksArgs } from "@repo/data";
-import { moveTasksMutation } from "@repo/data/models/page/mutators/move-tasks";
+import { MoveTasksArgs } from "@wodge/domain/pages";
+import { moveTasksMutation } from "@wodge/domain/pages";
 
 export async function moveTasks(party: PageParty, params: RunnerParams) {
   const args = params.mutation.args as MoveTasksArgs;

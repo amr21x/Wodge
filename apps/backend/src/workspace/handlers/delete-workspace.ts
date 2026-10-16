@@ -4,7 +4,7 @@ import {
   defaultWorkspaceStructure,
   makeWorkspaceMembersKey,
   makeWorkspaceStructureKey,
-} from "@repo/data";
+} from "@wodge/data";
 
 import { badRequest, ok } from "../../lib/http-utils";
 

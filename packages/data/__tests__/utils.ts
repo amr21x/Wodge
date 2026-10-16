@@ -1,19 +1,12 @@
 import { nanoid } from "nanoid";
 import {
   BRAND_COLOR,
-  Channel,
-  Group,
   ID_LENGTH,
-  Room,
-  Message,
   TEAM_MEMBERS_ROLE,
-  Team,
-  Thread,
   WORKSPACE_TEAM_ID_LENGTH,
-  WorkspaceMembers,
-  WorkspaceStructure,
-  ThreadMessage,
-} from "..";
+} from "@wodge/domain/constants";
+import { Channel } from "@wodge/domain/channels";
+import { Group, Room, Message, Team, Thread, WorkspaceMembers, WorkspaceStructure, ThreadMessage } from "..";
 import { UserId } from "./tests";
 
 export function createTestThread(data?: Partial<Thread>) {

@@ -1,0 +1,22 @@
+{
+  "name": "@wodge/domain",
+  "version": "0.1.0",
+  "private": true,
+  "exports": {
+    "./pages": "./src/pages/index.ts",
+    "./channels": "./src/channels/index.ts",
+    "./constants": "./src/constants.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --incremental false --pretty false"
+  },
+  "dependencies": {
+    "array-move": "^4.0.0",
+    "immer": "^10.0.3",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@wodge/ts": "workspace:*",
+    "typescript": "^5.3.3"
+  }
+}

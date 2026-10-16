@@ -27,7 +27,7 @@ import { deleteGroupMutation } from "./mutators/delete-group";
 import { createPageMutation } from "./mutators/create-page";
 import { createRoomMutation } from "./mutators/create-room";
 import { createThreadMutation } from "./mutators/create-thread";
-import { ChannelsTypes } from "../../schemas/channel.schema";
+import { ChannelsTypes } from "@wodge/domain/channels";
 import { Folder, Team } from "../../schemas/team.schema";
 import { Room } from "../../schemas/room.schema";
 import { Thread } from "../../schemas/thread.schema";
@@ -37,7 +37,7 @@ import { updateRoomMutation } from "./mutators/update-room";
 import { updateThreadMutation } from "./mutators/update-thread";
 import { updateFolderMutation } from "./mutators/update-folder";
 import { deleteFolderMutation } from "./mutators/delete-folder";
-import { Page } from "../../schemas/page.schema";
+import { Page } from "@wodge/domain/pages";
 
 export interface TeamUpdateArgs {
   teamUpdate: TeamUpdate;

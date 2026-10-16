@@ -1,6 +1,6 @@
 import { produce } from "immer";
-import { DrObj } from "../../..";
-import { Column } from "../../../schemas/page.schema";
+import type { DrObj } from "../../types";
+import { Column } from "../schema";
 
 export function updateColumnMutation({
   col,

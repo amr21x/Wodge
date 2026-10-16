@@ -1,7 +1,7 @@
 "use client";
 
-import { Invite, Invites } from "@repo/data";
-import { env } from "@repo/env";
+import { Invite, Invites } from "@wodge/data";
+import { env } from "@wodge/env";
 import { useCurrentWorkspace } from "@/components/workspace-provider";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { getAvatarAddress } from "@repo/data/browser";
+import { getAvatarAddress } from "@wodge/data/browser";
 
 export function useAvatarUrl(id?: string) {
   const { data, isError } = useQuery({

@@ -1,4 +1,4 @@
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 

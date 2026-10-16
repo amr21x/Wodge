@@ -1,7 +1,7 @@
 import { useParams } from "next/navigation";
 import { useActionState, useEffect, useMemo, useState } from "react";
 import { Replicache } from "replicache";
-import { threadMutators, createThreadRep } from "@repo/data/browser";
+import { threadMutators, createThreadRep } from "@wodge/data/browser";
 
 import { useCurrentUser } from "./use-current-user";
 import { useCurrentWorkspace } from "@/components/workspace-provider";

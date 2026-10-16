@@ -44,6 +44,41 @@ const common = {
 let runtime;
 try {
   await check(
+    "page domain exports bundle without app, database, environment or sync clients",
+    async () => {
+      const result = await build({
+        ...common,
+        stdin: {
+          contents:
+            'export * from "@wodge/domain/pages"; export * from "@wodge/domain/channels"; export * from "@wodge/domain/constants";',
+          resolveDir: path.join(root, "apps/backend"),
+        },
+        platform: "browser",
+        write: false,
+      });
+      assert.deepEqual(
+        Object.keys(result.metafile.inputs).filter((p) =>
+          /(?:^apps\/|packages\/(?:data|env|backend-protocol)\/|node_modules\/.*(?:replicache|react|drizzle|partykit))/.test(
+            p,
+          ),
+        ),
+        [],
+      );
+      await assert.rejects(
+        build({
+          ...common,
+          stdin: {
+            contents: 'import "@wodge/domain/src/pages/mutations/create-task";',
+            resolveDir: path.join(root, "apps/backend"),
+          },
+          platform: "browser",
+          write: false,
+        }),
+        /Could not resolve/,
+      );
+    },
+  );
+  await check(
     "neutral domain bundle excludes browser configuration and server integrations",
     async () => {
       const result = await build({
@@ -79,9 +114,9 @@ try {
     },
   );
   for (const [specifier, name] of [
-    ["@repo/data/server", "createDb"],
-    ["@repo/data/db", "createDb"],
-    ["@repo/backend-protocol", "betterAuth"],
+    ["@wodge/data/server", "createDb"],
+    ["@wodge/data/db", "createDb"],
+    ["@wodge/backend-protocol", "betterAuth"],
   ]) {
     await check(`browser import of ${specifier} is rejected`, async () => {
       await assert.rejects(

@@ -10,7 +10,7 @@ import { PostsList } from "./posts-list";
 import { QAsList } from "./qas-list";
 import { useSubscribe } from "@/hooks/use-subscribe";
 import { ReadTransaction } from "replicache";
-import { ThreadPost } from "@repo/data";
+import { ThreadPost } from "@wodge/data";
 import { useCurrentThreadRep } from "@/hooks/use-thread-rep";
 import { useUpdateRecentlyVisited } from "@/hooks/use-recently-visited";
 

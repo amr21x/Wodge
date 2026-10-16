@@ -14,7 +14,7 @@ import OfflineEditor from "@/components/editor/block-editor/offline-editor";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { PollMaker } from "@/components/poll-maker";
 import { Replicache } from "replicache";
-import { threadMutators } from "@repo/data/browser";
+import { threadMutators } from "@wodge/data/browser";
 import { toast } from "sonner";
 
 export function ThreadEditor({

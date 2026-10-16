@@ -1,11 +1,11 @@
-import { removeMemberMutation } from "@repo/data/models/workspace/mutators/remove-member";
+import { removeMemberMutation } from "@wodge/data/models/workspace/mutators/remove-member";
 import { RunnerParams } from "../../lib/replicache";
 import WorkspaceParty from "../workspace-party";
 import {
   WorkspaceMembers,
   makeWorkspaceMembersKey,
   makeWorkspaceStructureKey,
-} from "@repo/data";
+} from "@wodge/data";
 import { produce } from "immer";
 import { PushAuth } from "../handlers/workspace-push";
 

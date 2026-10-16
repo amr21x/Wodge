@@ -1,6 +1,6 @@
 import { SafeDiv } from "@/components/safe-div";
 import { SidebarItemBtn } from "@/app/(workspaces)/[workspaceSlug]/(workspace)/_components/sidebar-item-btn";
-import { Thread, ThreadMessage, ThreadPost } from "@repo/data";
+import { Thread, ThreadMessage, ThreadPost } from "@wodge/data";
 import { Button } from "@/components/ui/button";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { useEffect } from "react";

@@ -1,37 +1,22 @@
-import { WriteTransaction } from "replicache";
-import { createColumnMutation } from "./mutators/create-column";
-import { Column, Task } from "../../schemas/page.schema";
-import { deleteColumnMutation } from "./mutators/delete-column";
-import { updateColumnMutation } from "./mutators/update-column";
-import { createTaskMutation } from "./mutators/create-task";
-import { editTaskMutation } from "./mutators/edit-task";
-import { deleteTaskMutation } from "./mutators/delete-task";
-import { moveColumnsMutation } from "./mutators/move-columns";
-import { moveTasksMutation } from "./mutators/move-tasks";
+import type { WriteTransaction } from "replicache";
+import {
+  createColumnMutation,
+  deleteColumnMutation,
+  updateColumnMutation,
+  createTaskMutation,
+  editTaskMutation,
+  deleteTaskMutation,
+  moveColumnsMutation,
+  moveTasksMutation,
+  type Column,
+  type Task,
+  type CreateColumnArgs,
+  type CreateTaskArgs,
+  type EditTaskArgs,
+  type MoveColumnsArgs,
+  type MoveTasksArgs,
+} from "@wodge/domain/pages";
 
-export interface CreateColumnArgs {
-  title?: string;
-  id: string;
-}
-export interface CreateTaskArgs {
-  task: Task;
-  col: string;
-}
-
-export interface EditTaskArgs {
-  task: Task;
-}
-
-export interface MoveColumnsArgs {
-  c1: string;
-  c2: string;
-}
-
-export interface MoveTasksArgs {
-  t1: string;
-  tOrC2: string;
-  isOverColumn: boolean;
-}
 export const pageMutators = {
   async createColumn(tx: WriteTransaction, data: CreateColumnArgs) {
     const columns = (await tx.get<Column[]>("columns")) || [];

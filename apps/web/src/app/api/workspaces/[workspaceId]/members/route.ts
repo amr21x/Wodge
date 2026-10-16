@@ -1,4 +1,4 @@
-import { memberships } from "@repo/data";
+import { memberships } from "@wodge/data";
 import { createDb, getUserInfoById } from "@/lib/data-server";
 import { and, eq } from "drizzle-orm";
 

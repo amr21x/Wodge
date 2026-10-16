@@ -1,4 +1,4 @@
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 import { toast } from "@/components/ui/toast";
 
 export async function getSrcLink(

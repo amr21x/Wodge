@@ -1,7 +1,7 @@
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 
-import { ChannelsTypes } from "@repo/data";
+import { ChannelsTypes } from "@wodge/domain/channels";
 
 export interface RecentlyVisitedItem {
   type: ChannelsTypes;

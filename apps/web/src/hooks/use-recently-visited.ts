@@ -1,6 +1,6 @@
 import { useAtomValue, useSetAtom } from "jotai";
 import { useEffect } from "react";
-import { ChannelsTypes } from "@repo/data";
+import { ChannelsTypes } from "@wodge/domain/channels";
 import { useParams } from "next/navigation";
 import { produce } from "immer";
 import { useCurrentWorkspace } from "@/components/workspace-provider";

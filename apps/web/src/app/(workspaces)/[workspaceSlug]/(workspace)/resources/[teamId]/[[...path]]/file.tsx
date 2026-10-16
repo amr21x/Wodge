@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 
 import { Download, File as FileIcon, Trash2 } from "lucide-react";
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 import { SidebarItemBtn } from "../../../_components/sidebar-item-btn";
 import { toast } from "@/components/ui/toast";
 import { Checkbox } from "@/components/ui/checkbox";

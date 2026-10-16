@@ -1,7 +1,7 @@
-import { env } from "@repo/env/client";
+import { env } from "@wodge/env/client";
 import { makeWorkspaceMembersKey } from "./keys";
 import { queryClient } from "./query-client";
-import type { ChannelsTypes } from "../schemas/channel.schema";
+import type { ChannelsTypes } from "@wodge/domain/channels";
 
 export function replicacheWrapper<Request, Result>(
   mode: "push" | "pull",

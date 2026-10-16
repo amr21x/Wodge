@@ -8,7 +8,7 @@ import {
   makeWorkspaceAvatarKey,
   REPLICACHE_VERSIONS_KEY,
   Workspace,
-} from "@repo/data";
+} from "@wodge/data";
 import { badRequest } from "../../lib/http-utils";
 
 export async function deleteFile(

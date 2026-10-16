@@ -1,4 +1,4 @@
-import { makeWorkspacesStoreKey, REPLICACHE_VERSIONS_KEY } from "@repo/data";
+import { makeWorkspacesStoreKey, REPLICACHE_VERSIONS_KEY } from "@wodge/data";
 import UserParty from "./user-party";
 import { Versions } from "../types";
 

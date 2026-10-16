@@ -17,7 +17,7 @@ import {
   Sun,
   Users2,
 } from "lucide-react";
-import { Workspace } from "@repo/data";
+import { Workspace } from "@wodge/data";
 import Link from "next/link";
 import {
   DropdownMenu,

@@ -1,7 +1,7 @@
-import { changeMemberRoleMutation } from "@repo/data/models/workspace/mutators/change-member-role";
+import { changeMemberRoleMutation } from "@wodge/data/models/workspace/mutators/change-member-role";
 import { RunnerParams } from "../../lib/replicache";
 import WorkspaceParty from "../workspace-party";
-import { WorkspaceMembers, makeWorkspaceMembersKey } from "@repo/data";
+import { WorkspaceMembers, makeWorkspaceMembersKey } from "@wodge/data";
 import { produce } from "immer";
 import { PushAuth } from "../handlers/workspace-push";
 

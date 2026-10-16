@@ -6,9 +6,9 @@ import {
   Replicache,
 } from "replicache";
 
-import { env } from "@repo/env";
-import { replicacheWrapper } from "@repo/data/browser";
-import { workspaceMutators } from "@repo/data/models/workspace/workspace-mutators";
+import { env } from "@wodge/env";
+import { replicacheWrapper } from "@wodge/data/browser";
+import { workspaceMutators } from "@wodge/data/models/workspace/workspace-mutators";
 
 export function createWorkspaceRep(userId: string, workspaceId: string) {
   return new Replicache<typeof workspaceMutators>({

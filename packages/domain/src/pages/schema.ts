@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ChannelSchema } from "./channel.schema";
+import { ChannelSchema } from "../channels/index";
 
 export const TaskSchema = z.object({
   id: z.string(),

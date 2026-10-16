@@ -2,7 +2,7 @@
 
 import { sign } from "@/lib/utils/sign";
 import { removeMember } from "@/lib/data-server";
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 
 export async function POST(
   req: Request,

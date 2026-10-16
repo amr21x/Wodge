@@ -1,4 +1,6 @@
-import { Column, DrObj, pageMutators, Task } from "@repo/data";
+import { Column, Task } from "@wodge/domain/pages";
+import { DrObj } from "@wodge/data";
+import { pageMutators } from "@/client/sync/pages";
 
 import { ColumnDef } from "@tanstack/react-table";
 import { DeepReadonly, Replicache } from "replicache";

@@ -1,6 +1,6 @@
 import { produce } from "immer";
-import { DrObj } from "../../..";
-import { Task } from "../../../schemas/page.schema";
+import type { DrObj } from "../../types";
+import { Task } from "../schema";
 
 export function deleteTaskMutation({
   task,

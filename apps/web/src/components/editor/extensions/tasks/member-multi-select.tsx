@@ -18,7 +18,7 @@ import { Check, Users2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { forwardRef, useEffect, useMemo, useState } from "react";
 
-import { canView, Member } from "@repo/data";
+import { canView, Member } from "@wodge/data";
 import { useCurrentWorkspace } from "@/components/workspace-provider";
 import { isEditing } from "@/app/(workspaces)/[workspaceSlug]/(workspace)/room/[teamId]/[channelId]/atoms";
 

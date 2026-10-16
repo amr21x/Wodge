@@ -15,10 +15,11 @@
     "reset:app": "rm -r ./apps/web/.wrangler && rm -r ./apps/backend/.partykit",
     "init:app": "pnpm generate && pnpm migrate:local && mkdir -p ./apps/backend/.partykit",
     "livekit": "livekit-server --dev --bind 0.0.0.0",
-    "deploy:app": "turbo deploy:app"
+    "deploy:app": "turbo deploy:app",
+    "check:boundaries": "node scripts/check-boundaries.mjs"
   },
   "devDependencies": {
-    "@repo/ts": "workspace:*",
+    "@wodge/ts": "workspace:*",
     "eslint": "8.56.0",
     "eslint-config-turbo": "^2.0.0",
     "tsx": "^4.7.1",

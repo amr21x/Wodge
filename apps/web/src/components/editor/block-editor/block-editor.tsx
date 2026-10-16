@@ -3,7 +3,7 @@
 import { EditorContent } from "@tiptap/react";
 import React, { memo, useEffect, useMemo, useRef } from "react";
 import { TiptapProps } from "./types";
-import { UserType } from "@repo/data";
+import { UserType } from "@wodge/data";
 import { useBlockEditor } from "@/hooks/use-block-editor";
 import { useCanEdit } from "@/hooks/use-can-edit";
 import { ScrollArea } from "@/components/ui/scroll-area";

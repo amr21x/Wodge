@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ChannelSchema } from "./channel.schema";
+import { ChannelSchema } from "@wodge/domain/channels";
 
 export const MessageSchema = z.object({
   id: z.string(),

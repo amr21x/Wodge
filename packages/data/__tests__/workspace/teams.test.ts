@@ -3,7 +3,10 @@ import { createTestStructure, createTestTeam } from "../utils";
 import { createTeamMutation } from "../../models/workspace/mutators/create-team";
 import { describe, expect, test } from "vitest";
 import { nanoid } from "nanoid";
-import { TEAM_MEMBERS_ROLE, WORKSPACE_TEAM_ID_LENGTH } from "../..";
+import {
+  TEAM_MEMBERS_ROLE,
+  WORKSPACE_TEAM_ID_LENGTH,
+} from "@wodge/domain/constants";
 import { updateTeamInfoMutation } from "../../models/workspace/mutators/team-info";
 import {
   addTeamMembersMutation,

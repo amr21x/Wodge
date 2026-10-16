@@ -1,9 +1,10 @@
 import WorkspaceParty from "../workspace-party";
 import { RunnerParams } from "../../lib/replicache";
-import { Channel, makeWorkspaceStructureKey } from "@repo/data";
-import { createPageMutation } from "@repo/data/models/workspace/mutators/create-page";
-import { NewPageArgs } from "@repo/data/models/workspace/workspace-mutators";
-import { updatePageMutation } from "@repo/data/models/workspace/mutators/update-page";
+import { Channel } from "@wodge/domain/channels";
+import { makeWorkspaceStructureKey } from "@wodge/data";
+import { createPageMutation } from "@wodge/data/models/workspace/mutators/create-page";
+import { NewPageArgs } from "@wodge/data/models/workspace/workspace-mutators";
+import { updatePageMutation } from "@wodge/data/models/workspace/mutators/update-page";
 import { PushAuth } from "../handlers/workspace-push";
 import { produce } from "immer";
 

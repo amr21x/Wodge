@@ -5,8 +5,9 @@
   "scripts": {
     "dev": "partykit dev --live",
     "deploy:app": "partykit deploy",
-    "build:foundation": "pnpm --filter @repo/worker-tools exec wrangler deploy --dry-run --config ../../apps/backend/wrangler.foundation.jsonc",
-    "test:foundation": "node tests/foundation/verify.mjs"
+    "build:foundation": "pnpm --filter @wodge/worker-tools exec wrangler deploy --dry-run --config ../../apps/backend/wrangler.foundation.jsonc",
+    "test:foundation": "node tests/foundation/verify.mjs",
+    "test:pages": "vitest run tests/integration/pages.test.ts --maxWorkers=2 --minWorkers=1"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.554.0",
@@ -24,20 +25,23 @@
     "replicache": "^14.1.0",
     "y-partykit": "^0.0.28",
     "zod": "^3.22.4",
-    "@repo/data": "workspace:*",
+    "@wodge/data": "workspace:*",
     "partyserver": "0.5.10",
     "y-partyserver": "2.2.0",
     "yjs": "13.6.14",
-    "@repo/backend-protocol": "workspace:*"
+    "@wodge/backend-protocol": "workspace:*",
+    "@wodge/domain": "workspace:*"
   },
   "devDependencies": {
-    "@repo/ts": "workspace:*",
+    "@wodge/ts": "workspace:*",
     "@types/lodash": "^4.14.202",
     "lodash": "^4.17.21",
     "partykit": "^0.0.89",
     "typescript": "^5.3.3",
     "vitest": "^1.3.1",
     "vitest-environment-miniflare": "^2.14.2",
-    "@cloudflare/workers-types": "4.20260424.1"
+    "@cloudflare/workers-types": "4.20260424.1",
+    "fake-indexeddb": "^5.0.2",
+    "jsdom": "^24.0.0"
   }
 }

@@ -5,9 +5,9 @@ import {
   PushRequest,
   Replicache,
 } from "replicache";
-import { env } from "@repo/env/client";
-import { replicacheWrapper } from "../../lib/browser-utils";
-import { pageMutators } from "./page-mutators";
+import { env } from "@wodge/env/client";
+import { replicacheWrapper } from "@wodge/data/browser";
+import { pageMutators } from "./mutators";
 
 export function createPageRep({
   channelId,

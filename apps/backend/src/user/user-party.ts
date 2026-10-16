@@ -10,7 +10,7 @@ import type * as Party from "partykit/server";
 // import { handlePost } from "./endpoints/user-post";
 import { notImplemented, ok, unauthorized } from "../lib/http-utils";
 import { verifyToken } from "../lib/auth";
-import { PokeMessage } from "@repo/data";
+import { PokeMessage } from "@wodge/data";
 import { UserPartyInterface, Versions } from "../types";
 import { Hono } from "hono";
 import { userPull } from "./handlers/user-pull";

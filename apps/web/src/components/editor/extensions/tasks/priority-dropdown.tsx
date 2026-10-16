@@ -8,7 +8,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { ChevronUpCircle, X } from "lucide-react";
-import { DrObj, Task } from "@repo/data";
+import { DrObj } from "@wodge/data";
+import { Task } from "@wodge/domain/pages";
 import { SidebarItemBtn } from "@/app/(workspaces)/[workspaceSlug]/(workspace)/_components/sidebar-item-btn";
 import { Badge } from "@/components/ui/badge";
 

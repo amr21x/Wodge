@@ -3,8 +3,8 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Post } from "./post";
 import { Replicache } from "replicache";
-import { ThreadMessage, ThreadPost } from "@repo/data";
-import { threadMutators } from "@repo/data/browser";
+import { ThreadMessage, ThreadPost } from "@wodge/data";
+import { threadMutators } from "@wodge/data/browser";
 import { useChannelPath } from "@/hooks/use-channel-path";
 import { CommentEditor } from "./comment-editor";
 import { ThreadMessagesList } from "./thread-msgs-list";

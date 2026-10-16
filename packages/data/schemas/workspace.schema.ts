@@ -1,4 +1,8 @@
-import { BRAND_COLOR, ID_LENGTH, WORKSPACE_GROUP_ID_LENGTH } from "./config";
+import {
+  BRAND_COLOR,
+  ID_LENGTH,
+  WORKSPACE_GROUP_ID_LENGTH,
+} from "@wodge/domain/constants";
 import { TeamSchema } from "./team.schema";
 import {
   integer,

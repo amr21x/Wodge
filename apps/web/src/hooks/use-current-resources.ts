@@ -1,8 +1,8 @@
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 
-import { env } from "@repo/env";
-import { WORKSPACE_TEAM_ID_LENGTH } from "@repo/data";
+import { env } from "@wodge/env";
+import { WORKSPACE_TEAM_ID_LENGTH } from "@wodge/domain/constants";
 import { useCurrentWorkspace } from "@/components/workspace-provider";
 
 export function useCurrentResources() {

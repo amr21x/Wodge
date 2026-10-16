@@ -1,8 +1,8 @@
 import { RunnerParams } from "../lib/replicache";
 import { produce } from "immer";
 import PageParty from "./page-party";
-import { MoveColumnsArgs } from "@repo/data";
-import { moveColumnsMutation } from "@repo/data/models/page/mutators/move-columns";
+import { MoveColumnsArgs } from "@wodge/domain/pages";
+import { moveColumnsMutation } from "@wodge/domain/pages";
 
 export async function moveColumns(party: PageParty, params: RunnerParams) {
   const args = params.mutation.args as MoveColumnsArgs;

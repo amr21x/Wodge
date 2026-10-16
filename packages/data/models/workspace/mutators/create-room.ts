@@ -1,5 +1,6 @@
 import { produce } from "immer";
-import { Room, RoomSchema, DrObj, TEAM_MEMBERS_ROLE } from "../../..";
+import { Room, RoomSchema, DrObj } from "../../..";
+import { TEAM_MEMBERS_ROLE } from "@wodge/domain/constants";
 import { WorkspaceStructure } from "../../../schemas/workspace.schema";
 
 interface CreateTeamArgs {

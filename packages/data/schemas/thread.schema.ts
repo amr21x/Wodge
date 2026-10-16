@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { ChannelSchema } from "./channel.schema";
-import { WORKSPACE_GROUP_ID_LENGTH } from "./config";
+import { ChannelSchema } from "@wodge/domain/channels";
+import { WORKSPACE_GROUP_ID_LENGTH } from "@wodge/domain/constants";
 
 export const ThreadSchema = ChannelSchema.extend({
   viewGroups: z

@@ -1,4 +1,4 @@
-import { env } from "@repo/env";
+import { env } from "@wodge/env";
 import { useState } from "react";
 import { Check, Copy, RefreshCcw, Repeat } from "lucide-react";
 import { useCurrentWorkspace } from "@/components/workspace-provider";

@@ -1,4 +1,4 @@
-import { isAdmin, isOwner, isTeamModerator } from "@repo/data";
+import { isAdmin, isOwner, isTeamModerator } from "@wodge/data";
 import { useCurrentUser } from "./use-current-user";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";

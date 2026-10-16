@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DrObj, Team, TeamSchema, WORKSPACE_TEAM_ID_LENGTH } from "@repo/data";
+import { DrObj, Team, TeamSchema } from "@wodge/data";
+import { WORKSPACE_TEAM_ID_LENGTH } from "@wodge/domain/constants";
 
 import { useForm } from "react-hook-form";
 import { useEffect, useRef } from "react";

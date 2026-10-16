@@ -1,8 +1,8 @@
 import { RunnerParams } from "../lib/replicache";
 import { produce } from "immer";
-import { createColumnMutation } from "@repo/data/models/page/mutators/create-column";
+import { createColumnMutation } from "@wodge/domain/pages";
 import PageParty from "./page-party";
-import { CreateColumnArgs } from "@repo/data";
+import { CreateColumnArgs } from "@wodge/domain/pages";
 
 export async function createColumn(party: PageParty, params: RunnerParams) {
   const args = params.mutation.args as CreateColumnArgs;
