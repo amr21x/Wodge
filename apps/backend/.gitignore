@@ -171,3 +171,5 @@ dist
 
 
 .tsbuildinfo
+# Wrangler local state and development bundles
+.wrangler/

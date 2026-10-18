@@ -599,6 +599,70 @@ try {
   );
 
   await check(
+    "partial configuration keeps collaboration available without external providers",
+    async () => {
+      const {
+        APP_DOMAIN,
+        BACKEND_DOMAIN,
+        AVATARS_URL,
+        BETTER_AUTH_SECRET,
+        SECRET_KEY,
+      } = runtimeOptions.bindings;
+      await runtime.setOptions(
+        convertV4MiniflareOptions({
+          ...runtimeOptions,
+          bindings: {
+            APP_DOMAIN,
+            BACKEND_DOMAIN,
+            AVATARS_URL,
+            BETTER_AUTH_SECRET,
+            SECRET_KEY,
+          },
+          outboundService: async () => {
+            throw new Error(
+              "Unconfigured integration attempted network access",
+            );
+          },
+        }),
+      );
+      try {
+        assert.equal((await request("/health")).status, 200);
+        assert.equal((await request("/api/users/me", {}, false)).status, 401);
+        assert.equal((await request("/api/users/me")).status, 200);
+        const response = await request(
+          "/api/workspaces/new",
+          json({ name: "Without storage", slug: "without-storage" }),
+        );
+        assert.equal(response.status, 201, await response.clone().text());
+        const created = (await response.json()).workspace;
+        assert.equal(
+          (await request(`/api/workspaces/${created.id}/members`)).status,
+          200,
+        );
+        // Earlier negative OTP checks share a rate-limit bucket in this local runtime.
+        const partialDatabase = await runtime.getD1Database("DB");
+        await partialDatabase.prepare("DELETE FROM auth_rate_limits").run();
+        const otp = await request(
+          "/api/auth/email-otp/send-verification-otp",
+          json({ email: "unconfigured@example.test", type: "sign-in" }),
+          false,
+        );
+        assert.equal(otp.status, 503, await otp.clone().text());
+        const webhook = await request("/api/billing/webhook", {
+          ...json({}),
+          headers: {
+            "content-type": "application/json",
+            "stripe-signature": "unconfigured",
+          },
+        });
+        assert.equal(webhook.status, 503, await webhook.clone().text());
+      } finally {
+        await runtime.setOptions(convertV4MiniflareOptions(runtimeOptions));
+      }
+    },
+  );
+
+  await check(
     "logout revokes the session and previously issued connection tickets",
     async () => {
       const response = await request("/api/auth/sign-out", json({}));

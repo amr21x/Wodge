@@ -1,4 +1,5 @@
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
+import { IntegrationUnavailableError } from "@wodge/infra/integration-unavailable";
 import { workspaceMemberLimit } from "@wodge/core/workspace/policy";
 import {
   authAccounts,
@@ -15,7 +16,7 @@ import { NewWorkspaceSchema } from "@wodge/domain/workspace/validation";
 import type { ServerEnvironment } from "@wodge/env/server";
 import type { Database } from "@wodge/infra/database/types";
 import { betterAuth } from "better-auth";
-import { APIError } from "better-auth/api";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import { emailOTP, organization } from "better-auth/plugins";
 
 /** Configure Better Auth here; the backend supplies environment and dependencies only. */
@@ -76,6 +77,19 @@ export function createAuth(
           },
         }),
     },
+    hooks: {
+      // Better Auth can mask delivery errors in background tasks. Reject an unavailable
+      // email capability before it creates a code or reports that a message was sent.
+      before: createAuthMiddleware(async (context) => {
+        if (
+          context.path.startsWith("/email-otp/") &&
+          (!environment.RESEND_API_KEY || !environment.RESEND_EMAIL_FROM)
+        )
+          throw new APIError("SERVICE_UNAVAILABLE", {
+            message: "Sign-in email is not configured",
+          });
+      }),
+    },
     plugins: [
       organization({
         allowUserToCreateOrganization: true,
@@ -122,12 +136,21 @@ export function createAuth(
         expiresIn: 300,
         allowedAttempts: 5,
         storeOTP: "hashed",
-        sendVerificationOTP: ({ email, otp }) =>
-          emailSender.send({
-            to: email,
-            subject: "Your Wodge sign-in code",
-            text: `Your Wodge sign-in code is ${otp}. It expires in 5 minutes.`,
-          }),
+        sendVerificationOTP: async ({ email, otp }) => {
+          try {
+            await emailSender.send({
+              to: email,
+              subject: "Your Wodge sign-in code",
+              text: `Your Wodge sign-in code is ${otp}. It expires in 5 minutes.`,
+            });
+          } catch (error) {
+            if (error instanceof IntegrationUnavailableError)
+              throw new APIError("SERVICE_UNAVAILABLE", {
+                message: error.message,
+              });
+            throw error;
+          }
+        },
       }),
     ],
   });

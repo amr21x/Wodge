@@ -2,6 +2,7 @@ import { BetterAuthMembership } from "@wodge/auth/membership";
 import { billingError } from "@wodge/core/billing/errors";
 import { BillingService } from "@wodge/core/billing/services/billing";
 import { StripePayments } from "@wodge/infra/payments/payments";
+import { IntegrationUnavailableError } from "@wodge/infra/integration-unavailable";
 import type { Context } from "hono";
 import { inject, injectable } from "tsyringe";
 import { WorkspaceGateway } from "../../gateways/workspace";
@@ -65,7 +66,8 @@ export class BillingHandlers {
         signature,
         c.env.STRIPE_WH_SECRET,
       );
-    } catch {
+    } catch (error) {
+      if (error instanceof IntegrationUnavailableError) throw error;
       return c.body(null, 400);
     }
     if (event.type === "ignored") return c.body(null, 200);

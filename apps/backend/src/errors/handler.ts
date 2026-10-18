@@ -1,4 +1,5 @@
 import { ApplicationError } from "@wodge/core/errors";
+import { IntegrationUnavailableError } from "@wodge/infra/integration-unavailable";
 import { HTTPException } from "hono/http-exception";
 import { ZodError } from "zod";
 import { CORS } from "../lib/helpers/responses";
@@ -6,6 +7,16 @@ import { applicationErrorStatus } from "./mappings";
 
 /** Translate semantic failures at the HTTP boundary; unexpected details stay in server logs. */
 export function handleError(error: unknown): Response {
+  if (error instanceof IntegrationUnavailableError) {
+    return Response.json(
+      {
+        ok: false,
+        error: { code: "INTEGRATION_UNAVAILABLE", message: error.message },
+      },
+      { status: 503, headers: CORS },
+    );
+  }
+
   if (error instanceof ZodError) {
     return Response.json(
       {

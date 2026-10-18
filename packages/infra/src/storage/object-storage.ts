@@ -14,12 +14,32 @@ import { FetchHttpHandler } from "@smithy/fetch-http-handler";
 import type { ServerEnvironment } from "@wodge/env/server";
 import type { ObjectStorage } from "@wodge/infra/storage/types";
 import { inject, injectable } from "tsyringe";
+import { IntegrationUnavailableError } from "../integration-unavailable";
 
 @injectable()
 export class S3ObjectStorage implements ObjectStorage {
-  private readonly client: S3Client;
-  constructor(@inject("environment") environment: ServerEnvironment) {
-    this.client = new S3Client({
+  private instance?: S3Client;
+  constructor(
+    @inject("environment") private readonly environment: ServerEnvironment,
+  ) {}
+
+  get configured(): boolean {
+    return Boolean(
+      this.environment.R2_ENDPOINT &&
+        this.environment.R2_ACCESS_KEY &&
+        this.environment.R2_SECRET_KEY,
+    );
+  }
+
+  private get client(): S3Client {
+    const environment = this.environment;
+    if (
+      !environment.R2_ENDPOINT ||
+      !environment.R2_ACCESS_KEY ||
+      !environment.R2_SECRET_KEY
+    )
+      throw new IntegrationUnavailableError("File storage");
+    return (this.instance ??= new S3Client({
       region: "us-east-1",
       endpoint: environment.R2_ENDPOINT,
       credentials: {
@@ -29,7 +49,7 @@ export class S3ObjectStorage implements ObjectStorage {
       requestHandler: new FetchHttpHandler(),
       streamCollector: async (stream) =>
         new Uint8Array(await new Response(stream).arrayBuffer()),
-    });
+    }));
   }
 
   createBucket(input: { Bucket: string }) {
@@ -84,6 +104,6 @@ export class S3ObjectStorage implements ObjectStorage {
   }
 
   dispose() {
-    this.client.destroy();
+    this.instance?.destroy();
   }
 }

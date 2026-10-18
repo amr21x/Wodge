@@ -26,6 +26,9 @@ const applications = new WeakMap<WorkerEnvironment, BackendApplication>();
 export function backendApplication(
   environment: WorkerEnvironment,
 ): BackendApplication {
+  // External providers can be absent locally; identity and ticket signing cannot.
+  if (!environment.BETTER_AUTH_SECRET || !environment.SECRET_KEY)
+    throw new Error("BETTER_AUTH_SECRET and SECRET_KEY are required");
   let application = applications.get(environment);
   if (!application) {
     application =

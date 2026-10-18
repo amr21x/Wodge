@@ -57,6 +57,16 @@ Copy `.dev.vars.example` to `.dev.vars` and provide local secrets. Set the publi
 environment from the root `.env.example`. Start backend with `pnpm --filter backend dev`
 and web with `pnpm --filter web dev`. Next forwards `/api/*` to the local Worker.
 
+For partial local development, only `BETTER_AUTH_SECRET` and `SECRET_KEY` are mandatory
+secrets. Keep them separate and strong; origins and D1/DO bindings still come from Wrangler.
+Provider credentials are temporarily optional. Missing storage, billing or call configuration
+returns HTTP 503 when those operations are attempted; email OTP returns unavailable when
+Resend is missing. Authentication is never bypassed: sign-in needs Resend or configured OAuth.
+Workspace synchronization skips bucket creation without storage credentials, so collaboration
+can run after authentication. Workspaces created this way need their buckets provisioned before
+enabling uploads later. Provider verification and required deployment configuration remain
+showcase readiness work; a successful local health check does not establish those integrations.
+
 Apply local migrations with `pnpm --filter backend db:migration:local`. Auth is fresh:
 no Supabase accounts, passwords or sessions are imported. Existing application data
 is not deleted or linked to newly authenticated accounts automatically.

@@ -1,6 +1,7 @@
 import type { ServerEnvironment } from "@wodge/env/server";
 import { inject, injectable } from "tsyringe";
 import { HttpClient } from "../http/client";
+import { IntegrationUnavailableError } from "../integration-unavailable";
 
 @injectable()
 export class ResendEmail {
@@ -10,6 +11,8 @@ export class ResendEmail {
   ) {}
 
   async send(message: { to: string; subject: string; text: string }) {
+    if (!this.environment.RESEND_API_KEY || !this.environment.RESEND_EMAIL_FROM)
+      throw new IntegrationUnavailableError("Sign-in email");
     const response = await this.http.request("https://api.resend.com/emails", {
       method: "POST",
       headers: {

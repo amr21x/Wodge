@@ -187,7 +187,8 @@ export class WorkspaceHandlers {
       const result = await this.memberships.add(member.userId);
       if (!result.ok) throw new Error("Workspace projection addition failed");
     }
-    if (!this.workspaceLifecycle.initialized)
+    // Workspace collaboration can run locally without file storage. Uploads remain unavailable.
+    if (!this.workspaceLifecycle.initialized && this.storage.configured)
       await this.storage.createBucket({
         Bucket: getBucketAddress(this.workspaceId),
       });
