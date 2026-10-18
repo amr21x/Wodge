@@ -1,7 +1,5 @@
 //@ts-nocheck
 
-const { setupDevPlatform } = require("@cloudflare/next-on-pages/next-dev");
-
 const withPWA = require("next-pwa")({
   dest: "public",
   disable: process.env.NODE_ENV === "development",
@@ -11,19 +9,21 @@ const withPWA = require("next-pwa")({
 
 const jiti = require("jiti")(__filename);
 
-jiti("./node_modules/@wodge/env/index.ts");
+jiti("./node_modules/@wodge/env/client.ts");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = withPWA({}) || {};
 
-/**
- * Add Cloudflare bindings for Next.js development mode.
- */
+// In development Next forwards API traffic; production routes these paths to the backend Worker.
 
-(async () => {
-  if (process.env.NODE_ENV === "development") {
-    await setupDevPlatform();
-  }
-})();
+nextConfig.rewrites = async () =>
+  process.env.NODE_ENV === "development"
+    ? [
+        {
+          source: "/api/:path*",
+          destination: `${process.env.NEXT_PUBLIC_BACKEND_DOMAIN || "http://localhost:8787"}/api/:path*`,
+        },
+      ]
+    : [];
 
 module.exports = nextConfig;

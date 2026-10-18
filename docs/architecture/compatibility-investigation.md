@@ -2,6 +2,10 @@
 
 [Docs home](../README.md) · [Architecture](README.md)
 
+This is historical checkpoint evidence. The later owner-approved editor migration
+uses public Tiptap v2.27.3 packages and removes the private registry mapping.
+See the [current test inventory](../development/testing-strategy.md) for validation.
+
 Compatibility evidence is limited to the selected foundation scope of the
 [verified project](../development/documentation.md) and actual local executions.
 Imported provider/version conclusions and runtime claims from unrelated document

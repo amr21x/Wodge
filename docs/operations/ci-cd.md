@@ -4,17 +4,22 @@
 
 ## Current configuration
 
-[The checked-in workflow](../../.github/workflows/deploy.yml) is configured to deploy PartyKit backend changes on push to `main`. It installs dependencies and invokes PartyKit deployment. It does not implement the approved complete lint/format/type/test/build gates, documentation-only exclusion or manual deployment approval. The owner reports that CD is stopped; its remote disabled state has not been independently verified. Updating this policy does not change the executable workflow.
+[The checked-in workflow](../../.github/workflows/deploy.yml) is a manually triggered
+Wrangler deployment for the backend Worker. It configures Worker secrets from the
+`BACKEND_SECRETS` JSON secret and public origin variables. Automatic PartyKit deploy
+on push has been removed. Production namespace/data migration and hostname routing
+remain deployment prerequisites; no remote deployment was executed. This workflow
+does not yet implement the complete lint/format/type/test/build gates below.
 
 ## Documentation-only changes
 
 CI/CD must always skip pull requests and changes whose changed files are all under `docs/`. This applies to pull requests, pushes and their merge commits. Documentation-only changes must not run application lint, formatting, type checks, tests, builds, releases or deployments. Documentation review and link checks are independent of application CI/CD; no documentation publishing service is required.
 
-| Changed files | Required behavior |
-| --- | --- |
-| Only `docs/**`, including additions, edits and deletions | Skip application CI/CD. |
-| `docs/**` together with any path outside `docs/` | Run the normal checks for the application change; deployment still requires approval. |
-| Any path outside `docs/` | Apply the normal pipeline policy. Root configuration and workflow files are outside this exemption. |
+| Changed files                                            | Required behavior                                                                                   |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Only `docs/**`, including additions, edits and deletions | Skip application CI/CD.                                                                             |
+| `docs/**` together with any path outside `docs/`         | Run the normal checks for the application change; deployment still requires approval.               |
+| Any path outside `docs/`                                 | Apply the normal pipeline policy. Root configuration and workflow files are outside this exemption. |
 
 Determine the scope from the complete change set, including both paths of a rename. A move into or out of `docs/` is not documentation-only. Reviewers still check documentation accuracy, navigation and links; a skipped pipeline is not approval evidence or proof that requirements have shipped.
 

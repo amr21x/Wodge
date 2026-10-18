@@ -4,14 +4,14 @@
 
 Use the existing environment and release guidance to prepare operational work. These pages describe procedures and readiness requirements; they do not establish that a live revival deployment exists.
 
-| Read | What you will find |
-| --- | --- |
-| [Environments and runtime topology](environments.md) | Environment responsibilities and runtime topology. |
-| [CI/CD and deployment gates](ci-cd.md) | Recorded pipeline behavior, approved gates, and gaps in enforcement. |
-| [Release policy](release-policy.md) | Release readiness, approval evidence, and rollback expectations. |
-| [Revival deployment coordination](runbooks/revival-deployment.md) | Additional deployment coordination for the revival. |
-| [Observability](observability.md) | Operational visibility, diagnostics, and observability gaps. |
-| [Maintenance and feedback](maintenance.md) | Maintenance expectations and the feedback process. |
+| Read                                                              | What you will find                                                   |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------- |
+| [Environments and runtime topology](environments.md)              | Environment responsibilities and runtime topology.                   |
+| [CI/CD and deployment gates](ci-cd.md)                            | Recorded pipeline behavior, approved gates, and gaps in enforcement. |
+| [Release policy](release-policy.md)                               | Release readiness, approval evidence, and rollback expectations.     |
+| [Revival deployment coordination](runbooks/revival-deployment.md) | Additional deployment coordination for the revival.                  |
+| [Observability](observability.md)                                 | Operational visibility, diagnostics, and observability gaps.         |
+| [Maintenance and feedback](maintenance.md)                        | Maintenance expectations and the feedback process.                   |
 
 ## Troubleshoot and verify
 

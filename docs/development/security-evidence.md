@@ -2,6 +2,10 @@
 
 [Docs home](../README.md) · [Develop Wodge](README.md)
 
+This is historical checkpoint evidence. The later owner-approved editor migration
+uses public Tiptap v2.27.3 packages and removes the private registry mapping.
+See the [current test inventory](testing-strategy.md) for validation.
+
 Verified on 2026-10-16 against owner-selected baseline
 `51d921d8a03d5808df8df7c75d521ab920a870bb`.
 

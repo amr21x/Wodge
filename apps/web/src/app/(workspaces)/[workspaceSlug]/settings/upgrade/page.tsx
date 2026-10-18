@@ -9,9 +9,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useCurrentWorkspace } from "@/components/workspace-provider";
+import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
 import { cn } from "@/lib/utils";
-import { Workspace } from "@wodge/data";
+import { Workspace } from "@wodge/domain/workspace/models";
 import { useMutation } from "@tanstack/react-query";
 import { CheckCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -150,7 +150,9 @@ function UpgradePage() {
 
   const router = useRouter();
 
-  if (!workspace) return null;
+  if (!workspace) {
+    return null;
+  }
 
   const plans = [
     {
@@ -176,6 +178,7 @@ function UpgradePage() {
       isLoading: isUpgrading,
     },
   ];
+
   return (
     <div className="py-4">
       <PricingHeader

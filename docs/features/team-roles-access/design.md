@@ -8,3 +8,7 @@ visual system or broader redesign is selected by this page.
 
 The [smoke matrix](../../development/smoke-test-matrix.md) identifies the browser
 journeys that need actual validation.
+
+The [authorization implementation and target design](authorization/design.md)
+records the new backend role API and room enforcement. It does not yet replace
+the retained role/group controls shown by the UI.

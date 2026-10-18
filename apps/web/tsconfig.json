@@ -7,26 +7,11 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"]
     },
-    "types": [
-      "@cloudflare/workers-types/2023-07-01"
-    ],
+    "types": ["@cloudflare/workers-types/2023-07-01"],
     "strictNullChecks": true
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    "../../packages/ui/components/data-table/settings-data-table.tsx",
-    "src/components/workspace/sidebar/add-to-team.tsx",
-    "src/components/resources/advanced-uploadtsx",
-    "src/lib/utils/is-custom-node-selected.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }

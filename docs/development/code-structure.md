@@ -1,114 +1,122 @@
-# Code structure and package boundaries
+# Code structure and purpose
 
-[Docs home](../README.md) · [Develop Wodge](README.md)
+[Docs home](../README.md) · [Backend review path](backend-review-handoff.md)
 
-The current scope retains separate web and backend applications in the existing
-pnpm/Turborepo monorepo. The web application remains Next.js; broader framework
-and UI migration is deferred. See the [current project scope](documentation.md).
+The application runs as a Hono Worker and five PartyServer Durable Objects.
+Packages use the `@wodge` scope and expose their owning modules directly.
 
-## Package responsibilities
+```text
+apps/backend/src/
+  server.ts                     Worker fetch export and Durable Object class exports
+  application.ts                Hono middleware order, auth, webhooks and API mounts
+  container.ts                  one backend registration entrypoint
+  di/
+    register-services.ts        core/auth classes and their lifetimes
+    register-repositories.ts         persistence repository classes and their lifetimes
+    register-transport.ts       routes, handlers, gateways and sync adapters
+    register-providers.ts       technical integration classes
+    providers.ts                lazy database and Better Auth factories
+    adapters.ts                 capability tokens mapped to implementations
+    runtime.ts                  Worker cache and awaited object initialization
+  servers/                      Cloudflare lifecycle adapters; no containers
+  routes/                       method/path definitions; injected handler instances
+  handlers/                     validation, authorization and coordination
+  middleware/                   native Hono middleware factories
+  validators/                   transport schemas composed from domain schemas
+  gateways/                     calls to other objects through the HTTP client
+  lib/
+    sync/                       dispatch, acknowledgements, patches and validation
+    authorization/              invalidation delivery and retry coordination
+    helpers/                    request parsing and identity helpers
+  errors/                       global HTTP error mapping
+  types/                        Worker bindings, Hono contexts and request actors
 
-- `apps/web`: retained Next.js routes, UI, browser state, editor/task views, and
-  web-specific request adapters.
-- `apps/backend`: realtime services and authoritative backend operations. Production
-  routing remains PartyKit until the separately scoped PartyServer migration.
-- `packages/domain` (`@wodge/domain`): extracted page/task contracts, schemas and
-  pure mutations, plus shared channel definitions and constants. Its finite public
-  entries are `/pages`, `/channels` and `/constants`; there is no root barrel or
-  public source-path wildcard. It has no browser, environment or persistence imports.
-- `apps/web/src/client/sync/pages`: page Replicache construction and transaction
-  adapters. Both these adapters and backend page handlers call the same domain
-  mutations. Browser factories are no longer exported from the data package for pages.
-- `packages/data` (`@wodge/data`): transitional home for the remaining domain
-  features, keys, browser adapters and binding-based server persistence. Page/task
-  definitions and algorithms have moved; there are no compatibility re-exports for them.
-- `packages/backend-protocol`: isolated Better Auth/MCP adapters with Zod 4, without
-  changing retained Zod 3 domain validation.
-- `packages/env`: existing application configuration and a separate public-only
-  browser configuration entry point.
-- `config/ts` and `config/workers`: shared TypeScript settings and isolated Worker
-  build tooling respectively.
+packages/core/src/
+  <feature>/
+    services/                   business operations and persistence coordination
+    repositories/                    pure database/object data access
+    mutations/                  pure transformations, including optimistic reuse
+    errors.ts                   application error factories where needed
+  errors.ts                     application error class
 
-## Implemented foundation boundary
+packages/domain/src/
+  <feature>/
+    models.ts                   declarative business and stored record shapes
+    dto.ts                      operation inputs and response types
+    validation.ts               shared schemas
+    errors.ts                   error code types where needed
+  auth/schema/                  canonical identity and organization table schemas
+  sync/                         shared record/protocol definitions and keys
+  identifiers.ts                UUIDv7 defaults and legacy identifier validation
 
-`@wodge/data` retains the remaining shared entry point, `@wodge/data/browser` exposes
-the remaining browser helpers and constructors, and `@wodge/data/server` accepts
-explicit D1 bindings. Browser
-bundles reject the server/database/protocol entry points. Web request context stays
-inside `apps/web/src/lib/data-server.ts`; backend factories receive `DB` explicitly.
+packages/auth/src/
+  server.ts                     Better Auth configuration
+  client.ts                     browser auth client
+  membership.ts                 identity and organization membership operations
+  tickets.ts                    session-bound connection tickets
+  tokens.ts                     signing and verification
+  authorization/                workspace policies, roles, grants and evaluation
 
-Persistence operations do not grant authorization. HTTP/sync/MCP callers must enforce
-actor and resource permissions. The existing backend permission checks are preserved.
-Replicache remains the structured local-first system and Yjs owns collaborative text.
-
-The [foundation evidence](backend-foundation.md) records the checked implementation
-and limitations, including remaining production backend-to-web API calls. It does
-not claim all product operations have migrated to the separate backend.
-
-## Agreed restructuring direction
-
-The starting point is the current fix state, not an assumed completed foundation.
-Workspace packages use the `@wodge` scope. Existing Next.js and PartyKit hosts
-remain while responsibilities are extracted in reviewable slices.
-
-- `@wodge/domain`: feature contracts, data definitions and shared pure behavior.
-  Persistence schemas may use Drizzle, but browser-safe exports must not reach
-  server schemas, clients or initialization.
-- `@wodge/core`: authoritative feature operations, authorization, concrete
-  feature-owned queries and orchestration. Core receives dependencies explicitly;
-  Next.js request contexts and PartyKit instances do not become service dependencies.
-- Focused integration packages such as `@wodge/auth`, `@wodge/payments`,
-  `@wodge/email` and `@wodge/storage` own provider interactions. Product policy
-  belongs to core. No umbrella infrastructure package is required.
-- Application hosts own transports, lifecycle, configuration and composition.
-  Both existing server hosts may invoke core during extraction. Web owns UI and
-  browser integration. A DI container is not selected by this structure.
-
-Only populated boundaries are introduced. Core extraction, the remaining domain
-features, provider packages and broader web feature organization are still pending;
-the page slice does not claim their implementation. Runtime/auth migrations stay
-separate from the restructuring.
-
-## Page/task slice checkpoint
-
-Implemented from source revision `63426ac8ac4f08a055eac1bee774a79f98ee5b18`,
-with local validation on 2026-10-16. Schema defaults, mutation names and arguments,
-storage keys, version updates and permission checks are preserved. The shared
-readonly type is structural and does not require Replicache in domain.
-
-Runnable checks with the pinned pnpm launcher:
-
-```sh
-pnpm check:boundaries
-pnpm --filter @wodge/domain typecheck
-pnpm --filter backend test:pages
-pnpm --filter backend test:foundation
-pnpm exec tsc -p apps/backend/tsconfig.json --incremental false --pretty false
-pnpm exec tsc -p packages/backend-protocol/tsconfig.json --incremental false --pretty false
+packages/infra/
+  database/                     Drizzle configuration
+  src/
+    database/                   database construction and types
+    durable-objects/            technical record storage and alarm contracts
+    http/                       general HTTP client; supports object stub transport
+    email/                      generic delivery integration
+    storage/                    object storage SDK
+    payments/                   payment SDK
+    calls/                      call token SDK
 ```
 
-The new boundary check verifies declared workspace imports, public exports, domain
-runtime dependencies and production imports that bypass another workspace's API.
-The bundle checks additionally prove the page domain does not reach app, database,
-environment or sync-client code and reject private domain imports. These checks
-cover the extracted boundary; they do not assert complete separation of transitional
-features in `@wodge/data`.
+Not every feature needs every file. Avoid empty modules, barrel files, re-export
+wrappers and generic dependency bags.
 
-The page integration suite uses real Replicache transactions with an emulated
-IndexedDB and an in-memory backend storage fixture. It checks creation, editing,
-cascading column deletion, missing-column behavior, persisted versions and storage
-failure propagation. It does not establish network sync, authorization ingress,
-restart durability or multi-client/Yjs acceptance. The separate foundation suite
-checks real local Worker/D1 bindings and all existing backend entry bundles.
+## Dependency flow
 
-All commands above passed using Node 24.19.0 and an existing dependency snapshot;
-this is not a clean-install claim. Frozen offline lockfile validation passed with
-pnpm 9.4.0; third-party package resolutions did not change. The default pnpm launcher
-still fails locally, so validation invoked the pinned JavaScript launcher directly.
-Worker/D1 execution required loopback access outside the restricted sandbox.
+Routes receive handlers; handlers receive services and transport integrations;
+services receive repositories; repositories receive configured database/storage instances.
+Handlers do not import repositories. Services do not call HTTP endpoints or Durable
+Object gateways. Infrastructure contains no feature repositories or business policies.
+Auth owns permission evaluation, while core repository modules persist policy records.
+Domain schemas may execute validation and identifier defaults; feature mutation
+implementations and access evaluation live in core and auth respectively.
 
-Full web and data type checks retain exactly their pre-slice diagnostic signatures
-(36 web and 16 data diagnostics in this dependency snapshot). These include missing
-premium editor packages, dependency drift and stale tests/movement types. Full app
-startup, UI journeys and end-to-end collaboration remain unverified. Historical
-baseline and foundation records describe their own revisions and dependency names.
+Cross-object workflows are coordinated in backend handlers. A gateway selects a
+Durable Object namespace/stub and sends a request through `HttpClient`. The
+`https://internal` hostname is synthetic; the stub selects the destination.
+`/parties/:namespace/:id/*` remains the PartyServer routing convention.
+
+## Injection and runtime lifetimes
+
+All registrations live in the backend. `container.ts` calls the focused `di/`
+registration modules once. Classes use `@injectable()` and explicit constructor
+`@inject` tokens, without registering themselves. Registrations choose
+`ContainerScoped`; factories cache their result within the owning runtime.
+
+The Worker caches one application graph per environment object. Each Durable
+Object activation initializes one graph during awaited `onStart`. The DI startup
+boundary restores persisted records and supplies ready instances to the server.
+There are no per-request or per-alarm containers, and request callbacks do not
+resolve handlers. Identity, request headers and mutation revisions are explicit
+operation arguments or Hono context values.
+
+Cloudflare controls Durable Object construction, so its server classes cannot be
+constructed directly by TSyringe. This is why the single startup boundary exists.
+The required Worker class exports are runtime registration, not package barrels.
+
+## Identity, authorization and persistence
+
+Better Auth owns canonical D1 users, sessions, organizations and memberships.
+Workspace internals and resource authorization policies belong to the workspace
+Durable Object. Backend handlers coordinate identity writes and projection updates;
+public Better Auth mutations that bypass this coordination are restricted.
+
+Objects are SQLite-backed but currently persist KV records. Native Durable Object
+storage gates protect local storage operations; they do not create a transaction
+spanning D1, another object or an arbitrary asynchronous request. Full relational
+SQL migration and durable cross-store reconciliation remain follow-up work.
+
+Web contains presentation, browser authentication and optimistic sync adapters.
+It can reuse core pure mutation modules, but cannot import core services, repositories,
+DI, database clients or provider integrations. Browser bundling checks enforce this.

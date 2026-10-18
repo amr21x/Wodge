@@ -1,21 +1,20 @@
 import type { WriteTransaction } from "replicache";
-import {
-  createColumnMutation,
-  deleteColumnMutation,
-  updateColumnMutation,
-  createTaskMutation,
-  editTaskMutation,
-  deleteTaskMutation,
-  moveColumnsMutation,
-  moveTasksMutation,
-  type Column,
-  type Task,
-  type CreateColumnArgs,
-  type CreateTaskArgs,
-  type EditTaskArgs,
-  type MoveColumnsArgs,
-  type MoveTasksArgs,
-} from "@wodge/domain/pages";
+import { createColumnMutation } from "@wodge/core/pages/mutations/create-column";
+import { deleteColumnMutation } from "@wodge/core/pages/mutations/delete-column";
+import { updateColumnMutation } from "@wodge/core/pages/mutations/update-column";
+import { createTaskMutation } from "@wodge/core/pages/mutations/create-task";
+import { editTaskMutation } from "@wodge/core/pages/mutations/edit-task";
+import { deleteTaskMutation } from "@wodge/core/pages/mutations/delete-task";
+import { moveColumnsMutation } from "@wodge/core/pages/mutations/move-columns";
+import { moveTasksMutation } from "@wodge/core/pages/mutations/move-tasks";
+import type { Column, Task } from "@wodge/domain/pages/models";
+import type {
+  CreateColumnArgs,
+  CreateTaskArgs,
+  EditTaskArgs,
+  MoveColumnsArgs,
+  MoveTasksArgs,
+} from "@wodge/domain/pages/dto";
 
 export const pageMutators = {
   async createColumn(tx: WriteTransaction, data: CreateColumnArgs) {

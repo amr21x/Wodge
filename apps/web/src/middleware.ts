@@ -1,103 +1,50 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { updateSession } from "./lib/supabase/middleware";
-import { createDb, getUserById } from "@/lib/data-server";
-import { users } from "@wodge/data";
-import {
-  apiPrefix,
-  authRoutes,
-  DEFAULT_LOGIN_REDIRECT,
-  publicRoutes,
-} from "./routes";
+import { env } from "@wodge/env/client";
+import { authRoutes, publicRoutes } from "./routes";
+import type { PublicUserType } from "@wodge/domain/user/models";
 
 export async function middleware(request: NextRequest) {
-  const { nextUrl } = request;
-  const isApiRoute = nextUrl.pathname.startsWith(apiPrefix);
+  const path = request.nextUrl.pathname;
 
-  // order matters here
-
-  if (
-    nextUrl.pathname === "/auth/user" ||
-    nextUrl.pathname === "/demo" ||
-    nextUrl.pathname === "/info" ||
-    nextUrl.pathname === "/api/billing/webhook" ||
-    nextUrl.pathname === "/auth/callback"
-  ) {
-    return;
+  if (path.startsWith("/api/") || publicRoutes.includes(path)) {
+    return NextResponse.next();
   }
 
-  let { response, user } = await updateSession(request);
+  const response = await fetch(
+    `${env.NEXT_PUBLIC_BACKEND_DOMAIN}/api/users/me`,
+    {
+      headers: { cookie: request.headers.get("cookie") ?? "" },
+      cache: "no-store",
+    },
+  );
 
-  let curUser = await getUserById(user.data.user?.id);
-
-  // handle saving user data on our side
-  if (user.data.user && !curUser) {
-    const db = createDb();
-
-    const { id, email, user_metadata } = user.data.user;
-
-    try {
-      curUser = await db
-        .insert(users)
-        .values({
-          id: id,
-          email: email!,
-          displayName: user_metadata?.full_name || "",
-          avatar: user_metadata?.avatar_url || "",
-        })
-        .returning()
-        .get();
-    } catch {}
-  }
-
-  const isLoggedIn = !!curUser;
-  const hasUsername = !!curUser?.username;
-
-  const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
-  const isAuthRoute = authRoutes.includes(nextUrl.pathname);
-  const isOnboardingRoute = nextUrl.pathname === "/onboarding";
-
-  if (isApiRoute) {
-    return response;
-  }
-
-  // auth routes ex. login, onboarding
-  if (isAuthRoute) {
-    if (isLoggedIn) {
-      return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+  if (response.status === 401) {
+    if (authRoutes.includes(path)) {
+      return NextResponse.next();
     }
 
-    return response;
+    const login = new URL("/login", request.url);
+
+    login.searchParams.set("redirect", path);
+
+    return NextResponse.redirect(login);
   }
 
-  if (nextUrl.pathname.split("/").at(2) === "join") {
-    if (!isLoggedIn) {
-      return Response.redirect(
-        new URL(`/login?redirect=${nextUrl.pathname}`, nextUrl),
-      );
-    }
-    return response;
+  if (!response.ok) {
+    return NextResponse.next();
   }
 
-  // User is not authentic and trying to access a protected route
-  if (!isLoggedIn && !isPublicRoute) {
-    return Response.redirect(
-      new URL(`/login?redirect=${nextUrl.pathname}`, nextUrl),
-    );
+  const user = (await response.json()) as PublicUserType;
+
+  if (!user.username && path !== "/onboarding") {
+    return NextResponse.redirect(new URL("/onboarding", request.url));
   }
 
-  // User is authentic but has no profile
-  if (!hasUsername && !isOnboardingRoute) {
-    return Response.redirect(new URL("/onboarding", nextUrl));
+  if (user.username && (authRoutes.includes(path) || path === "/onboarding")) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
-  // User is authentic, has profile, and trying to access onboarding route
-  if (isOnboardingRoute && hasUsername) {
-    return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
-  }
-
-  return response;
+  return NextResponse.next();
 }
 
-export const config = {
-  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
-};
+export const config = { matcher: ["/((?!.+\\.[\\w]+$|_next|api).*)", "/"] };

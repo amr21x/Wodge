@@ -61,3 +61,8 @@ next-env.d.ts
 **/public/worker-*.js.map
 
 .npmrc
+
+# Local Worker secrets
+.dev.vars
+.dev.vars.*
+!.dev.vars.example

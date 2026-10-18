@@ -1,18 +1,18 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useCurrentWorkspace } from "@/components/workspace-provider";
+import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
 
 import { useParams } from "next/navigation";
 import { useMemo } from "react";
 
-import { PostsList } from "./posts-list";
-import { QAsList } from "./qas-list";
-import { useSubscribe } from "@/hooks/use-subscribe";
+import { PostsList } from "../../../../../../../features/discussions/components/posts-list";
+import { QAsList } from "../../../../../../../features/discussions/components/qas-list";
+import { useSubscribe } from "@/client/sync/use-subscribe";
 import { ReadTransaction } from "replicache";
-import { ThreadPost } from "@wodge/data";
-import { useCurrentThreadRep } from "@/hooks/use-thread-rep";
-import { useUpdateRecentlyVisited } from "@/hooks/use-recently-visited";
+import { ThreadPost } from "@wodge/domain/discussions/models";
+import { useCurrentThreadRep } from "@/features/discussions/hooks/use-thread-rep";
+import { useUpdateRecentlyVisited } from "@/features/workspace/hooks/use-recently-visited";
 
 function ThreadsPage() {
   useUpdateRecentlyVisited("thread");

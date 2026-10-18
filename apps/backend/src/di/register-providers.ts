@@ -1,0 +1,41 @@
+import { LiveKitCallTokens } from "@wodge/infra/calls/livekit";
+import { AuthorizationRetry } from "@wodge/infra/durable-objects/authorization-retry";
+import { ResendEmail } from "@wodge/infra/email/resend";
+import { HttpClient } from "@wodge/infra/http/client";
+import { StripePayments } from "@wodge/infra/payments/payments";
+import { S3ObjectStorage } from "@wodge/infra/storage/object-storage";
+import { Lifecycle, type DependencyContainer } from "tsyringe";
+
+// Lifetimes are declared here, never as module-import side effects in the classes.
+export function registerIntegrationClasses(container: DependencyContainer) {
+  container.register(
+    LiveKitCallTokens,
+    { useClass: LiveKitCallTokens },
+    { lifecycle: Lifecycle.ContainerScoped },
+  );
+  container.register(
+    AuthorizationRetry,
+    { useClass: AuthorizationRetry },
+    { lifecycle: Lifecycle.ContainerScoped },
+  );
+  container.register(
+    ResendEmail,
+    { useClass: ResendEmail },
+    { lifecycle: Lifecycle.ContainerScoped },
+  );
+  container.register(
+    HttpClient,
+    { useClass: HttpClient },
+    { lifecycle: Lifecycle.ContainerScoped },
+  );
+  container.register(
+    StripePayments,
+    { useClass: StripePayments },
+    { lifecycle: Lifecycle.ContainerScoped },
+  );
+  container.register(
+    S3ObjectStorage,
+    { useClass: S3ObjectStorage },
+    { lifecycle: Lifecycle.ContainerScoped },
+  );
+}

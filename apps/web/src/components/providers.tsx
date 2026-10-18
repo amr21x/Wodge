@@ -2,11 +2,8 @@
 
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
-import {
-  localStoragePersister,
-  queryClient,
-} from "@wodge/data/lib/query-client";
-import { WorkspaceProvider } from "@/components/workspace-provider";
+import { localStoragePersister, queryClient } from "@/client/query";
+import { WorkspaceProvider } from "@/features/workspace/state/workspace-provider";
 import { LayoutContextProvider } from "@livekit/components-react";
 import { createStore, Provider } from "jotai";
 

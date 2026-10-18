@@ -4,12 +4,12 @@
 
 Start with the product story, shared vocabulary, and showcase boundaries. Product descriptions and feature specifications include revival intent; they are not a claim that every capability is available in a running version.
 
-| Read | What you will find |
-| --- | --- |
-| [Product Definition](overview.md) | Wodge’s purpose, people, capabilities, and portfolio revival boundaries. |
-| [Principles & Non-Goals](principles.md) | Product principles, non-goals, and the boundaries of the showcase. |
-| [Glossary](glossary.md) | Shared vocabulary for workspaces, teams, collaboration, and access. |
-| [Financial Assessment](feasibility.md) | Historical financial assessment and feasibility assumptions. |
+| Read                                    | What you will find                                                       |
+| --------------------------------------- | ------------------------------------------------------------------------ |
+| [Product Definition](overview.md)       | Wodge’s purpose, people, capabilities, and portfolio revival boundaries. |
+| [Principles & Non-Goals](principles.md) | Product principles, non-goals, and the boundaries of the showcase.       |
+| [Glossary](glossary.md)                 | Shared vocabulary for workspaces, teams, collaboration, and access.      |
+| [Financial Assessment](feasibility.md)  | Historical financial assessment and feasibility assumptions.             |
 
 ## Continue exploring
 

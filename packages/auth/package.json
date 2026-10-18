@@ -1,0 +1,37 @@
+{
+  "name": "@wodge/auth",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./server": "./src/server.ts",
+    "./client": "./src/client.ts",
+    "./tickets": "./src/tickets.ts",
+    "./membership": "./src/membership.ts",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --incremental false --pretty false",
+    "test": "vitest run tests --maxWorkers=2 --minWorkers=1"
+  },
+  "dependencies": {
+    "@wodge/domain": "workspace:*",
+    "@wodge/infra": "workspace:*",
+    "better-auth": "1.7.10",
+    "@better-auth/drizzle-adapter": "1.7.10",
+    "@wodge/env": "workspace:*",
+    "tsyringe": "4.10.0",
+    "@wodge/core": "workspace:*",
+    "drizzle-orm": "0.45.2",
+    "jose": "^5.4.1"
+  },
+  "devDependencies": {
+    "@wodge/ts": "workspace:*",
+    "typescript": "^5.3.3",
+    "@cloudflare/workers-types": "4.20260424.1",
+    "react": "18.2.0",
+    "@types/react": "^18.2.65",
+    "vitest": "^1.3.1",
+    "nanoid": "^5.0.6"
+  }
+}

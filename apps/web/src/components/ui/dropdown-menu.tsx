@@ -101,6 +101,7 @@ const DropdownMenuItem = React.forwardRef<
     const [isDisclosureOpen, setIsDisclosureOpen] = React.useState(false);
     const [isActive, setIsActive] = React.useState(false);
     const [isPending, setIsPending] = React.useState(false);
+
     return (
       <DropdownMenuPrimitive.Item
         ref={ref}
@@ -144,8 +145,12 @@ const DropdownMenuItem = React.forwardRef<
                 size="fit"
                 className="basis-1/2"
                 onClick={async () => {
-                  if (!isActive) return;
+                  if (!isActive) {
+                    return;
+                  }
+
                   setIsPending(true);
+
                   await onDisclosureConfirm?.();
                   setIsDisclosureOpen(false);
                   setIsActive(false);

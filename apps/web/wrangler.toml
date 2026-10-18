@@ -3,12 +3,6 @@ pages_build_output_dir=".vercel/output/static"
 compatibility_flags = [ "nodejs_compat" ]
 compatibility_date = "2024-01-29"
 
-[[d1_databases]]
-binding = "DB" 
-database_name = "wodge"
-database_id = "f17da2ae-c255-422f-99ad-b8b93733b758"
-preview_database_id = "DB"
-migrations_dir = "./node_modules/@wodge/data/migrations"
 
 [vars]
 NODE_OPTIONS= "--max-old-space-size=8192"

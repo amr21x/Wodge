@@ -17,7 +17,10 @@ export default function Component({
   const router = useRouter();
 
   useEffect(() => {
-    if (countdown <= 0) return;
+    if (countdown <= 0) {
+      return;
+    }
+
     const interval = setInterval(() => {
       setCountdown(countdown - 1);
     }, 1000);
@@ -26,6 +29,7 @@ export default function Component({
   }, [countdown]);
 
   const queryClient = useQueryClient();
+
   return (
     <div className="flex min-h-[100dvh] flex-col items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-md text-center">

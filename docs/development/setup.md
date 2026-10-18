@@ -2,53 +2,52 @@
 
 [Docs home](../README.md) · [Develop Wodge](README.md)
 
-## Capstone checkout
+Use Node >=22.19 and pnpm 9.4.0. The backend runs a Hono Worker and five PartyServer
+Durable Objects; web remains Next-on-Pages and calls backend APIs. Authentication
+uses the separate `@wodge/auth` package with Better Auth, D1, email OTP, Google and
+GitHub. Editor extensions use the public Tiptap v2 packages.
 
-This describes checked-in configuration, not a verified working installation. The current baseline is `d875c2d369f2bed15ba4e7257242131fddcbfa0a`. The foundation toolchain declares Node.js >=22.19 and pnpm 9.4.0; `.node-version` selects Node 24.19.0. The [root README](../../README.md) preserves the walkthrough, team attribution, license and capstone setup instructions.
+## Configure and start
 
-1. Install the declared package manager and project dependencies in an appropriate local environment.
-2. Copy the tracked example environment configuration into private application-local files and configure only the services needed for the intended local workflow. Never commit real values.
-3. The existing `pnpm init:app` generates Drizzle artifacts, applies local D1 migrations and creates PartyKit state. Review it before executing; it changes local data.
-4. Existing `pnpm dev` starts Turborepo development services; `pnpm livekit` is the separate local call server command.
+1. Install dependencies with `pnpm install --frozen-lockfile`.
+2. Copy the root `.env.example` to `apps/web/.env.local`. These values are public web configuration.
+3. Copy `apps/backend/.dev.vars.example` to `apps/backend/.dev.vars`. Set local auth, email, OAuth and provider credentials there.
+4. Apply local D1 migrations with `pnpm --filter backend db:migration:local`.
+5. Start `pnpm --filter backend dev` and `pnpm --filter web dev`. Next forwards `/api/*` to the Worker in development.
 
-Existing scripts also include `build`, `lint`, `generate`, `migrate:local`, and `studio`. These script definitions were inspected; installation, generation, migrations, services and builds were not run in this migration.
+Worker bindings and public backend values are in `apps/backend/wrangler.jsonc`.
+Core services are registered in the sole backend container. Web has no D1 binding,
+DI container, application API handlers, Supabase integration or backend secrets.
+Auth schemas and migrations belong to domain. Database configuration belongs to
+infrastructure.
 
-The security cleanup preserves the original premium editor packages and integrations. Tracked
-registry configuration contains no authentication assignment. Configure any
-required private registry access outside tracked files. The
-[security cleanup evidence](security-evidence.md) records the final checks
-and redacted history findings.
+`pnpm init:app` applies local migrations; it does not generate a new migration.
+`pnpm generate` generates Drizzle migrations. `pnpm reset:app` deletes local
+Wrangler state and therefore local data; it is not a routine setup step.
+`pnpm livekit` starts the separate local call server.
 
-The [application baseline](baseline.md) records executed install, build, test, lint,
-type-check and startup results at the reviewed checkout, with a
-[failure inventory](failure-inventory.md) and reusable
-[smoke-test matrix](smoke-test-matrix.md).
+## Verify
 
-## Constraints and target setup
+- `pnpm exec vitest run --maxWorkers=2 --minWorkers=1` runs domain and backend tests.
+- `pnpm --filter backend test:runtime` runs the actual Worker/DO/auth flows in Miniflare, mocking external email and object storage.
+- `pnpm --filter backend test:foundation` checks package and existing database compatibility.
+- `pnpm --filter backend build` performs a Wrangler dry-run build.
+- `pnpm check:boundaries` checks package ownership and web/backend dependencies.
 
-Current setup retains Next-on-Pages, PartyKit, Supabase and LiveKit. Secret-export CLI integration has been removed from configuration and scripts. It is not the final revival setup. [Tooling](tooling.md) preserves the target command contract and [environments](../operations/environments.md) the proposed Workers bindings. The foundation evidence records selected foundation dependencies and their actual validation; the retained web adapter migration remains separate work.
+See [test inventory](testing-strategy.md) for cases and limits. Browser preview on
+the current host needs `libasound.so.2`; complete web build/typecheck. Live OAuth completion and email delivery need actual
+provider configuration.
 
-The existing setup uses Linux-style file commands, including destructive reset scripts. Windows compatibility is not established. Use the declared Node >=22.19 baseline for foundation tooling.
+## Deployment
 
-## Evidence
+Fresh authentication accounts are allowed; existing application data is not reset
+or silently attached to new accounts. The checked-in Worker registrations create
+new namespaces. Existing PartyKit storage and Yjs snapshots need an explicit
+cutover before production deployment. See [backend deployment notes](../../apps/backend/README.md).
 
-[Root scripts](../../package.json), [web scripts](../../apps/web/package.json), [backend scripts](../../apps/backend/package.json), [data package](../../packages/data/package.json), and [workspace configuration](../../pnpm-workspace.yaml).
+The manually triggered workflow uses Wrangler and Cloudflare secret management.
+It does not apply remote migrations or configure the web-origin route. No remote
+secrets, databases, deployments or authentication providers were changed.
 
-## Local configuration and deployed secrets
-
-Copy `.env.example` to `apps/web/.env.local`, `apps/web/.dev.vars` (Pages local
-bindings), and `apps/backend/.env` (retained PartyKit local development). Supply
-only development values; those files are ignored. The foundation Worker uses
-explicit local D1 and Durable Object bindings from
-`apps/backend/wrangler.foundation.jsonc`; it does not require application secrets.
-
-Deployment remains manually authorized. Configure deployed secrets directly with
-the hosting provider using its secret management; do not export production values
-into local web files. `deploy:app` no longer pulls secrets, rewrites environment
-files, or passes `--with-vars` to PartyKit. Public `NEXT_PUBLIC_*` build values
-remain distinct from server-only secrets. No remote secrets or resources were
-changed as part of this removal.
-
-The [backend foundation evidence](backend-foundation.md) records the current
-package boundaries, pinned dependencies, local Worker checks, and unresolved
-private-registry/full-application gates.
+Historical checkout evidence remains in [baseline](baseline.md),
+[failure inventory](failure-inventory.md), and [security evidence](security-evidence.md).

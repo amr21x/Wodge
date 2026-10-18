@@ -1,10 +1,10 @@
 "use client";
 
-import { AppHeader } from "@/app/(workspaces)/[workspaceSlug]/(workspace)/_components/app-header";
-import { SidebarWrapper } from "@/app/(workspaces)/[workspaceSlug]/(workspace)/_components/sidebar-wrapper";
+import { AppHeader } from "@/features/workspace/components/app-header";
+import { SidebarWrapper } from "@/features/workspace/components/sidebar-wrapper";
 import { useIsDesktop } from "@/hooks/use-is-desktop";
 import { cn } from "@/lib/utils";
-import { isSidebarOpenAtom } from "@/store/global-atoms";
+import { isSidebarOpenAtom } from "@/client/state/global-atoms";
 import { useAtom } from "jotai";
 import { useEffect } from "react";
 
@@ -23,7 +23,9 @@ function WorkspaceLayout({ children }: { children: React.ReactNode }) {
       <div
         className="flex h-full w-full flex-col"
         onClick={() => {
-          if (!isDesktop) setSidebarOpen(false);
+          if (!isDesktop) {
+            setSidebarOpen(false);
+          }
         }}
       >
         <AppHeader />

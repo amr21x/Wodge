@@ -9,7 +9,7 @@ export function Tag({
   color?: string;
   noBg?: boolean;
 }) {
-  if (noBg)
+  if (noBg) {
     return (
       <div className="flex items-center rounded-full">
         <div
@@ -22,6 +22,7 @@ export function Tag({
         <span className="truncate">{name}</span>
       </div>
     );
+  }
 
   return (
     <div

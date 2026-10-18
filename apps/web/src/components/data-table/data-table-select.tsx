@@ -25,7 +25,9 @@ export function DataTableRowSelect<TData extends { id: string }>({
 }: {
   row: Row<TData>;
 }) {
-  if (row.original.id.startsWith("add")) return null;
+  if (row.original.id.startsWith("add")) {
+    return null;
+  }
 
   return (
     <div className="flex items-center px-2">

@@ -29,9 +29,9 @@ the latest package-manager, monorepo, compiler, linter, or formatter release.
 web lint task still invokes `next lint`. Root format/type/test gate scripts have
 not been added. Do not describe target commands as implemented CI gates.
 
-`pnpm --filter backend build:foundation` compiles the local Worker fixture through
-Wrangler's dry run. `pnpm --filter backend test:foundation` runs import-boundary
-and local Worker/D1 checks. These do not deploy or validate all product journeys.
+`pnpm --filter backend build` compiles the production Worker through Wrangler's
+dry run. `pnpm --filter backend test:foundation` builds and runs the retained
+compatibility fixture, import-boundary checks and local Worker/D1 checks. These do not deploy or validate all product journeys.
 The evidence records explicit backend, protocol, and shared-data type commands.
 
 Worker tooling is isolated in `config/workers`: Wrangler 4.148.0 uses Workers v5

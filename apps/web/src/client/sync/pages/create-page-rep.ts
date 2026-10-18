@@ -6,7 +6,7 @@ import {
   Replicache,
 } from "replicache";
 import { env } from "@wodge/env/client";
-import { replicacheWrapper } from "@wodge/data/browser";
+import { replicacheWrapper } from "../transport";
 import { pageMutators } from "./mutators";
 
 export function createPageRep({
