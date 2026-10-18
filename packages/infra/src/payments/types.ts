@@ -1,9 +1,19 @@
 export type PaymentEvent =
   | {
-      id?: string;
-      type: "customer.subscription.created" | "customer.subscription.deleted";
+      id: string;
+      created: number;
+      type:
+        | "customer.subscription.created"
+        | "customer.subscription.updated"
+        | "customer.subscription.deleted";
       data: {
-        object: { metadata: Record<string, string>; customer?: string | null };
+        object: {
+          id: string;
+          created: number;
+          status: string;
+          metadata: Record<string, string>;
+          customer?: string | null;
+        };
       };
     }
   | { id?: string; type: "ignored" };

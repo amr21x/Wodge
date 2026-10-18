@@ -103,6 +103,7 @@ export function AppHeader() {
             lk_room && "text-green-600 dark:text-green-500",
           )}
           Icon={Video}
+          title="Calls are disabled; room messaging remains available"
           className={cn(
             "hidden ",
             !path?.page && "ml-auto",

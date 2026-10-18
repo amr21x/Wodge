@@ -1,4 +1,3 @@
-import { LiveKitCallTokens } from "@wodge/infra/calls/livekit";
 import { AuthorizationRetry } from "@wodge/infra/durable-objects/authorization-retry";
 import { ResendEmail } from "@wodge/infra/email/resend";
 import { HttpClient } from "@wodge/infra/http/client";
@@ -8,11 +7,6 @@ import { Lifecycle, type DependencyContainer } from "tsyringe";
 
 // Lifetimes are declared here, never as module-import side effects in the classes.
 export function registerIntegrationClasses(container: DependencyContainer) {
-  container.register(
-    LiveKitCallTokens,
-    { useClass: LiveKitCallTokens },
-    { lifecycle: Lifecycle.ContainerScoped },
-  );
   container.register(
     AuthorizationRetry,
     { useClass: AuthorizationRetry },

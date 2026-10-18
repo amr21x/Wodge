@@ -33,6 +33,20 @@ export class StripePayments {
     return this.stripe.billingPortal.sessions.create(params);
   }
 
+  async subscription(id: string) {
+    const subscription = await this.stripe.subscriptions.retrieve(id);
+    return {
+      id: subscription.id,
+      created: subscription.created,
+      status: subscription.status,
+      metadata: subscription.metadata,
+      customer:
+        typeof subscription.customer === "string"
+          ? subscription.customer
+          : subscription.customer.id,
+    };
+  }
+
   verifyEvent(body: string, signature: string, secret: string | undefined) {
     if (!secret) throw new IntegrationUnavailableError("Billing webhook");
     return this.stripe.webhooks
@@ -44,18 +58,23 @@ export class StripePayments {
 function toPaymentEvent(event: Stripe.Event): PaymentEvent {
   if (
     event.type !== "customer.subscription.created" &&
+    event.type !== "customer.subscription.updated" &&
     event.type !== "customer.subscription.deleted"
   ) {
     return { id: event.id, type: "ignored" };
   }
 
-  const { metadata, customer } = event.data.object;
+  const { id, created, status, metadata, customer } = event.data.object;
 
   return {
     id: event.id,
+    created: event.created,
     type: event.type,
     data: {
       object: {
+        id,
+        created,
+        status,
         metadata,
         customer: typeof customer === "string" ? customer : customer?.id,
       },

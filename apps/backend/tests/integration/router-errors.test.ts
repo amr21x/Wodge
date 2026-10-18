@@ -1,7 +1,7 @@
 import { ResourceGrantCache } from "@wodge/auth/authorization/grants";
 import { WorkspaceAccess } from "@wodge/auth/authorization/workspace-access";
 import { BetterAuthMembership } from "@wodge/auth/membership";
-import { LiveKitCallTokens } from "@wodge/infra/calls/livekit";
+import { RoomsHandlers } from "../../src/handlers/rooms/handlers";
 import { Hono } from "hono";
 import { YServer } from "y-partyserver";
 import { createRuntimeContainer } from "../../src/container";
@@ -51,9 +51,14 @@ function roomBindings(issue: () => Promise<string>): TestRouteResources {
   });
   container.registerInstance(ResourceGrantCache, roomAuthorizationFixture());
 
-  vi.spyOn(container.resolve(LiveKitCallTokens), "issue").mockImplementation(
-    issue,
-  );
+  // Inject a failing handler to exercise the production router's global error boundary.
+  vi.spyOn(
+    container.resolve(RoomsHandlers),
+    "generateCallToken",
+  ).mockImplementation(async () => {
+    await issue();
+    throw new Error("Unreachable error fixture");
+  });
 
   return {
     container,
@@ -96,7 +101,13 @@ test("unexpected route failures are logged and returned without internal details
 
   expect(response.status).toBe(500);
   expect(await response.text()).not.toContain("secret");
-  expect(log).toHaveBeenCalledWith("Unhandled backend error", failure);
+  expect(log).toHaveBeenCalledWith(
+    "Unhandled backend error",
+    expect.objectContaining({ type: "Error" }),
+  );
+  expect(JSON.stringify(log.mock.calls)).not.toContain(
+    "secret provider configuration",
+  );
 });
 
 test.each(Object.entries(applicationErrorStatus))(

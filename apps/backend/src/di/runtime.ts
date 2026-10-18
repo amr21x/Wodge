@@ -1,3 +1,4 @@
+import { validateServerEnvironment } from "@wodge/env/server";
 import { createRuntimeContainer } from "../container";
 import { BackendApplication } from "../application";
 import type { WorkerEnvironment } from "../types/worker-environment";
@@ -26,11 +27,9 @@ const applications = new WeakMap<WorkerEnvironment, BackendApplication>();
 export function backendApplication(
   environment: WorkerEnvironment,
 ): BackendApplication {
-  // External providers can be absent locally; identity and ticket signing cannot.
-  if (!environment.BETTER_AUTH_SECRET || !environment.SECRET_KEY)
-    throw new Error("BETTER_AUTH_SECRET and SECRET_KEY are required");
   let application = applications.get(environment);
   if (!application) {
+    validateServerEnvironment(environment);
     application =
       createRuntimeContainer(environment).resolve(BackendApplication);
     applications.set(environment, application);

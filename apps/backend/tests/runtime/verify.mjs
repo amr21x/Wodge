@@ -21,6 +21,7 @@ const { Miniflare, convertV4MiniflareOptions } = require("miniflare");
 const output = await mkdtemp(path.join(tmpdir(), "wodge-runtime-"));
 
 const emails = new Map();
+const stripeSubscriptions = new Map();
 
 /** @type {string[]} */
 const failures = [];
@@ -139,6 +140,8 @@ try {
       R2_SECRET_KEY: "test",
       STRIPE_SECRET_KEY: "sk_test_runtime",
       STRIPE_WH_SECRET: "whsec_runtime",
+      LIVEKIT_API_KEY: "must-not-enable-calls",
+      LIVEKIT_API_SECRET: "must-not-enable-calls-even-with-credentials",
       GITHUB_CLIENT_ID: "test-github",
       GITHUB_CLIENT_SECRET: "test-github-secret",
     },
@@ -151,6 +154,23 @@ try {
         return Response.json({ id: "test-email" });
       }
 
+      if (new URL(req.url).hostname === "api.stripe.com") {
+        const id = new URL(req.url).pathname.split("/").pop();
+        const value = stripeSubscriptions.get(id);
+        const subscription =
+          typeof value === "function" ? await value() : value;
+        return subscription
+          ? Response.json(subscription)
+          : Response.json(
+              {
+                error: {
+                  message: "Unknown subscription",
+                  type: "invalid_request_error",
+                },
+              },
+              { status: 404 },
+            );
+      }
       if (new URL(req.url).hostname.endsWith("objects.example.test")) {
         await req.arrayBuffer();
 
@@ -522,49 +542,18 @@ try {
   );
 
   await check(
-    "billing webhooks verify raw signatures before updating D1 and notifying objects",
+    "billing events are signed, idempotent, ordered and atomic; calls stay disabled",
     async () => {
-      assert.equal(
-        (await request("/api/billing/webhook", json({}))).status,
-        400,
-      );
-      const body = JSON.stringify({
-        id: "evt_runtime",
-        type: "customer.subscription.created",
-        data: {
-          object: {
-            metadata: { workspaceId: workspace.id },
-            customer: "cus_runtime",
-          },
-        },
+      const { verifyBilling } = await import("./billing.mjs");
+      await verifyBilling({
+        request,
+        json,
+        database,
+        workspace,
+        structure,
+        memberCookie: authorizationMemberCookie,
+        stripeSubscriptions,
       });
-      const timestamp = Math.floor(Date.now() / 1000);
-      const signature = createHmac("sha256", "whsec_runtime")
-        .update(`${timestamp}.${body}`)
-        .digest("hex");
-      const invalid = await request("/api/billing/webhook", {
-        method: "POST",
-        body,
-        headers: { "stripe-signature": `t=${timestamp},v1=invalid` },
-      });
-
-      assert.equal(invalid.status, 400);
-      const valid = await request("/api/billing/webhook", {
-        method: "POST",
-        body,
-        headers: { "stripe-signature": `t=${timestamp},v1=${signature}` },
-      });
-
-      assert.equal(valid.status, 200, await valid.text());
-      const row = await database
-        .prepare(
-          "SELECT is_premium, customer_id FROM auth_organizations WHERE id = ?",
-        )
-        .bind(workspace.id)
-        .first();
-
-      assert.equal(row.is_premium, 1);
-      assert.equal(row.customer_id, "cus_runtime");
     },
   );
 

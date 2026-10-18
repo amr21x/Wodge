@@ -58,7 +58,17 @@ export function handleError(error: unknown): Response {
     );
   }
 
-  console.error("Unhandled backend error", error);
+  // Provider errors can echo credentials in their message/cause. Keep only diagnostic frames.
+  console.error("Unhandled backend error", {
+    type: error instanceof Error ? error.name : typeof error,
+    frames:
+      error instanceof Error
+        ? error.stack
+            ?.split("\n")
+            .filter((line) => /^\s+at\s/.test(line))
+            .join("\n")
+        : undefined,
+  });
 
   return Response.json(
     {

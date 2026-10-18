@@ -36,3 +36,4 @@ jobs:
           --var "APP_DOMAIN:$APP_DOMAIN"
           --var "BACKEND_DOMAIN:$BACKEND_DOMAIN"
           --var "AVATARS_URL:$AVATARS_URL"
+          --var "INTEGRATION_MODE:ready"

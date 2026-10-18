@@ -54,16 +54,6 @@ export class WorkspaceRepository {
     return workspace;
   }
 
-  async setBilling(
-    workspaceId: string,
-    changes: { isPremium: boolean; customerId: string | null },
-  ) {
-    await this.database
-      .update(authOrganizations)
-      .set(changes)
-      .where(eq(authOrganizations.id, workspaceId));
-  }
-
   async getMembership(userId: string, workspaceId: string) {
     const [membership] = await this.database
       .select({

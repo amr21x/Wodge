@@ -102,10 +102,10 @@ test("missing signing secrets never enable a development authentication bypass",
     backendApplication(
       createTestEnvironment({ BETTER_AUTH_SECRET: "" }) as WorkerEnvironment,
     ),
-  ).toThrow("required");
+  ).toThrow("Invalid backend configuration");
   expect(() =>
     backendApplication(
       createTestEnvironment({ SECRET_KEY: "" }) as WorkerEnvironment,
     ),
-  ).toThrow("required");
+  ).toThrow("Invalid backend configuration");
 });

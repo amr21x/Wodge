@@ -5,6 +5,9 @@ BETTER_AUTH_SECRET=
 # Use a separate strong random value; this is not a provider API key.
 SECRET_KEY=
 
+# partial allows unavailable integrations locally; ready requires email, storage and Stripe test settings.
+INTEGRATION_MODE=partial
+
 # Provider credentials are temporarily optional for partial local development.
 # Missing configuration makes the corresponding operations unavailable.
 

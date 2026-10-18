@@ -1,5 +1,6 @@
 import { BetterAuthMembership } from "@wodge/auth/membership";
 import { billingError } from "@wodge/core/billing/errors";
+import { SubscriptionEventSchema } from "@wodge/domain/billing/validation";
 import { BillingService } from "@wodge/core/billing/services/billing";
 import { StripePayments } from "@wodge/infra/payments/payments";
 import { IntegrationUnavailableError } from "@wodge/infra/integration-unavailable";
@@ -72,18 +73,37 @@ export class BillingHandlers {
     }
     if (event.type === "ignored") return c.body(null, 200);
     const subscription = event.data.object;
-    const workspaceId = subscription.metadata.workspaceId;
-    if (
-      !workspaceId ||
-      (event.type === "customer.subscription.created" && !subscription.customer)
-    )
-      return c.body(null, 400);
-    const premium = event.type === "customer.subscription.created";
-    await this.billing.setSubscription(
-      workspaceId,
-      premium,
-      premium ? subscription.customer! : null,
+    const parsed = SubscriptionEventSchema.safeParse({
+      workspaceId: subscription.metadata?.workspaceId,
+      eventId: event.id,
+      eventCreated: event.created,
+      subscriptionId: subscription.id,
+      subscriptionCreated: subscription.created,
+      customerId: subscription.customer,
+      status: subscription.status,
+    });
+    if (!parsed.success)
+      return c.json({ error: "Invalid subscription event" }, 400);
+    const workspaceId = parsed.data.workspaceId;
+    // Capture the database version before reading Stripe. A later delivery cannot be overwritten
+    // by a snapshot fetched before it; contention retries the entire read/apply operation.
+    const previous = await this.billing.subscriptionState(workspaceId);
+    const current = await this.payments.subscription(
+      parsed.data.subscriptionId,
     );
+    if (
+      current.metadata.workspaceId !== workspaceId ||
+      current.customer !== parsed.data.customerId ||
+      current.id !== parsed.data.subscriptionId
+    )
+      return c.json({ error: "Subscription identity mismatch" }, 400);
+    const snapshot = SubscriptionEventSchema.parse({
+      ...parsed.data,
+      subscriptionCreated: current.created,
+      status: current.status,
+    });
+    await this.billing.applySubscription(snapshot, previous);
+    // Duplicate deliveries retry this idempotent notification if an earlier object call failed.
     await this.workspaces.notify(workspaceId);
     return c.body(null, 200);
   };

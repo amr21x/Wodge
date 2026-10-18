@@ -11,7 +11,7 @@ export function createTestEnvironment(
     BACKEND_DOMAIN: "http://localhost",
     BETTER_AUTH_SECRET:
       "foundation-test-secret-more-than-thirty-two-characters",
-    SECRET_KEY: "test-only-ticket-signing-key",
+    SECRET_KEY: "test-only-ticket-signing-key-more-than-32-characters",
     RESEND_API_KEY: "test-email-key",
     RESEND_EMAIL_FROM: "test@example.test",
     LIVEKIT_API_KEY: "local-key",

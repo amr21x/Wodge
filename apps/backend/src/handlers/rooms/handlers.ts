@@ -2,7 +2,6 @@ import {
   requireRoomPermission,
   roomMutationActions,
 } from "@wodge/auth/authorization/room-permissions";
-import { LiveKitCallTokens } from "@wodge/infra/calls/livekit";
 import type { Context } from "hono";
 import { inject, injectable } from "tsyringe";
 import { readJson } from "../../lib/helpers/json";
@@ -13,22 +12,19 @@ import type { RoomContext } from "../../types/hono-context";
 
 @injectable()
 export class RoomsHandlers {
-  constructor(
-    @inject(RoomSync) private readonly roomSync: RoomSync,
-    @inject(LiveKitCallTokens) private readonly tokens: LiveKitCallTokens,
-    @inject("objectId") private readonly roomId: string,
-  ) {}
+  constructor(@inject(RoomSync) private readonly roomSync: RoomSync) {}
   generateCallToken = async (c: Context<RoomContext>) => {
-    const token = await this.tokens.issue({
-      room: this.roomId,
-      identity: c.req.header("x-user-id"),
-      name: c.req.header("x-username") || "User",
-      ttl: "10m",
-      canPublish: true,
-      canSubscribe: true,
-    });
-
-    return c.json({ token }, 200);
+    return c.json(
+      {
+        ok: false,
+        error: {
+          code: "CALLS_DISABLED",
+          message:
+            "Calls are disabled in this showcase. Room messaging remains available.",
+        },
+      },
+      403,
+    );
   };
 
   roomPull = async (c: Context<RoomContext>) => {

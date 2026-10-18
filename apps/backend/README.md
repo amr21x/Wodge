@@ -58,9 +58,11 @@ environment from the root `.env.example`. Start backend with `pnpm --filter back
 and web with `pnpm --filter web dev`. Next forwards `/api/*` to the local Worker.
 
 For partial local development, only `BETTER_AUTH_SECRET` and `SECRET_KEY` are mandatory
-secrets. Keep them separate and strong; origins and D1/DO bindings still come from Wrangler.
+secrets. Each must contain at least 32 characters and differ from the other; origins and
+D1/DO bindings still come from Wrangler. `INTEGRATION_MODE=partial` is the local default.
 Provider credentials are temporarily optional. Missing storage, billing or call configuration
-returns HTTP 503 when those operations are attempted; email OTP returns unavailable when
+returns HTTP 503 when those operations are attempted; calls always return HTTP 403 with
+`CALLS_DISABLED`, regardless of credentials or plan. Email OTP returns unavailable when
 Resend is missing. Authentication is never bypassed: sign-in needs Resend or configured OAuth.
 Workspace synchronization skips bucket creation without storage credentials, so collaboration
 can run after authentication. Workspaces created this way need their buckets provisioned before
@@ -76,7 +78,27 @@ is not deleted or linked to newly authenticated accounts automatically.
 - `pnpm --filter backend test:foundation`: retained package and database compatibility checks.
 - `pnpm --filter backend build`: Wrangler dry-run bundle.
 
+## Billing event processing
+
+The signed webhook accepts subscription created/updated/deleted events and validates their
+identity, timestamps and workspace metadata. It reads the current Stripe subscription rather
+than treating delivery order or event timestamps as authoritative. Core services decide
+entitlement transitions; a repository conditionally writes the subscription cursor and
+organization plan in one D1 batch. The database change token is captured before the provider
+read, so concurrent updates require a complete retry with a fresh Stripe snapshot. Duplicate
+deliveries preserve entitlement and retry the idempotent object notification. An old subscription
+cannot downgrade its replacement. Different replacement subscriptions created in the same
+second return 503 for explicit reconciliation rather than guessing their order; no automated
+reconciliation queue exists yet. Live Checkout/portal behavior and full storage quotas remain
+unverified/incomplete.
+
 ## Deployment
+
+The deployment workflow sets `INTEGRATION_MODE=ready`. This requires complete Resend,
+storage and Stripe test settings before serving requests; LiveKit and OAuth remain optional.
+Both modes validate signing secrets, HTTP origins and paired OAuth configuration. Live Stripe
+keys are rejected because this is a test-billing showcase. Configuration errors list field
+names without printing values. The generated billing migration must be applied before webhook use.
 
 The checked-in Worker configuration bootstraps new SQLite-backed Durable Object
 classes. It does not migrate deployed PartyKit namespaces or old Yjs snapshots.

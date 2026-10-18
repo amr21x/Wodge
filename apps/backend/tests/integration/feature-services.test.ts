@@ -465,6 +465,13 @@ function billing() {
     listPrices: vi.fn(async () => ({ data: [{ id: "price" }] })),
     createCheckout: vi.fn(async () => ({ url: "https://payments/checkout" })),
     createPortal: vi.fn(async () => ({ url: "https://payments/portal" })),
+    subscription: vi.fn(async (_id: string) => ({
+      id: "subscription",
+      created: 1,
+      status: "active",
+      metadata: { workspaceId: "workspace" },
+      customer: "customer",
+    })),
     verifyEvent: vi.fn<[], Promise<PaymentEvent>>(async () => ({
       type: "ignored",
     })),
@@ -477,11 +484,32 @@ function billing() {
   };
   const workspace = {
     getWorkspaceById: vi.fn(async () => current),
-    setBilling: vi.fn(async () => {}),
+    setBilling: vi.fn(
+      async (
+        _id: string,
+        _changes: { isPremium: boolean; customerId: string | null },
+      ) => {},
+    ),
   };
   const isAdmin = vi.fn(async () => true),
     poke = vi.fn(async () => {});
-  const service = new BillingService(workspace as never);
+  let subscription:
+    | import("@wodge/domain/billing/dto").SubscriptionState
+    | undefined;
+  const subscriptions = {
+    get: vi.fn(async () => subscription),
+    commit: vi.fn(
+      async (event: import("@wodge/domain/billing/dto").SubscriptionState) => {
+        subscription = event;
+        await workspace.setBilling(event.workspaceId, {
+          isPremium: event.isPremium,
+          customerId: event.isPremium ? event.customerId : null,
+        });
+        return true;
+      },
+    ),
+  };
+  const service = new BillingService(workspace as never, subscriptions);
   const handlers = new BillingHandlers(
     service,
     payments as never,
@@ -553,7 +581,21 @@ test("verified billing events persist before notifications and reject missing me
     type: string,
     metadata: Record<string, string>,
     customer = "customer",
-  ) => ({ type, data: { object: { metadata, customer } } }) as PaymentEvent;
+  ) =>
+    ({
+      id: type,
+      created: type === "customer.subscription.deleted" ? 200 : 100,
+      type,
+      data: {
+        object: {
+          id: "subscription",
+          created: 1,
+          status: "active",
+          metadata,
+          customer,
+        },
+      },
+    }) as PaymentEvent;
   b.payments.verifyEvent.mockResolvedValue(
     event("customer.subscription.created", {}),
   );
@@ -566,6 +608,13 @@ test("verified billing events persist before notifications and reject missing me
   expect(b.workspace.setBilling).toHaveBeenCalledWith("workspace", {
     isPremium: true,
     customerId: "customer",
+  });
+  b.payments.subscription.mockResolvedValueOnce({
+    id: "subscription",
+    created: 1,
+    status: "canceled",
+    metadata: { workspaceId: "workspace" },
+    customer: "customer",
   });
   b.payments.verifyEvent.mockResolvedValue(
     event("customer.subscription.deleted", { workspaceId: "workspace" }),

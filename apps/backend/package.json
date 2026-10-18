@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "cookie-parse": "^0.4.0",
-    "hono": "4.12.15",
+    "hono": "4.13.13",
     "immer": "^10.0.3",
     "nanoid": "^5.0.5",
     "object-sizeof": "^2.6.4",

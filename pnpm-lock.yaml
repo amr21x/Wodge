@@ -53,11 +53,11 @@ importers:
         specifier: ^0.4.0
         version: 0.4.0
       hono:
-        specifier: 4.12.15
-        version: 4.12.15
+        specifier: 4.13.13
+        version: 4.13.13
       hono-party:
         specifier: 2.1.0
-        version: 2.1.0(@cloudflare/workers-types@4.20260424.1)(hono@4.12.15)(partyserver@0.5.10(@cloudflare/workers-types@4.20260424.1))
+        version: 2.1.0(@cloudflare/workers-types@4.20260424.1)(hono@4.13.13)(partyserver@0.5.10(@cloudflare/workers-types@4.20260424.1))
       immer:
         specifier: ^10.0.3
         version: 10.0.4
@@ -426,8 +426,8 @@ importers:
         specifier: ^11.2.4
         version: 11.2.4(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       hono:
-        specifier: 4.12.15
-        version: 4.12.15
+        specifier: 4.13.13
+        version: 4.13.13
       immer:
         specifier: ^10.0.4
         version: 10.0.4
@@ -10618,10 +10618,10 @@ packages:
       hono: ^4.6.17
       partyserver: ">=0.2.0 <1.0.0"
 
-  hono@4.12.15:
+  hono@4.13.13:
     resolution:
       {
-        integrity: sha512-qM0jDhFEaCBb4TxoW7f53Qrpv9RBiayUHo0S52JudprkhvpjIrGoU1mnnr29Fvd1U335ZFPZQY1wlkqgfGXyLg==,
+        integrity: sha512-CQ46U0ZkAGmbT/4UxdzzGJpacP2IeKgY4a5/tOI9AABbpOMfK739wfDXmv1usCk+3RkKj1hQy4/fjhiwa2xlrA==,
       }
     engines: { node: ">=16.9.0" }
 
@@ -22406,13 +22406,13 @@ snapshots:
 
   highlight.js@11.8.0: {}
 
-  hono-party@2.1.0(@cloudflare/workers-types@4.20260424.1)(hono@4.12.15)(partyserver@0.5.10(@cloudflare/workers-types@4.20260424.1)):
+  hono-party@2.1.0(@cloudflare/workers-types@4.20260424.1)(hono@4.13.13)(partyserver@0.5.10(@cloudflare/workers-types@4.20260424.1)):
     dependencies:
       "@cloudflare/workers-types": 4.20260424.1
-      hono: 4.12.15
+      hono: 4.13.13
       partyserver: 0.5.10(@cloudflare/workers-types@4.20260424.1)
 
-  hono@4.12.15: {}
+  hono@4.13.13: {}
 
   html-encoding-sniffer@4.0.0:
     dependencies:

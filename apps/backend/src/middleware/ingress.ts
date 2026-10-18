@@ -2,6 +2,7 @@ import type { AuthInstance } from "@wodge/auth/server";
 import { SessionTickets } from "@wodge/auth/tickets";
 import { AccountService } from "@wodge/core/user/services/account";
 import type { MiddlewareHandler } from "hono";
+import { HTTPException } from "hono/http-exception";
 import { WorkspaceGateway } from "../gateways/workspace";
 import type { ApiContext } from "../types/hono-context";
 import { authorizeChannel } from "./auth";
@@ -36,7 +37,14 @@ export function partyIngress(
       return c.notFound();
     }
 
-    const id = decodeURIComponent(encodedId);
+    let id: string;
+    try {
+      id = decodeURIComponent(encodedId);
+    } catch {
+      throw new HTTPException(400, { message: "Invalid object identifier" });
+    }
+    if (!id || id.length > 256 || /[\/\\\u0000-\u001f\u007f]/.test(id))
+      throw new HTTPException(400, { message: "Invalid object identifier" });
     const path = "/" + segments.join("/");
 
     // Service endpoints are reachable through bound DO stubs, never the public Worker ingress.
