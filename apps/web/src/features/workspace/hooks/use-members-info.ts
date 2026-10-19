@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { env } from "@wodge/env/client";
+
 import { PublicUserType } from "@wodge/domain/user/models";
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
 

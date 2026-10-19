@@ -7,13 +7,11 @@ import {
   RowPinningState,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import { Updater, useImmer } from "use-immer";
 import { RowData } from "@tanstack/react-table";
 import { produce } from "immer";
-import { last } from "lodash";
 
 declare module "@tanstack/react-table" {
   interface TableMeta<TData extends RowData> {
@@ -45,7 +43,6 @@ export function useTable<TData, TValue>({
   data,
   columns,
   updateHandler,
-  withForm,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [rowPinning, setRowPinning] = React.useState<RowPinningState>({

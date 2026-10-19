@@ -1,0 +1,45 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "typescript",
+    "unicorn",
+    "oxc",
+    "react",
+    "nextjs",
+    "jsx-a11y",
+    "import"
+  ],
+  "categories": {
+    "correctness": "warn"
+  },
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/.next/**",
+    "**/.wrangler/**",
+    "**/.vercel/**",
+    "**/dist/**",
+    "**/coverage/**"
+  ],
+  "overrides": [
+    {
+      "files": ["apps/web/**/*.{js,cjs,mjs,jsx,ts,tsx}"],
+      "env": {
+        "browser": true
+      }
+    }
+  ],
+  "settings": {
+    "next": {
+      "rootDir": "apps/web/"
+    }
+  },
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/set-state-in-effect": "off",
+    "react/refs": "off",
+    "react/purity": "off",
+    "react/immutability": "off",
+    "react/incompatible-library": "off",
+    "react/preserve-manual-memoization": "off"
+  }
+}

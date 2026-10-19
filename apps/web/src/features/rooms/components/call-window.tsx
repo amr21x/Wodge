@@ -9,6 +9,7 @@ export function CallWindow() {
   if (!open) return null;
 
   return (
+    /* oxlint-disable jsx-a11y/prefer-tag-over-role -- The unavailable-call notice is nonmodal; a native dialog would alter its display and focus behavior. */
     <div
       role="dialog"
       aria-modal="false"
@@ -29,5 +30,6 @@ export function CallWindow() {
         Close
       </Button>
     </div>
+    /* oxlint-enable jsx-a11y/prefer-tag-over-role */
   );
 }

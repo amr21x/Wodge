@@ -1,26 +1,10 @@
 "use client";
 
-import { Invite, Invites } from "@wodge/domain/workspace/models";
-import { env } from "@wodge/env/client";
+import { Invite } from "@wodge/domain/workspace/models";
+
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-
-function getInviteLink(invites?: Invites): Invite | undefined {
-  if (!invites) {
-    return;
-  }
-
-  const invite: [string, Invite] | undefined = Object.entries(invites).find(
-    ([k, v]) => v.method === "link",
-  );
-
-  if (!invite) {
-    return;
-  }
-
-  return invite[1];
-}
 
 export function useInvites() {
   const { workspaceId } = useCurrentWorkspace();

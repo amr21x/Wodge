@@ -9,6 +9,7 @@ import type {
 } from "../../src/types/hono-context";
 import { createTestEnvironment } from "../helpers/environment";
 // @vitest-environment node
+// @vitest-environment node
 import { BillingService } from "@wodge/core/billing/services/billing";
 import { DiscussionService } from "@wodge/core/discussions/services/posts";
 import { RoomService } from "@wodge/core/rooms/services/messages";
@@ -98,10 +99,9 @@ function workspace() {
     name: "workspace",
     ctx: { storage: store },
     env: {
-      ...{},
       User: {
         idFromName: (id: string) => id,
-        get: (id: string) => ({
+        get: (_id: string) => ({
           setName: async () => {},
           fetch: async (path: string) =>
             path.includes("add-workspace")
@@ -631,9 +631,8 @@ test("verified billing events persist before notifications and reject missing me
 });
 
 test("workspace directory validates admission without performing identity writes", async () => {
-  const { WorkspaceDirectory } = await import(
-    "@wodge/core/workspace/services/directory"
-  );
+  const { WorkspaceDirectory } =
+    await import("@wodge/core/workspace/services/directory");
   const invite = { workspaceId: "workspace", token: "invite" };
   const repository = {
     getWorkspaceById: async () => ({

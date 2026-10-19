@@ -19,7 +19,7 @@ export function ThreadAction({
     <div className="z-50 flex items-center gap-3 truncate pl-[0.5625rem] text-sm">
       <Icon
         className={cn(
-          "h-6 w-6 shrink-0 rounded-full border-2 border-background  p-0.5 ",
+          "h-6 w-6 shrink-0 rounded-full border-2 border-background p-0.5",
           comment.type === "open"
             ? "bg-green-600 text-green-50 dark:bg-green-500"
             : "bg-purple-600 text-purple-50 dark:bg-purple-500",

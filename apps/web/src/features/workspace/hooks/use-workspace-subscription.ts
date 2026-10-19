@@ -21,15 +21,9 @@ import { useParams, usePathname, useRouter } from "next/navigation";
 export function useWorkspaceSubscription() {
   const [workspaceRep, setWorkspaceRep] =
     useState<Replicache<WorkspaceMutators> | null>(null);
-  const router = useRouter();
+  useRouter();
 
-  const pathname = usePathname();
-
-  const isNotConcerned =
-    pathname.startsWith("/login") ||
-    pathname.startsWith("/onboarding") ||
-    pathname.startsWith("/settings") ||
-    pathname.split("/").at(2) === "join";
+  usePathname();
 
   const { workspaceSlug } = useParams() as { workspaceSlug: string };
 
@@ -51,16 +45,6 @@ export function useWorkspaceSubscription() {
       return;
     }
 
-    let timerId: any;
-    // if (!workspace && !isNotConcerned) {
-    //   timerId = setTimeout(() => {
-    //     router.push("/");
-    //   }, 3000);
-    // }
-    // return;
-
-    // if (workspaceRep && workspaceRep.name.includes(workspaceId)) return;
-
     if (!user || !workspaceId) {
       return;
     }
@@ -72,13 +56,7 @@ export function useWorkspaceSubscription() {
     }
 
     setWorkspaceRep(workspaceStore);
-
-    return () => {
-      if (timerId) {
-        clearTimeout(timerId);
-      }
-    };
-  }, [user, workspaceSlug, workspace, isPending]);
+  }, [user, workspaceSlug, workspace, isPending, getWorkspace, workspaceId]);
 
   const { snapshot: structure, isPending: isStructurePending } = useSubscribe(
     workspaceRep,

@@ -17,7 +17,7 @@ export function AudioMessage({
     teamId: string;
   }>();
 
-  const { data, isPending, isFetching, isError } = useQuery({
+  const { data, isError } = useQuery({
     queryKey: ["audio", message.id],
     queryFn: async () => {
       const link = await getSrcLink(message.id, workspaceId, channelId, teamId);
@@ -51,9 +51,11 @@ export function AudioMessage({
     <>
       {data && (
         <div className="py-1">
+          {/* oxlint-disable jsx-a11y/media-has-caption -- The current upload/demo contract supplies no caption track; do not advertise fabricated captions. */}
           <audio controls>
             <source src={data} type="audio/webm" />
           </audio>
+          {/* oxlint-enable jsx-a11y/media-has-caption */}
         </div>
       )}
     </>

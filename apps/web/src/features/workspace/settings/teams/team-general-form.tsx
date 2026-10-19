@@ -43,7 +43,7 @@ export function TeamGeneralForm({ team }: { team?: DrObj<Team> }) {
     }
 
     form.reset(team);
-  }, [team]);
+  }, [team, isAddition, form]);
 
   async function onSubmit(data: Pick<Team, "id" | "name" | "avatar">) {
     let flag = false;
@@ -68,7 +68,9 @@ export function TeamGeneralForm({ team }: { team?: DrObj<Team> }) {
       }
 
       form.reset();
-      flag && router.push(`/${workspaceSlug}/settings/teams/${data.id}`);
+      if (flag) {
+        router.push(`/${workspaceSlug}/settings/teams/${data.id}`);
+      }
     } catch {
       if (isAddition) {
         toast.error("Failed to create team");
@@ -88,7 +90,7 @@ export function TeamGeneralForm({ team }: { team?: DrObj<Team> }) {
         <div className="space-y-2">
           <p className="text-sm">Icon & Name</p>
 
-          <div className="flex w-64 items-center  gap-2">
+          <div className="flex w-64 items-center gap-2">
             <SafeAvatar
               src={team?.avatar}
               fallback={form.watch("name")?.[0] || ""}

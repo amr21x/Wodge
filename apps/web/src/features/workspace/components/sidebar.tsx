@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils/index";
 import { useFeatureFlags } from "@/components/feature-flags-provider";
 import { CHANNEL_FEATURES } from "@wodge/core/features/policy";
-import { useParams, usePathname } from "next/navigation";
+import { useParams } from "next/navigation";
 import {
   Database,
   Home,
@@ -15,12 +15,12 @@ import {
 } from "lucide-react";
 import { SidebarItem } from "./sidebar-item";
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 import { useAtom, useAtomValue } from "jotai";
 import { isSidebarOpenAtom } from "@/client/state/global-atoms";
 import { Teamspaces } from "./teamspaces";
 import { ChannelsTypes } from "@wodge/domain/channels/index";
-import { useIsOwnerOrAdmin } from "@/features/workspace/hooks/use-is-owner-or-admin";
+
 import { activeSidebarAtom } from "./sidebar-atoms";
 
 interface Tab {
@@ -75,7 +75,7 @@ export function Sidebar() {
     // <ScrollArea className="flex-1">
     <aside
       className={cn(
-        "h-full max-h-full min-h-0 flex-1 shrink-0 grow  overflow-y-auto bg-dim px-2.5 py-1.5 transition-all",
+        "h-full max-h-full min-h-0 flex-1 shrink-0 grow overflow-y-auto bg-dim px-2.5 py-1.5 transition-all",
         !isSidebarOpen && "px-0",
       )}
     >

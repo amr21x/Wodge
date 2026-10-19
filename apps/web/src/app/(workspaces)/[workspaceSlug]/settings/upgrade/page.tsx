@@ -88,7 +88,7 @@ const PricingCard = ({
       <Button
         isPending={isLoading}
         disabled={!!disabled}
-        className="relative inline-flex w-full items-center justify-center rounded-md bg-black px-6 font-medium text-white transition-colors  focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50 dark:bg-white dark:text-black"
+        className="relative inline-flex w-full items-center justify-center rounded-md bg-black px-6 font-medium text-white transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50 dark:bg-white dark:text-black"
         onClick={() => action()}
       >
         {/* <div className="absolute -inset-0.5 -z-10 rounded-lg bg-gradient-to-b from-[#c7d2fe] to-[#8678f9] opacity-75 blur" /> */}
@@ -123,7 +123,7 @@ function UpgradePage() {
       router.push(data.url);
     },
 
-    onError: (e) => {
+    onError: (_e) => {
       toast.error("Failed to upgrade");
     },
   });
@@ -143,7 +143,7 @@ function UpgradePage() {
       router.push(data.url);
     },
 
-    onError: (e) => {
+    onError: (_e) => {
       toast.error("Failed to revert");
     },
   });
@@ -170,7 +170,7 @@ function UpgradePage() {
       monthlyPrice: 50,
       description: "Perfect for owners of small & medium businesses",
       features: ["Storage up to 100GB", "Up to 50 members"],
-      actionLabel: workspace?.isPremium! ? "Current Plan" : "Upgrade",
+      actionLabel: workspace?.isPremium ? "Current Plan" : "Upgrade",
       exclusive: true,
       disabled: workspace?.isPremium,
       action: upgrade,

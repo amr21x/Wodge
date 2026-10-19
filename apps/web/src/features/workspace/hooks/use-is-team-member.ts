@@ -30,7 +30,7 @@ export function useIsTeamMember(forceTeamId?: string) {
           teamId: forceTeamId || teamId,
         }),
     );
-  }, [structure, teamId, user?.id]);
+  }, [structure, teamId, user?.id, forceTeamId]);
 
   return grant;
 }

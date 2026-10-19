@@ -120,7 +120,7 @@ export const useTextMenuContentTypes = (editor: Editor) => {
         type: "option",
       },
     ];
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react-hooks/exhaustive-deps -- Editor state is mutable; recompute options on its transactions.
   }, [editor, editor.state]);
 
   return options;

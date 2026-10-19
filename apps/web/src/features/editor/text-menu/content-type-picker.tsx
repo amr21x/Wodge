@@ -1,4 +1,4 @@
-import { ChevronDown, icons, LucideIcon, Pilcrow } from "lucide-react";
+import { ChevronDown, LucideIcon, Pilcrow } from "lucide-react";
 import { useMemo } from "react";
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
 import { Toolbar } from "../ui/toolbar";

@@ -39,7 +39,7 @@ import { DbProvider } from "./db-provider";
 import { useParams } from "next/navigation";
 import { TableView } from "./table-view";
 
-function TasksContent({ editor, node, getPos }: NodeViewWrapperProps) {
+function TasksContent({ editor }: NodeViewWrapperProps) {
   return (
     <NodeViewWrapper className="select-none">
       <DbProvider>

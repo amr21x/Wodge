@@ -43,8 +43,10 @@ export function partyIngress(
     } catch {
       throw new HTTPException(400, { message: "Invalid object identifier" });
     }
-    if (!id || id.length > 256 || /[\/\\\u0000-\u001f\u007f]/.test(id))
+    /* oxlint-disable eslint/no-control-regex -- Reject ASCII control characters in untrusted object identifiers. */
+    if (!id || id.length > 256 || /[/\\\u0000-\u001f\u007f]/.test(id))
       throw new HTTPException(400, { message: "Invalid object identifier" });
+    /* oxlint-enable eslint/no-control-regex */
     const path = "/" + segments.join("/");
 
     // Service endpoints are reachable through bound DO stubs, never the public Worker ingress.

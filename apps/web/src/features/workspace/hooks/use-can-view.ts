@@ -33,7 +33,7 @@ export function useCanView({
   const [grant, setGrant] = useState(false);
 
   const isAdminOrOwner = useIsOwnerOrAdmin();
-  const isTeamMod = useIsTeamModerator(forceTeamId);
+  useIsTeamModerator(forceTeamId);
 
   useEffect(() => {
     setGrant(
@@ -57,7 +57,19 @@ export function useCanView({
           ...(type === "page" && { folderId: forceFolderId || folderId }),
         }),
     );
-  }, [structure, teamId, user?.id, members, channelId, folderId, type]);
+  }, [
+    structure,
+    teamId,
+    user?.id,
+    members,
+    channelId,
+    folderId,
+    type,
+    isAdminOrOwner,
+    forceTeamId,
+    forceChannelId,
+    forceFolderId,
+  ]);
 
   return grant;
 }

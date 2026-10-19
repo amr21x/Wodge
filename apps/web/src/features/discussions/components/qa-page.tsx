@@ -31,7 +31,10 @@ export function QAPage({ rep }: { rep?: Replicache<ThreadMutators> }) {
     tx.get<ThreadPost[]>("posts"),
   );
 
-  const post = useMemo(() => posts?.find((p) => p.id === postId), [posts]);
+  const post = useMemo(
+    () => posts?.find((p) => p.id === postId),
+    [posts, postId],
+  );
   const { member } = useMember(post?.author);
   const { user } = useCurrentUser();
 
@@ -80,7 +83,7 @@ export function QAPage({ rep }: { rep?: Replicache<ThreadMutators> }) {
             <Button
               variant="secondary"
               size="sm"
-              className={cn("hidden gap-1.5  sm:inline-flex")}
+              className={cn("hidden gap-1.5 sm:inline-flex")}
               onClick={toggleThread}
             >
               <Icon

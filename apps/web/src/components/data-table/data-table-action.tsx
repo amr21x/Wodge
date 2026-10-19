@@ -96,8 +96,8 @@ export function DataTableActions<TData>({
           Icon={Check}
           onClick={() => table.options.meta?.submitRow(row.index)}
           className={cn(
-            "text-success-base  invisible transition-all",
-            isEdited && "visible -translate-x-7  ",
+            "text-success-base invisible transition-all",
+            isEdited && "visible -translate-x-7",
           )}
         />
 

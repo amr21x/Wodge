@@ -5,10 +5,12 @@ export type ToggleProps = {
   active?: boolean;
   onChange: (active: boolean) => void;
   size?: "small" | "large";
+  label: string;
 };
 
 export const Toggle = ({
   onChange,
+  label,
   active = false,
   size = "large",
 }: ToggleProps) => {
@@ -45,6 +47,7 @@ export const Toggle = ({
       className={buttonClass}
       type="button"
       role="switch"
+      aria-label={label}
       aria-checked={active}
       data-state={state}
       value={value}

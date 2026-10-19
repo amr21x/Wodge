@@ -91,7 +91,7 @@ describe("Durable Object persistence without a server", () => {
   });
 
   test("workspace lifecycle and file revisions persist the shared state", async () => {
-    const { storage, persistence, records } = fixture();
+    const { storage, records } = fixture();
     const state = await new WorkspaceRecordRepository(storage).loadWorkspace();
     const lifecycle = new WorkspaceLifecycleRepository(storage, state);
 

@@ -1,12 +1,11 @@
 import {
-  Thread,
   ThreadMessage as ThreadMessageType,
   ThreadPost,
 } from "@wodge/domain/discussions/models";
 import type { ThreadMutators } from "@/client/sync/discussions/mutators";
-import { memo, useEffect } from "react";
-import { ReadTransaction, Replicache } from "replicache";
-import { useSubscribe } from "@/client/sync/use-subscribe";
+import { memo } from "react";
+import { Replicache } from "replicache";
+
 import { ThreadMessage } from "./thread-message";
 import { toast } from "sonner";
 

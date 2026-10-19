@@ -43,7 +43,7 @@ export const useUploader = ({
 
       setLoading(false);
     },
-    [onUpload],
+    [onUpload, teamId, channelId, workspaceId],
   );
 
   return { loading, uploadFile };

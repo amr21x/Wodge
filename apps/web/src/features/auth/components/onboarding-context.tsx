@@ -2,9 +2,8 @@
 
 import type { UserType } from "@wodge/domain/user/models";
 
-import { useCurrentUser } from "@/features/account/hooks/use-current-user";
 import { useQueryClient } from "@tanstack/react-query";
-import { createContext, useContext, useEffect, useTransition } from "react";
+import { createContext, useContext, useTransition } from "react";
 
 interface ContextValues {
   user: UserType;
@@ -23,7 +22,7 @@ export function OnboardingProvider({
 }) {
   const [isPending, startTransition] = useTransition();
 
-  const queryClient = useQueryClient();
+  useQueryClient();
 
   // useEffect(() => {
   //   queryClient.invalidateQueries({

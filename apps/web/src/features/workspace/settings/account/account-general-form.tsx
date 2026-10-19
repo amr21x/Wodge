@@ -8,21 +8,19 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { SettingsContentAction, SettingsContentSection } from "../settings";
+
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
-import { PublicUserSchema, UserSchema } from "@wodge/domain/user/validation";
-import { PublicUserType, User } from "@wodge/domain/user/models";
-import { Workspace } from "@wodge/domain/workspace/models";
-import { WorkspaceSchema } from "@wodge/domain/workspace/validation";
-import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
+import { PublicUserSchema } from "@wodge/domain/user/validation";
+import { PublicUserType } from "@wodge/domain/user/models";
+
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils/index";
+
 import { toast } from "@/components/ui/toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { env } from "@wodge/env/client";
+
 import { useCurrentUser } from "@/features/account/hooks/use-current-user";
 
 function AccountGeneralFormContent() {
@@ -50,7 +48,7 @@ function AccountGeneralFormContent() {
         displayName: user.displayName as string,
       });
     }
-  }, [user]);
+  }, [user, form]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (
@@ -61,7 +59,7 @@ function AccountGeneralFormContent() {
 
       return data;
     },
-    onSuccess: (data) => {
+    onSuccess: (_data) => {
       toast.success("Account updated");
       queryClient.invalidateQueries({
         queryKey: ["user"],

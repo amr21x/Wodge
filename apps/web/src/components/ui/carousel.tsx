@@ -137,6 +137,7 @@ const Carousel = React.forwardRef<
           canScrollNext,
         }}
       >
+        {/* oxlint-disable jsx-a11y/prefer-tag-over-role -- Keep the ARIA carousel roles on wrappers with div props and refs. */}
         <div
           ref={ref}
           onKeyDownCapture={handleKeyDown}
@@ -147,6 +148,7 @@ const Carousel = React.forwardRef<
         >
           {children}
         </div>
+        {/* oxlint-enable jsx-a11y/prefer-tag-over-role */}
       </CarouselContext.Provider>
     );
   },
@@ -182,6 +184,7 @@ const CarouselItem = React.forwardRef<
   const { orientation } = useCarousel();
 
   return (
+    /* oxlint-disable jsx-a11y/prefer-tag-over-role -- Keep the ARIA carousel roles on wrappers with div props and refs. */
     <div
       ref={ref}
       role="group"
@@ -193,6 +196,7 @@ const CarouselItem = React.forwardRef<
       )}
       {...props}
     />
+    /* oxlint-enable jsx-a11y/prefer-tag-over-role */
   );
 });
 // CarouselItem.displayName = "CarouselItem";
@@ -209,7 +213,7 @@ const CarouselPrevious = React.forwardRef<
       variant={variant}
       size={size}
       className={cn(
-        "absolute  h-8 w-8 rounded-full",
+        "absolute h-8 w-8 rounded-full",
         orientation === "horizontal"
           ? "-left-12 top-1/2 -translate-y-1/2"
           : "-top-12 left-1/2 -translate-x-1/2 rotate-90",

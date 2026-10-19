@@ -10,7 +10,6 @@ import {
   Building2,
   Check,
   ChevronsUpDown,
-  Computer,
   LogOut,
   Monitor,
   MoonStar,
@@ -54,12 +53,12 @@ export function WorkspaceSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <div
+        <button
+          type="button"
           className={cn(
             buttonVariants({ variant: "ghost", size: "fit" }),
             "group max-w-44 cursor-pointer items-center justify-start pl-[0.345rem]",
           )}
-          role="button"
           aria-label="Switch workspace"
         >
           <SafeAvatar
@@ -71,7 +70,7 @@ export function WorkspaceSwitcher() {
 
           <p className="mr-1.5 truncate">{workspace?.name}</p>
           <ChevronsUpDown className="h-3.5 w-3.5 shrink-0 opacity-50 group-hover:opacity-100" />
-        </div>
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent alignOffset={0} align="start" className="w-52">
         <DropdownMenuGroup>

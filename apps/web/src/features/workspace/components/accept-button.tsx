@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { env } from "@wodge/env/client";
+
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -25,7 +25,7 @@ export function AcceptButton({ slug }: { slug: string }) {
         throw new Error("Failed to join workspace");
       }
     },
-    onSuccess: (data) => {
+    onSuccess: (_data) => {
       queryClient.invalidateQueries({
         queryKey: ["user-workspaces"],
       });

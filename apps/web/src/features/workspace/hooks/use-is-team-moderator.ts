@@ -32,7 +32,7 @@ export function useIsTeamModerator(forceTeamId?: string) {
           teamId: forceTeamId || teamId,
         }),
     );
-  }, [structure, teamId, user?.id]);
+  }, [structure, teamId, user?.id, members, forceTeamId]);
 
   return grant;
 }

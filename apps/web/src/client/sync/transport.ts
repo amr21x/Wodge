@@ -9,8 +9,7 @@ export function replicacheWrapper<Request, Result>(
   id: string,
   headers?: Record<string, string>,
 ) {
-  // eslint-disable-next-line no-unused-vars -- Preserve the Replicache callback signature.
-  return async (requestBody: Request, requestID: string) => {
+  return async (requestBody: Request, _requestID: string) => {
     try {
       const res = await fetch(`/api/replicache/${mode}`, {
         method: "POST",

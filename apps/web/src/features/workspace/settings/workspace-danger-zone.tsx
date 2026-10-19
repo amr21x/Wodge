@@ -1,14 +1,14 @@
 import { useIsOwnerOrAdmin } from "@/features/workspace/hooks/use-is-owner-or-admin";
 import { SettingsContentAction } from "./settings";
 import { useIsOwner } from "@/features/workspace/hooks/use-is-owner";
-import { env } from "@wodge/env/client";
+
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
 import { toast } from "@/components/ui/toast";
 import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function WorkspaceDangerZone() {
-  const isManager = useIsOwnerOrAdmin();
+  useIsOwnerOrAdmin();
   const isOwner = useIsOwner();
   const { workspaceId } = useCurrentWorkspace();
   const router = useRouter();
@@ -54,7 +54,7 @@ export function WorkspaceDangerZone() {
   });
 
   return (
-    <div className="flex gap-4 ">
+    <div className="flex gap-4">
       {!isOwner && (
         <SettingsContentAction
           variant="destructive"

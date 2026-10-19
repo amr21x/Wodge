@@ -29,7 +29,7 @@ import { cn } from "@/lib/utils/index";
 import { useMember } from "@/features/workspace/hooks/use-member";
 import { SafeAvatar } from "@/components/safe-avatar";
 import { TrackMutedIndicator } from "./track-muted-indicator";
-import { Button } from "@/components/ui/button";
+
 import { isCarouselOpenAtom } from "../state/atoms";
 import { useAtomValue } from "jotai";
 
@@ -65,8 +65,7 @@ function TrackRefContextIfNeeded(
   );
 }
 
-export interface ParticipantTileProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+export interface ParticipantTileProps extends React.HTMLAttributes<HTMLDivElement> {
   /** The track reference to display. */
   trackRef?: TrackReferenceOrPlaceholder;
   disableSpeakingIndicator?: boolean;
@@ -131,7 +130,20 @@ export const ParticipantTile = React.forwardRef<
   });
 
   return (
+    /* oxlint-disable jsx-a11y/prefer-tag-over-role -- This composite control contains child controls, so it cannot be a native button. */
     <div
+      role="button"
+      tabIndex={0}
+      aria-label={inFocus ? "Clear participant focus" : "Focus participant"}
+      onKeyDown={(event) => {
+        if (
+          event.target === event.currentTarget &&
+          (event.key === "Enter" || event.key === " ")
+        ) {
+          event.preventDefault();
+          event.currentTarget.click();
+        }
+      }}
       ref={ref}
       style={
         {
@@ -142,7 +154,7 @@ export const ParticipantTile = React.forwardRef<
       }
       {...elementProps}
       className={cn(
-        "group/focus flex cursor-pointer flex-col gap-[0.375rem]  overflow-hidden rounded-md border-2 border-transparent bg-background  opacity-100 data-[lk-video-muted=true]:opacity-100 data-[lk-video-source=camera]:opacity-100 data-[lk-video-source=screen_share]:opacity-100",
+        "group/focus flex cursor-pointer flex-col gap-[0.375rem] overflow-hidden rounded-md border-2 border-transparent bg-background opacity-100 data-[lk-video-muted=true]:opacity-100 data-[lk-video-source=camera]:opacity-100 data-[lk-video-source=screen_share]:opacity-100",
         (isScreenSharing || isCamSharing) && "opacity-100",
         isCarouselOpen && !inFocus && "border-border/40",
         trackReference.participant.isSpeaking &&
@@ -200,7 +212,7 @@ export const ParticipantTile = React.forwardRef<
                   className="h-20 w-20"
                 />
               </div>
-              <div className="absolute bottom-1 left-1 right-1  z-[45] flex items-center justify-between gap-2 p-1">
+              <div className="absolute bottom-1 left-1 right-1 z-[45] flex items-center justify-between gap-2 p-1">
                 <div className="flex items-center rounded-md bg-dim/50 p-1">
                   {trackReference.source === Track.Source.Camera ? (
                     <>
@@ -229,5 +241,6 @@ export const ParticipantTile = React.forwardRef<
         </ParticipantContextIfNeeded>
       </TrackRefContextIfNeeded>
     </div>
+    /* oxlint-enable jsx-a11y/prefer-tag-over-role */
   );
 });

@@ -1,6 +1,6 @@
-import { atom, useAtomValue, useSetAtom } from "jotai";
+import { atom } from "jotai";
 import { Message } from "./message";
-import { memo, useEffect, useLayoutEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 import { Message as MessageType } from "@wodge/domain/rooms/models";
 import type { RoomMutators } from "@/client/sync/rooms/mutators";
 import { ReadTransaction, Replicache } from "replicache";
@@ -18,7 +18,7 @@ export const MessageList = memo(
     );
 
     const { workspaceId } = useCurrentWorkspace();
-    const { teamId, channelId } = useParams<{
+    useParams<{
       teamId: string;
       channelId: string;
     }>();

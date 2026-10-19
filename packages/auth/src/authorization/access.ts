@@ -47,7 +47,6 @@ export function isTeamModerator({
 // canEdit
 
 export function canEdit({
-  members,
   structure,
   userId = "",
   teamId = "",

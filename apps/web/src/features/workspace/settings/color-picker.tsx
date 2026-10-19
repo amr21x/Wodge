@@ -3,7 +3,7 @@ import { BRAND_COLOR } from "@wodge/domain/constants";
 
 import { useState } from "react";
 import { HexColorInput, HexColorPicker } from "react-colorful";
-import { Check } from "lucide-react";
+
 import {
   Popover,
   PopoverContent,
@@ -54,7 +54,7 @@ export function ColorPicker({
         <PopoverTrigger asChild>
           <Swatch swatchColor={color} sid={0} selected={selected} />
         </PopoverTrigger>
-        <PopoverContent className="color-picker space-y-6 ">
+        <PopoverContent className="color-picker space-y-6">
           <HexColorPicker color={color} onChange={onSetColor} />
           <HexColorInput
             className={cn(inputVariants(), "w-full")}
@@ -95,7 +95,17 @@ interface SwatchProps extends ButtonProps {
 }
 
 export const Swatch = React.forwardRef<HTMLButtonElement, SwatchProps>(
-  ({ swatchColor, handler, sid, selected, className, ...props }, ref) => (
+  (
+    {
+      swatchColor,
+      handler,
+      className,
+      sid: _sid,
+      selected: _selected,
+      ...props
+    },
+    ref,
+  ) => (
     <Button
       size="sm"
       type="button"
@@ -109,7 +119,7 @@ export const Swatch = React.forwardRef<HTMLButtonElement, SwatchProps>(
       {...props}
     >
       <div
-        className="h-full w-full shrink-0 "
+        className="h-full w-full shrink-0"
         style={{ backgroundColor: swatchColor }}
       />
     </Button>

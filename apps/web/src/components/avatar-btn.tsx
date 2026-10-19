@@ -44,7 +44,21 @@ export function AvatarBtn({
       sideOffset={3}
       content={content || (avatar ? "Replace avatar" : "Add avatar")}
     >
+      {/* oxlint-disable jsx-a11y/prefer-tag-over-role -- This composite control contains child controls, so it cannot be a native button. */}
       <div
+        role="button"
+        tabIndex={0}
+        aria-label={avatar ? "Replace avatar" : "Add avatar"}
+        aria-disabled={isUploading || isDeleting}
+        onKeyDown={(event) => {
+          if (
+            event.target === event.currentTarget &&
+            (event.key === "Enter" || event.key === " ")
+          ) {
+            event.preventDefault();
+            inputRef.current?.click();
+          }
+        }}
         className={cn(
           "group relative w-fit cursor-pointer",
           (isUploading || isDeleting) && "animate-pulse",
@@ -85,7 +99,7 @@ export function AvatarBtn({
               e.stopPropagation();
               e.preventDefault();
               setBlobUrl(undefined);
-              inputRef.current?.value && (inputRef.current.value = "");
+              if (inputRef.current) inputRef.current.value = "";
               onRemove?.();
             }}
             disabled={isDeleting}
@@ -100,6 +114,7 @@ export function AvatarBtn({
           </Button>
         )}
       </div>
+      {/* oxlint-enable jsx-a11y/prefer-tag-over-role */}
     </TooltipWrapper>
   );
 }

@@ -1,43 +1,6 @@
 "use client";
 
-import React, { forwardRef, useMemo, useState } from "react";
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragOverlay,
-  DragStartEvent,
-  DragEndEvent,
-  UniqueIdentifier,
-  DragOverEvent,
-  Active,
-  Over,
-} from "@dnd-kit/core";
-import {
-  arrayMove,
-  rectSwappingStrategy,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import {
-  SidebarItem,
-  SidebarItemProps,
-} from "@/features/workspace/components/sidebar-item";
-import { Channel } from "@wodge/domain/channels/index";
-import { Team } from "@wodge/domain/workspace/models";
-import { RiDraggable } from "react-icons/ri";
-import { clear } from "console";
-import { Teamspaces } from "@/features/workspace/components/teamspaces";
-import { useAppStore } from "@/client/state/store";
-import { produce } from "immer";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import React from "react";
 
 // type Movement =
 //   | {

@@ -16,7 +16,6 @@ export function createThreadMutation({
   thread,
   teamId,
   structure,
-  curUserId,
 }: CreateThreadArgs) {
   // Validate the data
   const validateFields = ThreadSchema.safeParse(thread);

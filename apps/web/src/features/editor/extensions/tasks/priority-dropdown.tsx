@@ -8,9 +8,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils/index";
 import { ChevronUpCircle, X } from "lucide-react";
-import { DrObj } from "@wodge/domain/types";
+
 import { Task } from "@wodge/domain/pages/models";
-import { SidebarItemBtn } from "@/features/workspace/components/sidebar-item-btn";
+
 import { Badge } from "@/components/ui/badge";
 
 export function PriorityDropdown({
@@ -31,8 +31,8 @@ export function PriorityDropdown({
           className={cn(
             buttonVariants({ variant: "ghost", size: bigger ? "sm" : "fit" }),
             "justify-start gap-2 text-sm aria-disabled:opacity-85",
-            !!!priority && "text-muted-foreground",
-            !!priority && "group/priority gap-1 text-foreground opacity-100",
+            !priority && "text-muted-foreground",
+            priority && "group/priority gap-1 text-foreground opacity-100",
             bigger && "text-sm",
           )}
           aria-disabled={!isEditing}
@@ -44,7 +44,7 @@ export function PriorityDropdown({
             </div>
           )}
 
-          {!!!priority && (
+          {!priority && (
             <>
               {!bigger && (
                 <ChevronUpCircle className="h-4 w-4 text-foreground" />
@@ -53,7 +53,7 @@ export function PriorityDropdown({
             </>
           )}
 
-          {!!priority && <Priority priority={priority} />}
+          {priority && <Priority priority={priority} />}
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align={bigger ? "center" : "start"} className="w-44">
@@ -72,9 +72,9 @@ export function PriorityDropdown({
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => onSelect?.(undefined)}
-          disabled={!!!priority}
+          disabled={!priority}
         >
-          <X className="h-4 w-4 " />
+          <X className="h-4 w-4" />
           Remove Priority
         </DropdownMenuItem>
       </DropdownMenuContent>

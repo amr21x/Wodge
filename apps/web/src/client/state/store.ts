@@ -4,13 +4,12 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { Replicache } from "replicache";
 import type PartySocket from "partysocket";
-import { Room } from "livekit-client";
+
 import type { WorkspaceMutators } from "@/client/sync/workspace/mutators";
 import { userMutators } from "@/client/sync/user/mutators";
 import { pageMutators } from "@/client/sync/pages/mutators";
 import type { RoomMutators } from "@/client/sync/rooms/mutators";
 import type { ThreadMutators } from "@/client/sync/discussions/mutators";
-import { env } from "@wodge/env/client";
 
 import { createSocket } from "./create-socket";
 import { createWorkspaceRep } from "./create-workspace-rep";

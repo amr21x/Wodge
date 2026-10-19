@@ -17,7 +17,7 @@ import { useRouter } from "next/navigation";
 
 export function OnboardingSteps() {
   const { isPending } = useOnboarding();
-  const router = useRouter();
+  useRouter();
 
   return (
     <Stepper className="z-20 max-w-lg">

@@ -44,7 +44,7 @@ export function useCurrentRoomRep() {
       setRep(repTemp);
       setChannelRep(repTemp);
     }
-  }, [workspaceId, team, channel, structure.teams, user]);
+  }, [workspaceId, team, channel, structure.teams, user, rep, setChannelRep]);
 
   return rep;
 }

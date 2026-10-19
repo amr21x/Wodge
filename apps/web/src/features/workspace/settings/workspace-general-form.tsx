@@ -7,24 +7,24 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { SettingsContentAction, SettingsContentSection } from "./settings";
+
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { Workspace } from "@wodge/domain/workspace/models";
 import { WorkspaceSchema } from "@wodge/domain/workspace/validation";
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils/index";
+
 import { toast } from "@/components/ui/toast";
-import { Info } from "lucide-react";
+
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { env } from "@wodge/env/client";
+
 import { useRouter } from "next/navigation";
 
 export function WorkspaceGeneralForm() {
-  const { workspace, workspaceRep, workspaceId } = useCurrentWorkspace();
+  const { workspace, workspaceId } = useCurrentWorkspace();
   const queryClient = useQueryClient();
 
   const form = useForm<Workspace>({
@@ -43,7 +43,7 @@ export function WorkspaceGeneralForm() {
     if (workspace) {
       form.reset(workspace);
     }
-  }, [workspace]);
+  }, [workspace, form]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (data: Pick<Workspace, "name" | "slug">) => {
@@ -56,7 +56,7 @@ export function WorkspaceGeneralForm() {
 
       return data;
     },
-    onSuccess: (data) => {
+    onSuccess: (_data) => {
       toast.success("Workspace updated");
       queryClient.invalidateQueries({
         queryKey: ["user-workspaces"],

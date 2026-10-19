@@ -12,7 +12,7 @@ export async function verifyCanonicalUserTypes(
   const username: string | null = profile.username;
   const name: string = profile.displayName;
   // @ts-expect-error Authentication fields are not part of the application profile DTO.
-  profile.emailVerified;
+  void profile.emailVerified;
   // @ts-expect-error Profile repositories cannot edit verified identity fields.
   users.update(profile.id, { email: "changed@example.test" });
   // @ts-expect-error Profile edits cannot replace the canonical identity ID.

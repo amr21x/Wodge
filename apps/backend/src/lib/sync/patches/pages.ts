@@ -2,7 +2,7 @@ import { PatchOperation } from "replicache";
 import PageServer from "../../../servers/page";
 import { PatcherParams } from "../replicache";
 
-export function createPagePatch(party: PageServer, userId: string) {
+export function createPagePatch(party: PageServer, _userId: string) {
   return async function ({ fromVersion }: PatcherParams) {
     const patch: PatchOperation[] = [];
 

@@ -175,6 +175,9 @@ pnpm dev --filter backend
 pnpm dev             # Start development services
 pnpm build           # Build all workspaces
 pnpm lint            # Run linting across the monorepo
+pnpm lint:fix        # Apply safe lint fixes
+pnpm format          # Format the monorepo
+pnpm format:check    # Check formatting without writing files
 pnpm generate        # Generate database artifacts
 pnpm migrate:local   # Apply local database migrations
 pnpm studio          # Open the database studio

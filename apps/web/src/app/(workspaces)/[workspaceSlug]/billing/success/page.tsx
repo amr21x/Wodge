@@ -11,9 +11,9 @@ export default function Component({
   params: { workspaceSlug: string };
 }) {
   const [countdown, setCountdown] = useState(5);
-  const [validated, setValidated] = useState(false);
+  useState(false);
 
-  const searchParams = useSearchParams();
+  useSearchParams();
   const router = useRouter();
 
   useEffect(() => {

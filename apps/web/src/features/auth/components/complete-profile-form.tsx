@@ -1,7 +1,7 @@
 "use client";
 
 import { api } from "@/client/api";
-import { useRef, useState } from "react";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -16,7 +16,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { PublicUserType } from "@wodge/domain/user/models";
+
 import { UpdateUserSchema } from "@wodge/domain/user/validation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AvatarBtn } from "../../../components/avatar-btn";

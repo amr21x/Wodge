@@ -19,17 +19,15 @@ function fixture() {
     },
   } as unknown as DurableObjectStorage);
   const gateway = {
-    resolve: vi.fn(
-      async (_scope, subject): Promise<ResourceGrant> => ({
-        principal: subject,
-        workspaceId: "workspace",
-        scope: { type: "room", id: "room" },
-        permissions: { room: ["read"], message: ["send"] },
-        issuedAt: Date.now(),
-        expiresAt: Date.now() + 30_000,
-        policyRevision: 1,
-      }),
-    ),
+    resolve: vi.fn(async (_scope, subject): Promise<ResourceGrant> => ({
+      principal: subject,
+      workspaceId: "workspace",
+      scope: { type: "room", id: "room" },
+      permissions: { room: ["read"], message: ["send"] },
+      issuedAt: Date.now(),
+      expiresAt: Date.now() + 30_000,
+      policyRevision: 1,
+    })),
   };
   return {
     gateway,
@@ -152,12 +150,10 @@ test("an unbound room with existing records cannot be claimed by a workspace", a
 });
 
 test("failed invalidation remains durable and is acknowledged only after delivery succeeds", async () => {
-  const { AuthorizationRepository } = await import(
-    "@wodge/core/authorization/repositories/policy"
-  );
-  const { AuthorizationInvalidations } = await import(
-    "../../src/lib/authorization/invalidation"
-  );
+  const { AuthorizationRepository } =
+    await import("@wodge/core/authorization/repositories/policy");
+  const { AuthorizationInvalidations } =
+    await import("../../src/lib/authorization/invalidation");
   const records = new Map<string, unknown>();
   const query = new AuthorizationRepository(
     {

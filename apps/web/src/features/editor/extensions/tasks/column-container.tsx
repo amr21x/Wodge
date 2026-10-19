@@ -40,21 +40,15 @@ function ColumnContainer({ column, tasks, rep, editor }: Props) {
     return tasks.map((task) => task.id);
   }, [tasks]);
 
-  const {
-    setNodeRef,
-    attributes,
-    listeners,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
-    id: column.id,
-    data: {
-      type: "Column",
-      column,
-    },
-    disabled: editMode,
-  });
+  const { setNodeRef, attributes, listeners, transform, transition } =
+    useSortable({
+      id: column.id,
+      data: {
+        type: "Column",
+        column,
+      },
+      disabled: editMode,
+    });
 
   const style = {
     transition,
@@ -63,7 +57,7 @@ function ColumnContainer({ column, tasks, rep, editor }: Props) {
 
   const ref = useRef<HTMLParagraphElement>(null);
 
-  const edit = useEditable(ref, setName, {
+  useEditable(ref, setName, {
     disabled: !editMode,
   });
 
@@ -79,7 +73,7 @@ function ColumnContainer({ column, tasks, rep, editor }: Props) {
       selection?.removeAllRanges();
       selection?.addRange(range);
     }
-  }, [editMode]);
+  }, [editMode, editor]);
 
   return (
     <div ref={setNodeRef}>
@@ -92,7 +86,11 @@ function ColumnContainer({ column, tasks, rep, editor }: Props) {
           className="flex max-w-64 cursor-grab items-center pb-3 md:max-w-80"
         >
           <div className="flex w-full items-start gap-1">
-            <p
+            {/* oxlint-disable jsx-a11y/prefer-tag-over-role -- useEditable manages this contenteditable textbox; native inputs cannot host its editable DOM. */}
+            <div
+              role="textbox"
+              aria-label="Column name"
+              tabIndex={0}
               ref={ref}
               // contentEditable={editMode}
               suppressContentEditableWarning
@@ -114,10 +112,10 @@ function ColumnContainer({ column, tasks, rep, editor }: Props) {
                   }
                 }
               }}
-              autoFocus
             >
               {name}
-            </p>
+            </div>
+            {/* oxlint-enable jsx-a11y/prefer-tag-over-role */}
             <div className="py-1 text-sm text-muted-foreground transition-all group-hover:text-foreground">
               {tasks.length || 0}
             </div>
@@ -135,7 +133,7 @@ function ColumnContainer({ column, tasks, rep, editor }: Props) {
                       setEditMode(true);
                     }}
                   >
-                    <Pencil className="h-4 w-4 " />
+                    <Pencil className="h-4 w-4" />
                     Edit column
                   </DropdownMenuItem>
 
@@ -227,7 +225,7 @@ function ColumnContainer({ column, tasks, rep, editor }: Props) {
             }
           }}
         >
-          <Plus className="h-4 w-4 " />
+          <Plus className="h-4 w-4" />
           Add task
         </Button>
       </div>
@@ -238,14 +236,14 @@ function ColumnContainer({ column, tasks, rep, editor }: Props) {
 export function ColumnTitle({ column }: { column: Column }) {
   return (
     <div className="group flex h-fit min-h-0 w-80 flex-col rounded-md bg-secondary/30 p-1.5 transition-all">
-      <div className="flex  max-w-80  cursor-grab items-center pb-3">
+      <div className="flex max-w-80 cursor-grab items-center pb-3">
         <div className="flex w-full items-center gap-1">
           <Input
             className={cn(
               "mr-1 w-fit min-w-0 rounded border p-0 px-1 text-base font-medium outline-none focus-visible:border-none disabled:cursor-grab disabled:opacity-100",
             )}
             value={column.title}
-            onChange={(e) => {}}
+            onChange={(_e) => {}}
             inRow
           />
 

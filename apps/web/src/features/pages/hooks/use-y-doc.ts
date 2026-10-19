@@ -5,9 +5,6 @@ import * as Y from "yjs";
 import { IndexeddbPersistence } from "y-indexeddb";
 import { editorUsersAtoms } from "@/features/editor/block-editor/atoms";
 import { useSetAtom } from "jotai";
-import { set } from "lodash";
-import { CloseEvent } from "partysocket/ws";
-import { useEffect } from "react";
 
 interface YDocProps {
   channelId: string;
@@ -22,7 +19,7 @@ export function useYDoc({
   teamId,
   workspaceId,
 }: YDocProps) {
-  const setDisplayUsers = useSetAtom(editorUsersAtoms);
+  useSetAtom(editorUsersAtoms);
   const yDoc = new Y.Doc();
   const idbProvider = new IndexeddbPersistence(channelId, yDoc);
 

@@ -1,4 +1,3 @@
-import { createHmac } from "node:crypto";
 import assert from "node:assert/strict";
 import { builtinModules, createRequire } from "node:module";
 import { mkdtemp, readFile, readdir, realpath, rm } from "node:fs/promises";
@@ -198,9 +197,8 @@ try {
       "utf8",
     );
     if (migration === "0005_canonical_organizations.sql") {
-      const { seedOrganizationMigration } = await import(
-        "./organization-migration.mjs"
-      );
+      const { seedOrganizationMigration } =
+        await import("./organization-migration.mjs");
       await seedOrganizationMigration(database, sql);
     }
 
@@ -229,9 +227,8 @@ try {
   await check(
     "canonical organization migration preserves workspace IDs, memberships, invitations and billing state",
     async () => {
-      const { verifyOrganizationMigration } = await import(
-        "./organization-migration.mjs"
-      );
+      const { verifyOrganizationMigration } =
+        await import("./organization-migration.mjs");
       await verifyOrganizationMigration(database);
     },
   );

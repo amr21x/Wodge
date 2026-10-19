@@ -1,10 +1,10 @@
 import { DrObj } from "@wodge/domain/types";
 import { Message } from "@wodge/domain/rooms/models";
-import { useQuery } from "@tanstack/react-query";
+
 import { useParams } from "next/navigation";
 import { Download, File } from "lucide-react";
 import { SidebarItemBtn } from "../../workspace/components/sidebar-item-btn";
-import { env } from "@wodge/env/client";
+
 import { download, getSrcLink } from "@/features/files/download";
 import { useState } from "react";
 

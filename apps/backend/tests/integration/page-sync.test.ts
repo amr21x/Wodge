@@ -44,10 +44,13 @@ function fixture() {
     name: "page",
     ctx: { storage: { get, put, list } },
     env: {
-      ...{ SECRET_KEY: "fixture" },
+      SECRET_KEY: "fixture",
       Workspace: {
         idFromName: (id: string) => id,
-        get: () => ({ setName: async () => {}, fetch: poke }),
+        get: () => ({
+          setName: async () => {},
+          fetch: poke,
+        }),
       },
     },
   } as unknown as PageParty;

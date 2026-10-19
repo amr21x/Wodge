@@ -27,7 +27,7 @@ export const TooltipWrapper = React.forwardRef<
       className,
       ...props
     },
-    ref,
+    _ref,
   ) => {
     return (
       <TooltipProvider {...props} delayDuration={100}>

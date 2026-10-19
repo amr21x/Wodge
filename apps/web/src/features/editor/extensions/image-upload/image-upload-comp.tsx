@@ -1,6 +1,6 @@
 import { FeatureGate } from "@/components/feature-flags-provider";
 import { Editor, NodeViewWrapper } from "@tiptap/react";
-import { memo, useCallback } from "react";
+import { useCallback } from "react";
 
 import { ImageUploader } from "./image-uploader";
 

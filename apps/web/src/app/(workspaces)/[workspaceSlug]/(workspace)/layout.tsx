@@ -14,12 +14,13 @@ function WorkspaceLayout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setSidebarOpen(isDesktop);
-  }, [isDesktop]);
+  }, [isDesktop, setSidebarOpen]);
 
   return (
-    <div className="flex h-dvh w-full ">
+    <div className="flex h-dvh w-full">
       <SidebarWrapper />
 
+      {/* oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- This background delegates dismissal of the mobile sidebar; it is not a separate control. */}
       <div
         className="flex h-full w-full flex-col"
         onClick={() => {

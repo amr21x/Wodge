@@ -7,7 +7,7 @@ import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provid
 import { recentlyVisitedAtom } from "@/client/state/global-atoms";
 
 export function useRecentlyVisited() {
-  const { workspaceId, structure } = useCurrentWorkspace();
+  const { workspaceId } = useCurrentWorkspace();
   const recentlyVisitedRecord = useAtomValue(recentlyVisitedAtom);
 
   if (!workspaceId) {
@@ -60,5 +60,5 @@ export function useUpdateRecentlyVisited(type: ChannelsTypes) {
         [workspaceId]: newRecentlyVisited,
       };
     });
-  }, [workspaceId]);
+  }, [workspaceId, teamId, folderId, channelId, setRecentlyVisited, type]);
 }

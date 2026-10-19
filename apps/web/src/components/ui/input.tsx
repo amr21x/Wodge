@@ -4,8 +4,7 @@ import { cn } from "@/lib/utils";
 import { Label } from "./label";
 import { cva } from "class-variance-authority";
 
-export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   inRow?: boolean;
 }
@@ -44,8 +43,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             <Label
               htmlFor={props.id}
               className={cn(
-                "dark:peer-focus:text-primary-base absolute left-3 top-1/2 translate-y-[-50%]  capitalize transition-all peer-focus:top-3 peer-focus:pt-1.5 peer-focus:text-xs peer-focus:text-primary",
-                props.value && "top-3 pt-1.5 text-xs text-foreground/80 ",
+                "dark:peer-focus:text-primary-base absolute left-3 top-1/2 translate-y-[-50%] capitalize transition-all peer-focus:top-3 peer-focus:pt-1.5 peer-focus:text-xs peer-focus:text-primary",
+                props.value && "top-3 pt-1.5 text-xs text-foreground/80",
                 props["aria-invalid"] &&
                   "dark:text-destructive-base dark:peer-focus:text-destructive-base text-destructive peer-focus:text-destructive",
               )}

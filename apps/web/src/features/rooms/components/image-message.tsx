@@ -15,7 +15,7 @@ export function ImageMessage({
     channelId: string;
     teamId: string;
   }>();
-  const { data, isPending, isFetching } = useQuery({
+  const { data } = useQuery({
     queryKey: ["image", message.id],
     queryFn: async () => {
       const link = await getSrcLink(message.id, workspaceId, channelId, teamId);
@@ -40,12 +40,14 @@ export function ImageMessage({
   return (
     <div className="relative h-56 w-72 overflow-hidden rounded-md">
       {data && (
+        /* oxlint-disable next/no-img-element -- User-provided or blob image URLs have no fixed dimensions or image-optimizer contract. */
         <img
           src={data}
           alt={message.content}
           className="absolute inset-0 h-full w-full object-cover text-transparent"
           loading="lazy"
         />
+        /* oxlint-enable next/no-img-element */
       )}
     </div>
   );

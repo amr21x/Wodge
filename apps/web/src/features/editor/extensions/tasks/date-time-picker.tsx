@@ -96,7 +96,7 @@ export function DateTimePicker({
       </PopoverTrigger>
       <PopoverContent
         align={bigger ? "center" : "start"}
-        className=" w-auto p-0"
+        className="w-auto p-0"
         onClick={(e) => {
           e.stopPropagation();
         }}
@@ -111,7 +111,7 @@ export function DateTimePicker({
         />
 
         <div className="space-y-4 border-t border-border p-3">
-          <div className="flex items-center justify-between gap-1 ">
+          <div className="flex items-center justify-between gap-1">
             <Label htmlFor="time-toggle" className="text-sm">
               Include time
             </Label>

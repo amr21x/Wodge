@@ -1,6 +1,5 @@
 "use client";
 
-import { useContext } from "react";
 import { SettingsCollapsiblePlaceHolder } from "../settings";
 import { SidebarItem } from "../../components/sidebar-item";
 import { useIsDesktop } from "@/hooks/use-is-desktop";
@@ -31,7 +30,7 @@ export function GroupsSidebar() {
         let jsx = (
           <SidebarItem
             noIcon
-            className={cn("justify-start py-1.5  pr-1.5")}
+            className={cn("justify-start py-1.5 pr-1.5")}
             href={`${baseUrl}/${group.id}`}
             isActive={pathname.split("/").at(-1) === group.id}
           >

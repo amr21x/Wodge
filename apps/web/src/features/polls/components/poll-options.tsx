@@ -29,10 +29,11 @@ export function PollOptions({
         !isRoom && "pl-9",
       )}
     >
-      <ul className="flex w-full flex-col gap-2 ">
+      <ul className="flex w-full flex-col gap-2">
         {options?.map((option, i) => (
           <li key={i}>
-            <div
+            <button
+              type="button"
               className={cn(
                 buttonVariants({
                   variant: "outline",
@@ -61,7 +62,7 @@ export function PollOptions({
                     vote === i && "visible",
                   )}
                 />
-                <span className="overflow-hidden overflow-y-auto truncate ">
+                <span className="overflow-hidden overflow-y-auto truncate">
                   {option}
                 </span>
 
@@ -69,7 +70,7 @@ export function PollOptions({
                   <span className="ml-auto">{`${((votes?.[i] ?? 0) / totalVotes) * 100}%`}</span>
                 )}
               </div>
-            </div>
+            </button>
           </li>
         ))}
       </ul>

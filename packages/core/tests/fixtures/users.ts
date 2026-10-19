@@ -1,5 +1,3 @@
-import { nanoid } from "nanoid";
-import { LEGACY_ENTITY_ID_LENGTH } from "@wodge/domain/constants";
 import { PublicUserType } from "@wodge/domain/user/models";
 
 export const UserId = "-5oxKtIB8FXvYZL0AXjXp";

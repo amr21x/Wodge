@@ -1,12 +1,9 @@
-import Link from "next/link";
-
 import { EmailWrapper } from "./email-wrapper";
 import { OAuth } from "./oauth";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -14,7 +11,7 @@ import { Separator } from "@/components/ui/separator";
 
 export function LoginWrapper() {
   return (
-    <Card className="z-20  flex w-fit max-w-96 flex-col justify-center border-none bg-transparent shadow-none">
+    <Card className="z-20 flex w-fit max-w-96 flex-col justify-center border-none bg-transparent shadow-none">
       <CardHeader>
         <CardTitle className="text-center text-2xl">Welcome Back</CardTitle>
         <CardDescription className="text-center">
@@ -24,7 +21,7 @@ export function LoginWrapper() {
       <CardContent className="space-y-6 px-8">
         <EmailWrapper />
 
-        <div className="relative flex justify-center ">
+        <div className="relative flex justify-center">
           <div className="absolute inset-0 flex items-center px-0.5">
             <Separator />
           </div>

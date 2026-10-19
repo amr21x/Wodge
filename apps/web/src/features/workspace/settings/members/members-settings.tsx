@@ -11,12 +11,10 @@ import { Member } from "@wodge/domain/workspace/models";
 import { SettingsSearchInput } from "../settings-search-input";
 import { DataTable } from "@/components/data-table/data-table";
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
-import { authClient } from "@wodge/auth/client";
+
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { env } from "@wodge/env/client";
-import { useMembersInfo } from "@/features/workspace/hooks/use-members-info";
 
 export function MembersSettings() {
   const { members, workspaceId, workspace } = useCurrentWorkspace();
@@ -24,7 +22,7 @@ export function MembersSettings() {
   const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async (c: boolean) => {
+    mutationFn: async (_c: boolean) => {
       await fetch(`/api/workspaces/${workspaceId}/invite`, {
         method: "PATCH",
       });
@@ -90,7 +88,7 @@ export function MembersSettings() {
             onCheckedChange={mutate}
             checked={workspace?.isInviteLinkEnabled || false}
             disabled={isPending}
-            className="disabled:cursor-progress "
+            className="disabled:cursor-progress"
           />
         }
       >

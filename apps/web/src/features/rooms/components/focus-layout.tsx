@@ -3,15 +3,14 @@ import type { TrackReferenceOrPlaceholder } from "@livekit/components-core";
 import type { ParticipantClickEvent } from "@livekit/components-core";
 import { ParticipantTile } from "./participant-tile";
 import { mergeProps } from "./merge-props";
-import { Button } from "@/components/ui/button";
+
 import { cn } from "@/lib/utils/index";
-import { createPortal } from "react-dom";
+
 import { isCarouselOpenAtom } from "../state/atoms";
 import { useAtomValue } from "jotai";
 
 /** @public */
-export interface FocusLayoutContainerProps
-  extends React.HTMLAttributes<HTMLDivElement> {}
+export interface FocusLayoutContainerProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 /**
  * The `FocusLayoutContainer` is a layout component that expects two children:

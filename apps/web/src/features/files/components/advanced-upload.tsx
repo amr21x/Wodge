@@ -15,7 +15,7 @@ import { useParams } from "next/navigation";
 import { env } from "@wodge/env/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useQuery } from "@tanstack/react-query";
+
 import { useUploadToken } from "../../workspace/components/use-upload-token";
 
 export function AdvancedUploadButton({ workspaceId }: { workspaceId: string }) {
@@ -71,7 +71,7 @@ export function AdvancedUploadButton({ workspaceId }: { workspaceId: string }) {
             };
           },
         });
-  }, [token]);
+  }, [token, path, workspaceId, teamId]);
 
   if (!uppyRef) {
     return null;
@@ -82,13 +82,13 @@ export function AdvancedUploadButton({ workspaceId }: { workspaceId: string }) {
       <PopoverTrigger asChild>
         <SidebarItemBtn Icon={Plus} className="" />
       </PopoverTrigger>
-      <PopoverContent className="w-fit max-w-72 ">
+      <PopoverContent className="w-fit max-w-72">
         <Dashboard
           uppy={uppyRef}
           id="dashboard"
           height={"auto"}
           width={240}
-          className="flex justify-center "
+          className="flex justify-center"
         />
 
         <div className="space-y-1">

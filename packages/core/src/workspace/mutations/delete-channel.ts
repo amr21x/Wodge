@@ -10,8 +10,6 @@ export function deleteChannelMutation({
   folderId,
   channelId,
   type,
-  userId,
-  isAdmin,
 }: WorkspaceChannelMutation & {
   type: ChannelsTypes;
   isAdmin: boolean;

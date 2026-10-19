@@ -2,7 +2,7 @@ import { useCurrentResources } from "@/features/workspace/hooks/use-current-reso
 import { File } from "./file";
 
 export function Files({ workspaceId }: { workspaceId: string }) {
-  const { files, dirs, curPath } = useCurrentResources();
+  const { files, curPath } = useCurrentResources();
 
   return (
     <>

@@ -157,8 +157,6 @@ export const SlashCommand = Extension.create({
 
               const { view } = props.editor;
 
-              const editorNode = view.dom as HTMLElement;
-
               const getReferenceClientRect = () => {
                 if (!props.clientRect) {
                   return props.editor.storage[extensionName].rect;
@@ -187,8 +185,6 @@ export const SlashCommand = Extension.create({
 
                 // Account for when the editor is bound inside a container that doesn't go all the way to the edge of the screen
 
-                const editorXOffset = editorNode.getBoundingClientRect().x;
-
                 return new DOMRect(rect.x, yPos, rect.width, rect.height);
               };
 
@@ -214,8 +210,6 @@ export const SlashCommand = Extension.create({
 
               const { view } = props.editor;
 
-              const editorNode = view.dom as HTMLElement;
-
               const getReferenceClientRect = () => {
                 if (!props.clientRect) {
                   return props.editor.storage[extensionName].rect;
@@ -240,7 +234,6 @@ export const SlashCommand = Extension.create({
 
               view.dom.parentElement?.addEventListener("scroll", scrollHandler);
 
-              // eslint-disable-next-line no-param-reassign
               props.editor.storage[extensionName].rect = props.clientRect
                 ? getReferenceClientRect()
                 : {

@@ -43,7 +43,11 @@ export function postVoteMutation({
     }
 
     post.pollVoters?.push({ voter: curUserId, option });
-    post.votes![option] ? post.votes![option]!++ : (post.votes![option] = 1);
+    if (post.votes![option]) {
+      post.votes![option]!++;
+    } else {
+      post.votes![option] = 1;
+    }
   });
 
   return newArr as ThreadPost[];

@@ -28,7 +28,7 @@ export function httpFeatures(
   if (/^\/api\/rooms\/[^/]+\/token$/.test(path)) return [];
   if (/^\/api\/mcp(?:\/|$)/.test(path)) return ["agentAccess"];
   if (path === "/api/workspaces/new") return ["workspaceCreation"];
-  if (/^\/api\/workspaces\/preview\//.test(path)) return ["membership"];
+  if (path.startsWith("/api/workspaces/preview/")) return ["membership"];
   const match = path.match(/^\/api\/workspaces\/[^/]+(.*)$/);
   if (!match) return undefined;
   const tail = match[1];
@@ -39,9 +39,9 @@ export function httpFeatures(
     /^\/(invite|join\/[^/]+|leave|members(?:\/[^/]+(?:\/role)?)?)$/.test(tail!)
   )
     return ["membership"];
-  if (/^\/files\//.test(tail!)) return ["resources"];
+  if (tail!.startsWith("/files/")) return ["resources"];
   // This legacy route accesses the standalone team bucket, not page attachments.
-  if (/^\/file\//.test(tail!)) return ["resources"];
+  if (tail!.startsWith("/file/")) return ["resources"];
   if (tail === "/update" || tail === "/avatar") return ["workspaceSettings"];
   if (tail === "" || tail === "/")
     return method === "GET" ? [] : ["workspaceSettings"];

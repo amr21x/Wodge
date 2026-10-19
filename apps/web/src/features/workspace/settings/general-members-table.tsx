@@ -1,10 +1,9 @@
 import { DrObj } from "@wodge/domain/types";
 import { Member } from "@wodge/domain/workspace/models";
-import { useTable } from "./use-table";
-import { Mutable } from "@/lib/utils/index";
+
 import { Table } from "@tanstack/react-table";
 import { MembersCombobox } from "./members-combobox";
-import { Input } from "@/components/ui/input";
+
 import { DataTable } from "@/components/data-table/data-table";
 import { SettingsSearchInput } from "./settings-search-input";
 

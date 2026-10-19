@@ -1,5 +1,4 @@
 import {
-  Thread,
   ThreadMessage as ThreadMessageType,
   ThreadPost,
 } from "@wodge/domain/discussions/models";

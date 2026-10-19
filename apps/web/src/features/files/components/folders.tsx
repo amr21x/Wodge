@@ -3,8 +3,8 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Folder } from "./folder";
 
-export function Folders({ workspaceId }: { workspaceId: string }) {
-  const { files, dirs, curPath } = useCurrentResources();
+export function Folders(_input: { workspaceId: string }) {
+  const { dirs, curPath } = useCurrentResources();
   const { workspaceSlug, teamId } = useParams<{
     workspaceSlug: string;
     teamId: string;

@@ -67,14 +67,16 @@ export function Step({ index, children, className }: StepsProps) {
     count.current++;
 
     return () => {
+      /* oxlint-disable react-hooks/exhaustive-deps -- This ref is a shared numeric counter, not a DOM node; cleanup decrements its current value. */
       count.current--;
+      /* oxlint-enable react-hooks/exhaustive-deps */
     };
-  }, []);
+  }, [count]);
 
   return (
     <div
       className={cn(
-        "min-w-0 shrink-0 grow-0 basis-full  transition-all",
+        "min-w-0 shrink-0 grow-0 basis-full transition-all",
         "flex flex-col items-center gap-8",
         currentStep === index ? "visible opacity-100" : "visible opacity-0",
         className,

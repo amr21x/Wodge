@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Loader } from "@/components/ui/loader";
 import { useStepper } from "@/components/ui/stepper";
 import { toast } from "@/components/ui/toast";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -18,7 +18,7 @@ const EmailFormSchema = z.object({
 
 export function EmailForm() {
   const [isPending, setIsPending] = useState(false);
-  const [successOTP, setSuccessOTP] = useState(false);
+  useState(false);
   const [emailAtomVal, setEmailAtom] = useAtom(emailAtom);
 
   const { nextStep } = useStepper();

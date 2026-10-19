@@ -36,7 +36,7 @@ export default class UserServer
     });
   }
 
-  async onConnect(connection: Connection, ctx: ConnectionContext) {
+  async onConnect(connection: Connection, _ctx: ConnectionContext) {
     await this.ensurePresence();
     connection.send(
       JSON.stringify({

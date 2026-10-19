@@ -43,7 +43,7 @@ export function GroupGeneralForm({ group }: { group?: DrObj<Group> }) {
 
     form.reset(group);
     setColored(false);
-  }, [group, isAddition]);
+  }, [group, isAddition, form]);
 
   async function onSubmit(data: Omit<Group, "members" | "createdBy">) {
     let flag = false;
