@@ -164,13 +164,13 @@ function SettingsContent({
           className,
         )}
       >
-        <div className="h-[2.75rem] w-full shrink-0 ">
+        <div className="h-[2.75rem] w-full shrink-0">
           <div className="flex w-full items-start justify-between">
             <SheetTrigger asChild>
               <SidebarItemBtn
                 Icon={PanelLeft}
                 className={cn(
-                  "visible -ml-1 w-fit opacity-100 transition-all  duration-300 md:invisible",
+                  "visible -ml-1 w-fit opacity-100 transition-all duration-300 md:invisible",
                 )}
               />
             </SheetTrigger>
@@ -247,8 +247,7 @@ function SettingsClose() {
 
   return (
     <Button
-      className="-mr-1  items-start
-       p-0 text-muted-foreground/70 transition-all hover:text-foreground"
+      className="-mr-1 items-start p-0 text-muted-foreground/70 transition-all hover:text-foreground"
       size="fit"
       variant="link"
       onClick={() => router.push("/" + (workspaceSlug || ""))}

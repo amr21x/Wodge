@@ -54,7 +54,7 @@ export const EditorInfo = memo(({ users, maxLength = 5 }: EditorInfoProps) => {
             {usersSet.length > 5 && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <div className="z-50 -ml-2 flex h-6 w-6 cursor-pointer select-none items-center justify-center rounded-full bg-secondary text-xs text-muted-foreground ring-[1.5px] ring-secondary ">
+                  <div className="z-50 -ml-2 flex h-6 w-6 cursor-pointer select-none items-center justify-center rounded-full bg-secondary text-xs text-muted-foreground ring-[1.5px] ring-secondary">
                     <span className="hidden md:inline">+</span>
                     {usersSet.length - 5}
                   </div>

@@ -54,7 +54,7 @@ export function ColorPicker({
         <PopoverTrigger asChild>
           <Swatch swatchColor={color} sid={0} selected={selected} />
         </PopoverTrigger>
-        <PopoverContent className="color-picker space-y-6 ">
+        <PopoverContent className="color-picker space-y-6">
           <HexColorPicker color={color} onChange={onSetColor} />
           <HexColorInput
             className={cn(inputVariants(), "w-full")}
@@ -109,7 +109,7 @@ export const Swatch = React.forwardRef<HTMLButtonElement, SwatchProps>(
       {...props}
     >
       <div
-        className="h-full w-full shrink-0 "
+        className="h-full w-full shrink-0"
         style={{ backgroundColor: swatchColor }}
       />
     </Button>

@@ -11,5 +11,7 @@ export const permissionCatalogue = {
 export type PermissionResource = keyof typeof permissionCatalogue;
 
 export type Permissions = {
-  [Resource in PermissionResource]?: (typeof permissionCatalogue)[Resource][number][];
+  [
+    Resource in PermissionResource
+  ]?: (typeof permissionCatalogue)[Resource][number][];
 };

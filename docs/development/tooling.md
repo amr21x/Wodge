@@ -2,8 +2,8 @@
 
 [Docs home](../README.md) · [Develop Wodge](README.md)
 
-The current foundation retains the existing tooling and selects only the runtime
-and dependency changes needed by the portfolio milestone. See the
+The monorepo uses Oxlint for linting and Oxfmt for formatting. Other runtime and
+dependency choices retain the foundation described in the
 [current scope](documentation.md) and [executed foundation evidence](backend-foundation.md).
 
 ## Runtime and package manager
@@ -12,22 +12,50 @@ Node.js must be >=22.19.0; `.node-version` selects 24.19.0. The package-manager 
 is pnpm 9.4.0. The host's inherited pnpm launcher failed during verification;
 checks invoked an existing pinned CLI directly. This is not a global launcher repair.
 
-## Retained tools
+## Tools
 
 - TypeScript remains on the resolved 5.3.3 compiler.
-- ESLint and Prettier remain the linter and formatter. No replacement is selected.
+- Oxlint 1.89.0 and Oxfmt 0.74.0 are pinned at the repository root. ESLint,
+  Prettier and their plugins are no longer direct workspace dependencies.
 - Turborepo remains on the retained 2.x dependency line.
 - Vitest remains in the existing workspaces. Protocol-package peer compatibility
   uses its separately pinned version; it is not a repository-wide runner upgrade.
 
-Broader tooling modernization is deferred. There is no current mandate to install
-the latest package-manager, monorepo, compiler, linter, or formatter release.
+Other tooling modernization remains separately scoped; this migration does not
+upgrade Next.js, React, TypeScript, pnpm or Turborepo.
 
 ## Commands and verification
 
-`pnpm build` and `pnpm lint` retain their existing application behavior; the current
-web lint task still invokes `next lint`. Root format/type/test gate scripts have
-not been added. Do not describe target commands as implemented CI gates.
+Run these commands from the repository root:
+
+- `pnpm lint` lints all workspaces and root scripts with one Oxlint invocation.
+- `pnpm lint:fix` applies safe lint fixes.
+- `pnpm format` writes formatting for supported source, config and documentation files.
+- `pnpm format:check` checks the same files without modifying them.
+
+The web workspace lint script forwards to the root command. Next.js 14 build-time
+ESLint integration is disabled because linting runs separately. The Code Quality
+workflow checks lint and formatting on pushes and pull requests, including docs-only
+changes; these are source checks, not application build/test jobs. The manual Worker
+deploy workflow runs both checks before configuring secrets or deploying.
+
+`.oxlintrc.json` enables native TypeScript, React, Hooks, Next.js, accessibility,
+import and general correctness rules. Correctness findings are warnings; Rules of
+Hooks violations are errors. React Compiler-specific checks are disabled because
+this React 18 application does not use React Compiler. This is not exact ESLint rule
+parity: the removed Cloudflare next-on-pages plugin's four provider-specific rules
+and Turbo environment rule have no native replacement here. The retained Pages
+adapter build remains the deployment compatibility check. The unused TanStack
+plugin was installed but not enabled in the old configuration.
+
+`.oxfmtrc.json` keeps the previous 80-column formatting and Tailwind class sorting
+for `clsx` and `cn` using the web Tailwind v3 configuration. Import and package-key
+sorting are disabled to preserve ordering. Generated outputs, dependencies,
+coverage and the pnpm-managed lockfile are excluded; gitignored files are skipped.
+The initial formatting pass establishes the baseline for the check command.
+
+For VS Code, install the `oxc.oxc-vscode` extension. Workspace language settings use
+it as the formatter; its lint integration reads the same root configuration.
 
 `pnpm --filter backend build` compiles the production Worker through Wrangler's
 dry run. `pnpm --filter backend test:foundation` builds and runs the retained

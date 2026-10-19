@@ -236,7 +236,7 @@ export const Teamspace = React.forwardRef<
           })}
           className="group/collapsible"
         >
-          <div className="relative -ml-0.5 mr-2 h-5 w-5 ">
+          <div className="relative -ml-0.5 mr-2 h-5 w-5">
             <SidebarItemBtn
               className={cn(
                 "invisible absolute p-0.5 transition-transform",
@@ -248,7 +248,7 @@ export const Teamspace = React.forwardRef<
             />
             <SafeAvatar
               className={cn(
-                "absolute left-0 top-0 h-5 w-5 shrink-0 rounded-md ",
+                "absolute left-0 top-0 h-5 w-5 shrink-0 rounded-md",
 
                 type !== "resources" && "group-hover/collapsible:invisible",
               )}

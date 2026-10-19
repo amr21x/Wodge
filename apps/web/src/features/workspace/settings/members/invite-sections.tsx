@@ -46,7 +46,7 @@ export function InviteLink() {
 
   return (
     <div className="flex w-full items-center justify-between gap-6 overflow-hidden rounded-md bg-accent p-3">
-      <div className=" truncate text-sm">
+      <div className="truncate text-sm">
         {isLinkLoading ? (
           <Skeleton className="h-4 w-11/12 max-w-lg" />
         ) : (

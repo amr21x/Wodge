@@ -26,8 +26,8 @@ export class S3ObjectStorage implements ObjectStorage {
   get configured(): boolean {
     return Boolean(
       this.environment.R2_ENDPOINT &&
-        this.environment.R2_ACCESS_KEY &&
-        this.environment.R2_SECRET_KEY,
+      this.environment.R2_ACCESS_KEY &&
+      this.environment.R2_SECRET_KEY,
     );
   }
 

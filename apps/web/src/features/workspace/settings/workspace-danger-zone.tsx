@@ -54,7 +54,7 @@ export function WorkspaceDangerZone() {
   });
 
   return (
-    <div className="flex gap-4 ">
+    <div className="flex gap-4">
       {!isOwner && (
         <SettingsContentAction
           variant="destructive"

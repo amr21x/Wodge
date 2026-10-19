@@ -55,9 +55,7 @@ export function ComboboxCell({
               "group w-48 max-w-48 cursor-pointer justify-start gap-1 font-normal",
             )}
           >
-            {nData > 0 && (
-              <span className="relative  truncate">{renderer}</span>
-            )}
+            {nData > 0 && <span className="relative truncate">{renderer}</span>}
 
             {nData === 0 && (
               <div

@@ -121,7 +121,7 @@ export function TableView({ editor }: { editor: Editor }) {
   });
 
   return (
-    <div className="w-full overflow-y-auto  border-border">
+    <div className="w-full overflow-y-auto border-border">
       <div className="pb-4">
         <DataTable table={table.table} withHeader />
 

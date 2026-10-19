@@ -90,7 +90,7 @@ export function MembersSettings() {
             onCheckedChange={mutate}
             checked={workspace?.isInviteLinkEnabled || false}
             disabled={isPending}
-            className="disabled:cursor-progress "
+            className="disabled:cursor-progress"
           />
         }
       >

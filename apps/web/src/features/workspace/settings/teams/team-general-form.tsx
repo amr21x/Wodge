@@ -88,7 +88,7 @@ export function TeamGeneralForm({ team }: { team?: DrObj<Team> }) {
         <div className="space-y-2">
           <p className="text-sm">Icon & Name</p>
 
-          <div className="flex w-64 items-center  gap-2">
+          <div className="flex w-64 items-center gap-2">
             <SafeAvatar
               src={team?.avatar}
               fallback={form.watch("name")?.[0] || ""}

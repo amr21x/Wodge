@@ -142,7 +142,7 @@ function UploadButtonContent({
           id="dashboard"
           height={240}
           width={240}
-          className="simple flex justify-center "
+          className="simple flex justify-center"
         />
       </PopoverContent>
     </Popover>

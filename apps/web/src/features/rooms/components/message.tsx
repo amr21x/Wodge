@@ -93,7 +93,7 @@ export const Message = memo(
     }
 
     return (
-      <div className="group rounded-md p-1.5 transition-all hover:bg-secondary/40 ">
+      <div className="group rounded-md p-1.5 transition-all hover:bg-secondary/40">
         <div className="flex items-start gap-2">
           <SafeAvatar
             className="h-7 w-7"

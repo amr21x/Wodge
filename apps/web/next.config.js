@@ -14,6 +14,9 @@ jiti("./node_modules/@wodge/env/client.ts");
 /** @type {import('next').NextConfig} */
 const nextConfig = withPWA({}) || {};
 
+// Linting runs once for the whole monorepo through Oxlint and the quality CI job.
+nextConfig.eslint = { ignoreDuringBuilds: true };
+
 // In development Next forwards API traffic; production routes these paths to the backend Worker.
 
 nextConfig.rewrites = async () =>

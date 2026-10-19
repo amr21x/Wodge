@@ -74,7 +74,7 @@ export function PriorityDropdown({
           onClick={() => onSelect?.(undefined)}
           disabled={!!!priority}
         >
-          <X className="h-4 w-4 " />
+          <X className="h-4 w-4" />
           Remove Priority
         </DropdownMenuItem>
       </DropdownMenuContent>

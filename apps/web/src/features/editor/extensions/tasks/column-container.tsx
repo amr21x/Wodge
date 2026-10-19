@@ -135,7 +135,7 @@ function ColumnContainer({ column, tasks, rep, editor }: Props) {
                       setEditMode(true);
                     }}
                   >
-                    <Pencil className="h-4 w-4 " />
+                    <Pencil className="h-4 w-4" />
                     Edit column
                   </DropdownMenuItem>
 
@@ -227,7 +227,7 @@ function ColumnContainer({ column, tasks, rep, editor }: Props) {
             }
           }}
         >
-          <Plus className="h-4 w-4 " />
+          <Plus className="h-4 w-4" />
           Add task
         </Button>
       </div>
@@ -238,7 +238,7 @@ function ColumnContainer({ column, tasks, rep, editor }: Props) {
 export function ColumnTitle({ column }: { column: Column }) {
   return (
     <div className="group flex h-fit min-h-0 w-80 flex-col rounded-md bg-secondary/30 p-1.5 transition-all">
-      <div className="flex  max-w-80  cursor-grab items-center pb-3">
+      <div className="flex max-w-80 cursor-grab items-center pb-3">
         <div className="flex w-full items-center gap-1">
           <Input
             className={cn(

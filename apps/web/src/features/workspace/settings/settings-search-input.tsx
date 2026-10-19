@@ -20,7 +20,7 @@ export function SettingsSearchInput<TData>({
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <div className="relative flex w-80 ">
+    <div className="relative flex w-80">
       <Input
         placeholder={placeHolder || "Search"}
         className="pl-8 pr-8"

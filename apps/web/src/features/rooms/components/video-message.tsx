@@ -38,11 +38,11 @@ export function VideoMessage({
   });
 
   return (
-    <div className="  rounded-md">
+    <div className="rounded-md">
       {data && (
         <video
           controls
-          className="aspect-video max-h-[10.125rem] max-w-72 rounded-md "
+          className="aspect-video max-h-[10.125rem] max-w-72 rounded-md"
         >
           <source src={data} type="video/webm" />
         </video>

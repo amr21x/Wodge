@@ -45,8 +45,8 @@ export function UserCard() {
   return (
     <div
       className={cn(
-        "flex max-h-12 min-h-7 w-60 items-center overflow-hidden  border-r  border-t border-border/50 bg-background px-1.5 py-2 transition-all",
-        !isSidebarOpen && " w-0 px-0",
+        "flex max-h-12 min-h-7 w-60 items-center overflow-hidden border-r border-t border-border/50 bg-background px-1.5 py-2 transition-all",
+        !isSidebarOpen && "w-0 px-0",
       )}
     >
       <DropdownMenu>
@@ -116,7 +116,7 @@ export function UserCard() {
         <SidebarItemBtn
           Icon={micStatus ? Mic : MicOff}
           className={cn(
-            "ml-auto ",
+            "ml-auto",
             !micStatus && "text-destructive hover:text-destructive",
           )}
           onClick={() => {

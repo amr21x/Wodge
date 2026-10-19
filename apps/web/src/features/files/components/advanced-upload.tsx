@@ -82,13 +82,13 @@ export function AdvancedUploadButton({ workspaceId }: { workspaceId: string }) {
       <PopoverTrigger asChild>
         <SidebarItemBtn Icon={Plus} className="" />
       </PopoverTrigger>
-      <PopoverContent className="w-fit max-w-72 ">
+      <PopoverContent className="w-fit max-w-72">
         <Dashboard
           uppy={uppyRef}
           id="dashboard"
           height={"auto"}
           width={240}
-          className="flex justify-center "
+          className="flex justify-center"
         />
 
         <div className="space-y-1">

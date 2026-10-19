@@ -70,7 +70,7 @@ export const ContentItemMenu = ({ editor }: ContentItemMenuProps) => {
               side="bottom"
               align="start"
               sideOffset={8}
-              className="flex min-w-[16rem] flex-col p-2 "
+              className="flex min-w-[16rem] flex-col p-2"
             >
               <PopoverClose asChild>
                 <DropdownButton onClick={actions.resetTextFormatting}>

@@ -10,8 +10,7 @@ import { isCarouselOpenAtom } from "../state/atoms";
 import { useAtomValue } from "jotai";
 
 /** @public */
-export interface FocusLayoutContainerProps
-  extends React.HTMLAttributes<HTMLDivElement> {}
+export interface FocusLayoutContainerProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 /**
  * The `FocusLayoutContainer` is a layout component that expects two children:

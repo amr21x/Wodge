@@ -25,7 +25,7 @@ export function SidebarHeader() {
     >
       <WorkspaceSwitcher />
 
-      <div className=" ml-auto flex shrink-0  items-center gap-1">
+      <div className="ml-auto flex shrink-0 items-center gap-1">
         <SidebarItemBtn Icon={PanelLeftClose} onClick={closeSidebar} />
         {/* <SidebarItemBtn Icon={ArrowDownWideNarrow} /> */}
       </div>

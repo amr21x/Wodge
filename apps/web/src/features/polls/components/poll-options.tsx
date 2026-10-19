@@ -29,7 +29,7 @@ export function PollOptions({
         !isRoom && "pl-9",
       )}
     >
-      <ul className="flex w-full flex-col gap-2 ">
+      <ul className="flex w-full flex-col gap-2">
         {options?.map((option, i) => (
           <li key={i}>
             <div
@@ -61,7 +61,7 @@ export function PollOptions({
                     vote === i && "visible",
                   )}
                 />
-                <span className="overflow-hidden overflow-y-auto truncate ">
+                <span className="overflow-hidden overflow-y-auto truncate">
                   {option}
                 </span>
 

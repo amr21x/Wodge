@@ -63,7 +63,7 @@ export function tasksColumns({
         }, [isEditing]);
 
         return (
-          <div className="group/task flex h-full w-full max-w-64 items-center ">
+          <div className="group/task flex h-full w-full max-w-64 items-center">
             <p
               ref={titleRef}
               suppressContentEditableWarning
@@ -115,7 +115,7 @@ export function tasksColumns({
     },
     {
       id: "status",
-      header: () => <Header className=" !text-sm !font-medium">Status</Header>,
+      header: () => <Header className="!text-sm !font-medium">Status</Header>,
       cell: ({ row }) => {
         const col = columns?.find((c) => c.id === row.original.columnId);
         const [open, setOpen] = useState(false);

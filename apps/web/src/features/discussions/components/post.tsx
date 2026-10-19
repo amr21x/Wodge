@@ -67,7 +67,7 @@ export const Post = memo(
     const commentsLength = post?.comments.length || 0;
 
     return (
-      <div className="group overflow-hidden rounded-md border border-border/50 bg-dim ">
+      <div className="group overflow-hidden rounded-md border border-border/50 bg-dim">
         <div className="flex w-full flex-col items-start px-2 pb-2 pt-4">
           <div className="flex w-full items-start gap-2">
             <SafeAvatar
@@ -198,7 +198,7 @@ export const Post = memo(
           ) : (
             <div className="BlockEditor tiptap ProseMirror overflow-hidden">
               <SafeDiv
-                className=" tableWrapper w-full text-balance break-words pl-9"
+                className="tableWrapper w-full text-balance break-words pl-9"
                 html={post?.content || comment?.content || ""}
               />
             </div>

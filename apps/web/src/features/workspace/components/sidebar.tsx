@@ -75,7 +75,7 @@ export function Sidebar() {
     // <ScrollArea className="flex-1">
     <aside
       className={cn(
-        "h-full max-h-full min-h-0 flex-1 shrink-0 grow  overflow-y-auto bg-dim px-2.5 py-1.5 transition-all",
+        "h-full max-h-full min-h-0 flex-1 shrink-0 grow overflow-y-auto bg-dim px-2.5 py-1.5 transition-all",
         !isSidebarOpen && "px-0",
       )}
     >

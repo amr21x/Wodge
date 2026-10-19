@@ -106,7 +106,7 @@ const DropdownMenuItem = React.forwardRef<
       <DropdownMenuPrimitive.Item
         ref={ref}
         className={cn(
-          "relative flex h-7 cursor-pointer select-none items-center gap-2 rounded-sm px-1.5  text-sm outline-none transition-colors focus:bg-accent/50 focus:text-accent-foreground  data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+          "relative flex h-7 cursor-pointer select-none items-center gap-2 rounded-sm px-1.5 text-sm outline-none transition-colors focus:bg-accent/50 focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
           inset && "pl-8",
           destructive && "text-destructive focus:text-destructive",
           disclosure && "overflow-hidden",
@@ -137,7 +137,7 @@ const DropdownMenuItem = React.forwardRef<
             <div
               className={cn(
                 "absolute left-0 flex w-full translate-y-7 gap-1 transition-transform",
-                isDisclosureOpen && "top-0 translate-y-0  ",
+                isDisclosureOpen && "top-0 translate-y-0",
               )}
             >
               <Button

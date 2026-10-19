@@ -114,7 +114,7 @@ function DataTable<TData>({
                 ))}
                 <TableCell
                   className={cn(
-                    "absolute left-0 top-1/2 z-50 flex  w-full -translate-y-1/2 text-muted-foreground",
+                    "absolute left-0 top-1/2 z-50 flex w-full -translate-y-1/2 text-muted-foreground",
                     isEditing && "invisible right-0",
                   )}
                 >

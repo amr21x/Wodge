@@ -74,7 +74,7 @@ export function Step({ index, children, className }: StepsProps) {
   return (
     <div
       className={cn(
-        "min-w-0 shrink-0 grow-0 basis-full  transition-all",
+        "min-w-0 shrink-0 grow-0 basis-full transition-all",
         "flex flex-col items-center gap-8",
         currentStep === index ? "visible opacity-100" : "visible opacity-0",
         className,

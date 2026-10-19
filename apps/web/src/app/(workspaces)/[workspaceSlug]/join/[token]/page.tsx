@@ -77,7 +77,7 @@ async function JoinWorkspacePage({
             {user.displayName} has invited you to join {workspace.name}
           </p>
 
-          <p className=" text-center">
+          <p className="text-center">
             You are invited to join Wodge workspace{" "}
             <strong>{workspace.name}</strong>.
           </p>

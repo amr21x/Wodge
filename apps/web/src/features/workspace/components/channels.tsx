@@ -257,7 +257,7 @@ export const Channel = React.forwardRef<
                   <DropdownMenuContent>
                     <DialogTrigger asChild>
                       <DropdownMenuItem className="">
-                        <Pencil className="h-4 w-4 " />
+                        <Pencil className="h-4 w-4" />
                         Edit {type}
                       </DropdownMenuItem>
                     </DialogTrigger>

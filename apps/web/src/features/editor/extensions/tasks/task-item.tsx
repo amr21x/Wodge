@@ -81,13 +81,13 @@ export const TaskItem = forwardRef<HTMLDivElement, TaskItemProps>(
             e.stopPropagation();
           }
         }}
-        className="group/task relative flex h-fit max-h-36 flex-col rounded-md bg-background p-2.5 text-sm hover:bg-background/65 "
+        className="group/task relative flex h-fit max-h-36 flex-col rounded-md bg-background p-2.5 text-sm hover:bg-background/65"
         {...props}
         aria-disabled={isEditing}
       >
         <div
           className={cn(
-            "invisible absolute -top-0 left-1/2 h-1.5 w-[99%] -translate-x-1/2  -translate-y-full rounded-sm bg-sky-500/30 transition-all dark:bg-sky-900/30",
+            "invisible absolute -top-0 left-1/2 h-1.5 w-[99%] -translate-x-1/2 -translate-y-full rounded-sm bg-sky-500/30 transition-all dark:bg-sky-900/30",
             isAbove && "visible",
           )}
         />
@@ -102,7 +102,7 @@ export const TaskItem = forwardRef<HTMLDivElement, TaskItemProps>(
             ref={titleRef}
             suppressContentEditableWarning
             className={cn(
-              "!my-0 max-h-32 w-full overflow-hidden  truncate break-words p-1 text-base font-medium focus:outline-none",
+              "!my-0 max-h-32 w-full overflow-hidden truncate break-words p-1 text-base font-medium focus:outline-none",
               isEditing && "cursor-text",
               noTitle && "text-muted-foreground",
             )}

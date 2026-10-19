@@ -67,8 +67,8 @@ export function TaskSheet({ task, rep }: TaskSheetProps) {
   return (
     <SheetContent
       className={cn(
-        "flex w-full flex-col gap-0 px-0 pb-0 pt-10 sm:w-3/4 sm:max-w-full md:w-3/5  lg:max-w-[31.25rem] 2xl:max-w-[46.875rem]",
-        isSidebarOpen && " sm:max-w-[calc(100vw-15rem)]",
+        "flex w-full flex-col gap-0 px-0 pb-0 pt-10 sm:w-3/4 sm:max-w-full md:w-3/5 lg:max-w-[31.25rem] 2xl:max-w-[46.875rem]",
+        isSidebarOpen && "sm:max-w-[calc(100vw-15rem)]",
       )}
     >
       <SheetHeader
@@ -100,7 +100,7 @@ export function TaskSheet({ task, rep }: TaskSheetProps) {
         </SheetTitle>
 
         {!title && (
-          <p className="absolute -top-2 left-6 text-2xl font-semibold text-muted-foreground ">
+          <p className="absolute -top-2 left-6 text-2xl font-semibold text-muted-foreground">
             Untitled
           </p>
         )}

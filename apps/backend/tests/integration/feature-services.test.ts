@@ -631,9 +631,8 @@ test("verified billing events persist before notifications and reject missing me
 });
 
 test("workspace directory validates admission without performing identity writes", async () => {
-  const { WorkspaceDirectory } = await import(
-    "@wodge/core/workspace/services/directory"
-  );
+  const { WorkspaceDirectory } =
+    await import("@wodge/core/workspace/services/directory");
   const invite = { workspaceId: "workspace", token: "invite" };
   const repository = {
     getWorkspaceById: async () => ({

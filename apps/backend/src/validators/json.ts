@@ -4,9 +4,8 @@ import type { z } from "zod";
 
 /** Preserve both the wire input and parsed output in Hono's route contract. */
 export function jsonBody<Schema extends z.ZodTypeAny>(schema: Schema) {
-  return validator(
-    "json",
-    (value: z.input<Schema>): z.output<Schema> => schema.parse(value),
+  return validator("json", (value: z.input<Schema>): z.output<Schema> =>
+    schema.parse(value),
   );
 }
 

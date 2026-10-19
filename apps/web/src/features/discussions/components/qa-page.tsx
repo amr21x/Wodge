@@ -80,7 +80,7 @@ export function QAPage({ rep }: { rep?: Replicache<ThreadMutators> }) {
             <Button
               variant="secondary"
               size="sm"
-              className={cn("hidden gap-1.5  sm:inline-flex")}
+              className={cn("hidden gap-1.5 sm:inline-flex")}
               onClick={toggleThread}
             >
               <Icon

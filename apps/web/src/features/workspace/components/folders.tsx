@@ -148,7 +148,7 @@ function SortableDirectory({
         )}
       </CollapsibleTrigger>
       <CollapsibleContent
-        className={cn("transition-all ", !isRoot && "py-1 pl-3.5")}
+        className={cn("transition-all", !isRoot && "py-1 pl-3.5")}
       >
         <div
           className={cn(

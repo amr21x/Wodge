@@ -45,7 +45,7 @@ export function UserCard({ className }: { className?: string }) {
       <DropdownMenuTrigger asChild>
         <div
           className={cn(
-            "flex cursor-pointer select-none items-center gap-2 rounded-md px-2 py-1 hover:bg-secondary/60 aria-expanded:bg-secondary/60 ",
+            "flex cursor-pointer select-none items-center gap-2 rounded-md px-2 py-1 hover:bg-secondary/60 aria-expanded:bg-secondary/60",
             className,
           )}
         >

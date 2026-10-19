@@ -30,7 +30,7 @@ export function File({
           variant: "ghost",
           size: "sm",
         }),
-        "group items-center justify-start gap-2 rounded-none py-4 ",
+        "group items-center justify-start gap-2 rounded-none py-4",
       )}
     >
       {/* <Checkbox className="mr-1.5" /> */}

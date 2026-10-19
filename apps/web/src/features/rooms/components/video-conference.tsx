@@ -30,8 +30,7 @@ import { cn } from "@/lib/utils/index";
 import { useAtom, useAtomValue } from "jotai";
 import { isCarouselOpenAtom } from "../state/atoms";
 
-export interface VideoConferenceProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+export interface VideoConferenceProps extends React.HTMLAttributes<HTMLDivElement> {
   chatMessageFormatter?: MessageFormatter;
   chatMessageEncoder?: MessageEncoder;
   chatMessageDecoder?: MessageDecoder;

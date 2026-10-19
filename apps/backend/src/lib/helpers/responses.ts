@@ -16,7 +16,7 @@ export const error = (err: string | { message: string }, status = 500) => {
   return json(
     {
       ok: false,
-      error: typeof err === "string" ? err : err.message ?? "Unknown error",
+      error: typeof err === "string" ? err : (err.message ?? "Unknown error"),
     },
     status,
   );

@@ -72,7 +72,7 @@ export function RecentItem({ item }: { item: RecentlyVisitedItem }) {
       }}
     >
       <div className="group/item rounded-md border border-border bg-background">
-        <div className="relative h-6 bg-secondary/40 px-3 ">
+        <div className="relative h-6 bg-secondary/40 px-3">
           <Icon className="absolute bottom-0 h-5 w-5 translate-y-1/2 opacity-50 transition-all group-hover/item:opacity-100" />
         </div>
         <div className="px-3 pb-2 pt-4">

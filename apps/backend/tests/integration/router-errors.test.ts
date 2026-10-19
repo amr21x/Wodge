@@ -356,9 +356,8 @@ test.each([
 ] as const)(
   "workspace admission uses D1 membership before its local projection (%s, %s)",
   async (authoritativeMember, projectedMember, status) => {
-    const { workspaceMembership } = await import(
-      "../../src/middleware/workspace/membership"
-    );
+    const { workspaceMembership } =
+      await import("../../src/middleware/workspace/membership");
     const router = new Hono();
     router.use(
       "*",

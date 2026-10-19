@@ -57,7 +57,7 @@ const SidebarItem = forwardRef<HTMLDivElement, SidebarItemProps>(
         {collapsible && (
           <div className="relative -ml-0.5 mr-2 h-4 w-4">
             <ChevronRight className="invisible absolute left-0 top-0 mr-1 h-4 w-4 shrink-0 transition-transform group-hover:visible group-data-[state=open]/collapsible:rotate-90" />
-            <Icon className=" absolute left-0 top-0 h-4 w-4 shrink-0 group-hover:invisible" />
+            <Icon className="absolute left-0 top-0 h-4 w-4 shrink-0 group-hover:invisible" />
           </div>
         )}
 

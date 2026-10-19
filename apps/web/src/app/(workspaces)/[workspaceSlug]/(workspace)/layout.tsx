@@ -17,7 +17,7 @@ function WorkspaceLayout({ children }: { children: React.ReactNode }) {
   }, [isDesktop]);
 
   return (
-    <div className="flex h-dvh w-full ">
+    <div className="flex h-dvh w-full">
       <SidebarWrapper />
 
       <div
