@@ -8,11 +8,11 @@ import {
   WorkspaceStructure,
 } from "@wodge/domain/workspace/models";
 
-import { workspaceMutators } from "@/client/sync/workspace/mutators";
+import type { WorkspaceMutators } from "@/client/sync/workspace/mutators";
 import { useWorkspaceSubscription } from "@/features/workspace/hooks/use-workspace-subscription";
 
 interface WorkspaceContextProps {
-  workspaceRep: Replicache<typeof workspaceMutators> | null;
+  workspaceRep: Replicache<WorkspaceMutators> | null;
   workspace: Workspace | undefined;
   structure: DrObj<WorkspaceStructure>;
   members: DrObj<WorkspaceMembers>;

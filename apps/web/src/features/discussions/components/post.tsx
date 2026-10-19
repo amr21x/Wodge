@@ -4,7 +4,7 @@ import {
   ThreadMessage,
   ThreadPost,
 } from "@wodge/domain/discussions/models";
-import { threadMutators } from "@/client/sync/discussions/mutators";
+import type { ThreadMutators } from "@/client/sync/discussions/mutators";
 import { format } from "date-fns";
 import { SafeDiv } from "../../../components/safe-div";
 import { useMember } from "@/features/workspace/hooks/use-member";
@@ -42,7 +42,7 @@ export const Post = memo(
     opened?: boolean;
     isQA?: boolean;
     isComment?: boolean;
-    rep?: Replicache<typeof threadMutators>;
+    rep?: Replicache<ThreadMutators>;
   }) => {
     const { teamId, workspaceSlug } = useParams<{
       teamId: string;

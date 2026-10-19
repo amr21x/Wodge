@@ -3,6 +3,15 @@ name: Backend Worker Deploy
 # Production Durable Object namespace mapping must be verified before cutover.
 on:
   workflow_dispatch:
+    inputs:
+      integration_mode:
+        description: Integration configuration (partial for temporary minimal deployment)
+        type: choice
+        required: true
+        default: partial
+        options:
+          - partial
+          - ready
 
 jobs:
   deploy:
@@ -31,9 +40,10 @@ jobs:
           APP_DOMAIN: ${{ vars.APP_DOMAIN }}
           BACKEND_DOMAIN: ${{ vars.BACKEND_DOMAIN }}
           AVATARS_URL: ${{ vars.AVATARS_URL }}
+          INTEGRATION_MODE: ${{ inputs.integration_mode }}
         run: >-
           pnpm exec wrangler deploy --config ../../apps/backend/wrangler.jsonc
           --var "APP_DOMAIN:$APP_DOMAIN"
           --var "BACKEND_DOMAIN:$BACKEND_DOMAIN"
           --var "AVATARS_URL:$AVATARS_URL"
-          --var "INTEGRATION_MODE:ready"
+          --var "INTEGRATION_MODE:$INTEGRATION_MODE"

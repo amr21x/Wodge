@@ -1,7 +1,7 @@
 import { useParams } from "next/navigation";
 import { useActionState, useEffect, useMemo, useState } from "react";
 import { Replicache } from "replicache";
-import { threadMutators } from "@/client/sync/discussions/mutators";
+import type { ThreadMutators } from "@/client/sync/discussions/mutators";
 import { createThreadRep } from "@/client/sync/discussions/create-thread-rep";
 
 import { useCurrentUser } from "../../account/hooks/use-current-user";
@@ -20,7 +20,7 @@ export function useCurrentThreadRep() {
 
   const { user } = useCurrentUser();
 
-  const [rep, setRep] = useState<Replicache<typeof threadMutators> | undefined>(
+  const [rep, setRep] = useState<Replicache<ThreadMutators> | undefined>(
     undefined,
   );
 

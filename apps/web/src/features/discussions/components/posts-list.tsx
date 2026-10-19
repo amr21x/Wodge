@@ -1,7 +1,7 @@
 import { DrObj } from "@wodge/domain/types";
 import { Team } from "@wodge/domain/workspace/models";
 import { ThreadPost } from "@wodge/domain/discussions/models";
-import { threadMutators } from "@/client/sync/discussions/mutators";
+import type { ThreadMutators } from "@/client/sync/discussions/mutators";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { TabsContent } from "@/components/ui/tabs";
 import { useMemo } from "react";
@@ -14,7 +14,7 @@ export function PostsList({
   rep,
 }: {
   posts?: DrObj<ThreadPost[]>;
-  rep?: Replicache<typeof threadMutators>;
+  rep?: Replicache<ThreadMutators>;
 }) {
   const postsList = useMemo(
     () => posts?.filter((p) => p.type === "post" || p.type === "poll"),

@@ -94,7 +94,9 @@ unverified/incomplete.
 
 ## Deployment
 
-The deployment workflow sets `INTEGRATION_MODE=ready`. This requires complete Resend,
+The deployment workflow offers `partial` (the temporary default) and `ready` integration modes.
+Partial deployments need only the two signing secrets plus origins and D1/DO bindings;
+sign-in remains unavailable without email or OAuth. Ready mode requires complete Resend,
 storage and Stripe test settings before serving requests; LiveKit and OAuth remain optional.
 Both modes validate signing secrets, HTTP origins and paired OAuth configuration. Live Stripe
 keys are rejected because this is a test-billing showcase. Configuration errors list field

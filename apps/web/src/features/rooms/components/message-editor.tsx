@@ -1,4 +1,4 @@
-import { roomMutators } from "@/client/sync/rooms/mutators";
+import type { RoomMutators } from "@/client/sync/rooms/mutators";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useCurrentUser } from "@/features/account/hooks/use-current-user";
 import OfflineEditor from "@/features/editor/block-editor/offline-editor";
@@ -14,11 +14,7 @@ import { PollMaker } from "../../polls/components/poll-maker";
 import { SidebarItemBtn } from "../../workspace/components/sidebar-item-btn";
 import { UploadButton } from "./upload-button";
 
-export function MessageEditor({
-  rep,
-}: {
-  rep?: Replicache<typeof roomMutators>;
-}) {
+export function MessageEditor({ rep }: { rep?: Replicache<RoomMutators> }) {
   const editor = useMessageEditor({});
   const { user } = useCurrentUser();
   const { workspaceId } = useCurrentWorkspace();

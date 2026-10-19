@@ -15,13 +15,12 @@ import {
   makeWorkspaceStructureKey,
 } from "@wodge/domain/sync/index";
 
-import { workspaceMutators } from "@/client/sync/workspace/mutators";
+import type { WorkspaceMutators } from "@/client/sync/workspace/mutators";
 import { useParams, usePathname, useRouter } from "next/navigation";
 
 export function useWorkspaceSubscription() {
-  const [workspaceRep, setWorkspaceRep] = useState<Replicache<
-    typeof workspaceMutators
-  > | null>(null);
+  const [workspaceRep, setWorkspaceRep] =
+    useState<Replicache<WorkspaceMutators> | null>(null);
   const router = useRouter();
 
   const pathname = usePathname();

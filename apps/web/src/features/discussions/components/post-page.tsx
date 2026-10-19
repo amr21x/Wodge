@@ -4,7 +4,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Post } from "./post";
 import { Replicache } from "replicache";
 import { ThreadMessage, ThreadPost } from "@wodge/domain/discussions/models";
-import { threadMutators } from "@/client/sync/discussions/mutators";
+import type { ThreadMutators } from "@/client/sync/discussions/mutators";
 import { useChannelPath } from "@/features/workspace/hooks/use-channel-path";
 import { CommentEditor } from "./comment-editor";
 import { ThreadMessagesList } from "./thread-msgs-list";
@@ -12,7 +12,7 @@ import { useSubscribe } from "@/client/sync/use-subscribe";
 import { useMemo } from "react";
 import { useParams } from "next/navigation";
 
-export function PostPage({ rep }: { rep?: Replicache<typeof threadMutators> }) {
+export function PostPage({ rep }: { rep?: Replicache<ThreadMutators> }) {
   const { postId } = useParams<{ postId: string }>();
 
   const { snapshot: posts } = useSubscribe(rep, (tx) =>

@@ -3,8 +3,6 @@ import type {
   PostVoteArgs,
 } from "@wodge/domain/discussions/dto";
 import { WriteTransaction } from "replicache";
-import { PublicUserType } from "@wodge/domain/user/models";
-import { queryClient } from "../../query";
 import { ThreadMessage, ThreadPost } from "@wodge/domain/discussions/models";
 import { deleteCommentMutation } from "@wodge/core/discussions/mutations/delete-comment";
 import { editCommentMutation } from "@wodge/core/discussions/mutations/edit-comment";
@@ -16,188 +14,139 @@ import { togglePostMutation } from "@wodge/core/discussions/mutations/toggle-pos
 import { postVoteMutation } from "@wodge/core/discussions/mutations/vote";
 import { removePostVoteMutation } from "@wodge/core/discussions/mutations/remove-vote";
 
-export const threadMutators = {
-  async createPost(tx: WriteTransaction, data: ThreadPost) {
-    const posts = (await tx.get<ThreadPost[]>("posts")) || [];
+export type ThreadMutators = ReturnType<typeof createThreadMutators>;
 
-    const user = queryClient.getQueryData<PublicUserType>(["user"]);
+/** Keep optimistic identity tied to this replica, independent of profile cache timing. */
+export function createThreadMutators(userId: string) {
+  return {
+    async createPost(tx: WriteTransaction, data: ThreadPost) {
+      const posts = (await tx.get<ThreadPost[]>("posts")) || [];
 
-    if (!user) {
-      throw new Error("User not found");
-    }
+      const newMsgs = createPostMutation({
+        userId,
+        post: data,
+        postsArray: posts,
+      });
 
-    const newMsgs = createPostMutation({
-      userId: user.id,
-      post: data,
-      postsArray: posts,
-    });
+      await tx.set("posts", newMsgs);
+    },
 
-    await tx.set("posts", newMsgs);
-  },
+    async deletePost(tx: WriteTransaction, post: ThreadPost) {
+      const posts = (await tx.get<ThreadPost[]>("posts")) || [];
 
-  async deletePost(tx: WriteTransaction, post: ThreadPost) {
-    const posts = (await tx.get<ThreadPost[]>("posts")) || [];
+      const newPosts = deletePostMutation({
+        isPrivileged: true,
+        userId,
+        post,
+        postsArray: posts,
+      });
 
-    const user = queryClient.getQueryData<PublicUserType>(["user"]);
+      await tx.set("posts", newPosts);
+    },
+    async editPost(
+      tx: WriteTransaction,
+      post: ThreadPost & { newContent: string },
+    ) {
+      const posts = (await tx.get<ThreadPost[]>("posts")) || [];
 
-    if (!user) {
-      throw new Error("User not found");
-    }
+      const { newContent, ...curPost } = post;
+      const newPosts = editPostMutation({
+        userId,
+        post: curPost,
+        postsArray: posts,
+        newContent: newContent,
+      });
 
-    const newPosts = deletePostMutation({
-      isPrivileged: true,
-      userId: user.id,
-      post,
-      postsArray: posts,
-    });
+      await tx.set("posts", newPosts);
+    },
 
-    await tx.set("posts", newPosts);
-  },
-  async editPost(
-    tx: WriteTransaction,
-    post: ThreadPost & { newContent: string },
-  ) {
-    const posts = (await tx.get<ThreadPost[]>("posts")) || [];
+    async createComment(
+      tx: WriteTransaction,
+      data: ThreadMessage & { postId: string },
+    ) {
+      const posts = (await tx.get<ThreadPost[]>("posts")) || [];
 
-    const user = queryClient.getQueryData<PublicUserType>(["user"]);
+      const { postId, ...comment } = data;
 
-    if (!user) {
-      throw new Error("User not found");
-    }
+      const newPosts = createCommentMutation({
+        postId,
+        postsArray: posts,
+        comment,
+        isPrivileged: true,
 
-    const { newContent, ...curPost } = post;
-    const newPosts = editPostMutation({
-      userId: user.id,
-      post: curPost,
-      postsArray: posts,
-      newContent: newContent,
-    });
+        userId,
+      });
 
-    await tx.set("posts", newPosts);
-  },
+      await tx.set("posts", newPosts);
+    },
 
-  async createComment(
-    tx: WriteTransaction,
-    data: ThreadMessage & { postId: string },
-  ) {
-    const posts = (await tx.get<ThreadPost[]>("posts")) || [];
+    async deleteComment(
+      tx: WriteTransaction,
+      args: ThreadMessage & { postId: string },
+    ) {
+      const posts = (await tx.get<ThreadPost[]>("posts")) || [];
 
-    const user = queryClient.getQueryData<PublicUserType>(["user"]);
+      const { postId, ...comment } = args;
+      const newPosts = deleteCommentMutation({
+        isPrivileged: true,
+        userId,
+        comment,
+        postId,
+        postsArray: posts,
+      });
 
-    const { postId, ...comment } = data;
+      await tx.set("posts", newPosts);
+    },
 
-    if (!user) {
-      throw new Error("User not found");
-    }
+    async editComment(tx: WriteTransaction, args: EditThreadMessageArg) {
+      const posts = (await tx.get<ThreadPost[]>("posts")) || [];
 
-    const newPosts = createCommentMutation({
-      postId,
-      postsArray: posts,
-      comment,
-      isPrivileged: true,
+      const newPosts = editCommentMutation({
+        userId,
+        newContent: args.newContent,
+        comment: args.comment,
+        postId: args.postId,
+        postsArray: posts,
+      });
 
-      userId: user.id,
-    });
+      await tx.set("posts", newPosts);
+    },
+    async togglePost(tx: WriteTransaction, postId: string) {
+      const posts = (await tx.get<ThreadPost[]>("posts")) || [];
 
-    await tx.set("posts", newPosts);
-  },
+      const newPosts = togglePostMutation({
+        postId,
+        curUserId: userId,
+        isPrivileged: true,
+        postsArray: posts,
+      });
 
-  async deleteComment(
-    tx: WriteTransaction,
-    args: ThreadMessage & { postId: string },
-  ) {
-    const posts = (await tx.get<ThreadPost[]>("posts")) || [];
+      await tx.set("posts", newPosts);
+    },
 
-    const user = queryClient.getQueryData<PublicUserType>(["user"]);
+    async vote(tx: WriteTransaction, data: PostVoteArgs) {
+      const posts = await tx.get<ThreadPost[]>("posts");
 
-    if (!user) {
-      throw new Error("User not found");
-    }
+      const newStructure = postVoteMutation({
+        ...data,
+        postsArr: posts as ThreadPost[],
+        postId: data.postId,
+        curUserId: userId,
+      });
 
-    const { postId, ...comment } = args;
-    const newPosts = deleteCommentMutation({
-      isPrivileged: true,
-      userId: user.id,
-      comment,
-      postId,
-      postsArray: posts,
-    });
+      await tx.set("posts", newStructure);
+    },
+    async removeVote(tx: WriteTransaction, data: PostVoteArgs) {
+      const posts = await tx.get<ThreadPost[]>("posts");
 
-    await tx.set("posts", newPosts);
-  },
+      const newStructure = removePostVoteMutation({
+        ...data,
+        postsArr: posts as ThreadPost[],
+        postId: data.postId,
+        curUserId: userId,
+      });
 
-  async editComment(tx: WriteTransaction, args: EditThreadMessageArg) {
-    const posts = (await tx.get<ThreadPost[]>("posts")) || [];
-
-    const user = queryClient.getQueryData<PublicUserType>(["user"]);
-
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    const newPosts = editCommentMutation({
-      userId: user.id,
-      newContent: args.newContent,
-      comment: args.comment,
-      postId: args.postId,
-      postsArray: posts,
-    });
-
-    await tx.set("posts", newPosts);
-  },
-  async togglePost(tx: WriteTransaction, postId: string) {
-    const posts = (await tx.get<ThreadPost[]>("posts")) || [];
-
-    const user = queryClient.getQueryData<PublicUserType>(["user"]);
-
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    const newPosts = togglePostMutation({
-      postId,
-      curUserId: user.id,
-      isPrivileged: true,
-      postsArray: posts,
-    });
-
-    await tx.set("posts", newPosts);
-  },
-
-  async vote(tx: WriteTransaction, data: PostVoteArgs) {
-    const posts = await tx.get<ThreadPost[]>("posts");
-
-    const user = queryClient.getQueryData<PublicUserType>(["user"]);
-
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    const newStructure = postVoteMutation({
-      ...data,
-      postsArr: posts as ThreadPost[],
-      postId: data.postId,
-      curUserId: user.id,
-    });
-
-    await tx.set("posts", newStructure);
-  },
-  async removeVote(tx: WriteTransaction, data: PostVoteArgs) {
-    const posts = await tx.get<ThreadPost[]>("posts");
-
-    const user = queryClient.getQueryData<PublicUserType>(["user"]);
-
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    const newStructure = removePostVoteMutation({
-      ...data,
-      postsArr: posts as ThreadPost[],
-      postId: data.postId,
-      curUserId: user.id,
-    });
-
-    await tx.set("posts", newStructure);
-  },
-};
+      await tx.set("posts", newStructure);
+    },
+  };
+}

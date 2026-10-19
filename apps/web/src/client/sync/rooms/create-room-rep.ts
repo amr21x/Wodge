@@ -5,7 +5,7 @@ import {
   PushRequest,
   Replicache,
 } from "replicache";
-import { roomMutators } from "./mutators";
+import { createRoomMutators, type RoomMutators } from "./mutators";
 import { env } from "@wodge/env/client";
 import { replicacheWrapper } from "../transport";
 
@@ -20,10 +20,10 @@ export function createRoomRep({
   channelId: string;
   teamId: string;
 }) {
-  return new Replicache<typeof roomMutators>({
+  return new Replicache<RoomMutators>({
     name: `${userId}-${channelId}`,
     licenseKey: env.NEXT_PUBLIC_REPLICACHE_KEY,
-    mutators: roomMutators,
+    mutators: createRoomMutators(userId),
     pullInterval: null,
     pushURL: undefined,
     pullURL: undefined,

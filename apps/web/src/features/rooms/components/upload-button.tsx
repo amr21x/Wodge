@@ -15,7 +15,7 @@ import { useSetAtom } from "jotai";
 import { useCurrentUser } from "@/features/account/hooks/use-current-user";
 import { useQueryClient } from "@tanstack/react-query";
 import { Message } from "@wodge/domain/rooms/models";
-import { roomMutators } from "@/client/sync/rooms/mutators";
+import type { RoomMutators } from "@/client/sync/rooms/mutators";
 import { Replicache } from "replicache";
 import { env } from "@wodge/env/client";
 import Webcam from "@uppy/webcam";
@@ -33,7 +33,7 @@ export function UploadButton({
   workspaceId?: string;
   teamId: string;
   channelId: string;
-  rep?: Replicache<typeof roomMutators>;
+  rep?: Replicache<RoomMutators>;
 }) {
   const [open, setOpen] = useState(false);
 

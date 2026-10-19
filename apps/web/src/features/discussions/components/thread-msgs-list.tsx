@@ -3,7 +3,7 @@ import {
   ThreadMessage as ThreadMessageType,
   ThreadPost,
 } from "@wodge/domain/discussions/models";
-import { threadMutators } from "@/client/sync/discussions/mutators";
+import type { ThreadMutators } from "@/client/sync/discussions/mutators";
 import { memo, useEffect } from "react";
 import { ReadTransaction, Replicache } from "replicache";
 import { useSubscribe } from "@/client/sync/use-subscribe";
@@ -17,7 +17,7 @@ export const ThreadMessagesList = memo(
     post,
     isQA = false,
   }: {
-    rep?: Replicache<typeof threadMutators>;
+    rep?: Replicache<ThreadMutators>;
     comments?: ThreadMessageType[];
     post?: ThreadPost;
     isQA?: boolean;

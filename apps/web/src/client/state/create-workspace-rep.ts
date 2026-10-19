@@ -8,13 +8,16 @@ import {
 
 import { env } from "@wodge/env/client";
 import { replicacheWrapper } from "@/client/sync/transport";
-import { workspaceMutators } from "@/client/sync/workspace/mutators";
+import {
+  createWorkspaceMutators,
+  type WorkspaceMutators,
+} from "@/client/sync/workspace/mutators";
 
 export function createWorkspaceRep(userId: string, workspaceId: string) {
-  return new Replicache<typeof workspaceMutators>({
+  return new Replicache<WorkspaceMutators>({
     name: `${userId}-${workspaceId}`,
     licenseKey: env.NEXT_PUBLIC_REPLICACHE_KEY,
-    mutators: workspaceMutators,
+    mutators: createWorkspaceMutators(userId),
     pullInterval: null,
     pushURL: undefined,
     pullURL: undefined,

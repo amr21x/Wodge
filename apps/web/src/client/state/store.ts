@@ -5,24 +5,21 @@ import { devtools } from "zustand/middleware";
 import { Replicache } from "replicache";
 import type PartySocket from "partysocket";
 import { Room } from "livekit-client";
-import { workspaceMutators } from "@/client/sync/workspace/mutators";
+import type { WorkspaceMutators } from "@/client/sync/workspace/mutators";
 import { userMutators } from "@/client/sync/user/mutators";
 import { pageMutators } from "@/client/sync/pages/mutators";
-import { roomMutators } from "@/client/sync/rooms/mutators";
-import { threadMutators } from "@/client/sync/discussions/mutators";
+import type { RoomMutators } from "@/client/sync/rooms/mutators";
+import type { ThreadMutators } from "@/client/sync/discussions/mutators";
 import { env } from "@wodge/env/client";
 
 import { createSocket } from "./create-socket";
 import { createWorkspaceRep } from "./create-workspace-rep";
 
-type ChannelMutators =
-  | typeof roomMutators
-  | typeof threadMutators
-  | typeof pageMutators;
+type ChannelMutators = RoomMutators | ThreadMutators | typeof pageMutators;
 
 export interface AppStore {
   userStore?: Replicache<typeof userMutators>;
-  workspaces: Record<string, Replicache<typeof workspaceMutators>>;
+  workspaces: Record<string, Replicache<WorkspaceMutators>>;
   activeChanRep?: Replicache<ChannelMutators>;
   socket?: PartySocket;
 
@@ -30,12 +27,12 @@ export interface AppStore {
     addWorkspace: (
       workspace: string,
       userId: string,
-    ) => Replicache<typeof workspaceMutators>;
+    ) => Replicache<WorkspaceMutators>;
     connectSocket: (userId: string) => void;
     getWorkspace: (
       workspaceId: string,
       userId: string,
-    ) => Replicache<typeof workspaceMutators> | void;
+    ) => Replicache<WorkspaceMutators> | void;
     removeWorkspace: (workspaceId: string) => void;
     setChannelRep: (rep: Replicache<ChannelMutators>) => void;
   };

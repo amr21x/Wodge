@@ -2,7 +2,7 @@ import { atom, useAtomValue, useSetAtom } from "jotai";
 import { Message } from "./message";
 import { memo, useEffect, useLayoutEffect, useRef } from "react";
 import { Message as MessageType } from "@wodge/domain/rooms/models";
-import { roomMutators } from "@/client/sync/rooms/mutators";
+import type { RoomMutators } from "@/client/sync/rooms/mutators";
 import { ReadTransaction, Replicache } from "replicache";
 import { useSubscribe } from "@/client/sync/use-subscribe";
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
@@ -12,7 +12,7 @@ import { toast } from "sonner";
 export const lastSenderIdAtom = atom<string>("");
 
 export const MessageList = memo(
-  ({ rep }: { rep?: Replicache<typeof roomMutators> }) => {
+  ({ rep }: { rep?: Replicache<RoomMutators> }) => {
     const { snapshot: messages } = useSubscribe(rep, (tx: ReadTransaction) =>
       tx.get<MessageType[]>("messages"),
     );

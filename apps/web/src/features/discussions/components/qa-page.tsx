@@ -1,4 +1,4 @@
-import { threadMutators } from "@/client/sync/discussions/mutators";
+import type { ThreadMutators } from "@/client/sync/discussions/mutators";
 import { useSubscribe } from "@/client/sync/use-subscribe";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,7 +24,7 @@ import { Post } from "./post";
 import { ThreadAction } from "./thread-actions";
 import { ThreadMessagesList } from "./thread-msgs-list";
 
-export function QAPage({ rep }: { rep?: Replicache<typeof threadMutators> }) {
+export function QAPage({ rep }: { rep?: Replicache<ThreadMutators> }) {
   const { postId } = useParams<{ postId: string }>();
 
   const { snapshot: posts } = useSubscribe(rep, (tx) =>

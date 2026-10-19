@@ -1,7 +1,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Replicache } from "replicache";
-import { roomMutators } from "@/client/sync/rooms/mutators";
+import type { RoomMutators } from "@/client/sync/rooms/mutators";
 import { createRoomRep } from "@/client/sync/rooms/create-room-rep";
 
 import { useCurrentUser } from "../../account/hooks/use-current-user";
@@ -20,7 +20,7 @@ export function useCurrentRoomRep() {
 
   const { user } = useCurrentUser();
 
-  const [rep, setRep] = useState<Replicache<typeof roomMutators> | undefined>(
+  const [rep, setRep] = useState<Replicache<RoomMutators> | undefined>(
     undefined,
   );
 

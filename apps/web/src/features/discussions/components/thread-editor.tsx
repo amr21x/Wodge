@@ -1,4 +1,4 @@
-import { threadMutators } from "@/client/sync/discussions/mutators";
+import type { ThreadMutators } from "@/client/sync/discussions/mutators";
 import { SafeAvatar } from "@/components/safe-avatar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
@@ -24,7 +24,7 @@ export function ThreadEditor({
 }: {
   isQA?: boolean;
   isComment?: boolean;
-  rep?: Replicache<typeof threadMutators>;
+  rep?: Replicache<ThreadMutators>;
 }) {
   const { workspaceRep } = useCurrentWorkspace();
   const { user } = useCurrentUser();

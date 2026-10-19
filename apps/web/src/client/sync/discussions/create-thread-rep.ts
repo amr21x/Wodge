@@ -7,7 +7,7 @@ import {
 } from "replicache";
 import { env } from "@wodge/env/client";
 import { replicacheWrapper } from "../transport";
-import { threadMutators } from "./mutators";
+import { createThreadMutators, type ThreadMutators } from "./mutators";
 
 export function createThreadRep({
   channelId,
@@ -20,10 +20,10 @@ export function createThreadRep({
   channelId: string;
   teamId: string;
 }) {
-  return new Replicache<typeof threadMutators>({
+  return new Replicache<ThreadMutators>({
     name: `${userId}-${channelId}`,
     licenseKey: env.NEXT_PUBLIC_REPLICACHE_KEY,
-    mutators: threadMutators,
+    mutators: createThreadMutators(userId),
     pullInterval: null,
     pushURL: undefined,
     pullURL: undefined,

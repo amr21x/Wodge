@@ -1,4 +1,4 @@
-import { threadMutators } from "@/client/sync/discussions/mutators";
+import type { ThreadMutators } from "@/client/sync/discussions/mutators";
 import { SafeAvatar } from "@/components/safe-avatar";
 import { TooltipWrapper } from "@/components/tooltip-wrapper";
 import { useCurrentUser } from "@/features/account/hooks/use-current-user";
@@ -16,7 +16,7 @@ export function CommentEditor({
   isQA,
   isResolved,
 }: {
-  rep?: Replicache<typeof threadMutators>;
+  rep?: Replicache<ThreadMutators>;
   isQA?: boolean;
   isResolved?: boolean;
 }) {

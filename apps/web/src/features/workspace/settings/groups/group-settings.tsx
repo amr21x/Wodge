@@ -45,6 +45,13 @@ export function GroupSettings({
         {...(!isAddition && { footer: `Created by ${member?.email}` })}
       />
 
+      <p role="note" className="p-4 text-sm text-muted-foreground">
+        These are legacy groups. Adding or removing members, or deleting a
+        group, does not grant or revoke room access. Manage room access through
+        workspace roles and permissions; remove role assignments to revoke
+        existing access.
+      </p>
+
       <SettingsContentSection header="general">
         <GroupGeneralForm group={group} />
       </SettingsContentSection>

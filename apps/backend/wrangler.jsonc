@@ -5,6 +5,7 @@
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat"],
   "vars": {
+    "INTEGRATION_MODE": "partial",
     "APP_DOMAIN": "http://localhost:3000",
     "BACKEND_DOMAIN": "http://localhost:8787",
     "AVATARS_URL": "https://avatars.wodge.xyz",
