@@ -3,7 +3,7 @@
 ## Working agreement
 
 - Do not include issue IDs in authored content.
-- Confirm the task understanding before planning or implementation; reuse approval for the same scope.
+- Confirm the task understanding before planning; and give also confirm the implementation plan before applying it.
 - Preserve approved behavior and architecture. Discuss material changes before implementing them.
 - **Reuse first:** search for existing services, schemas, queries, helpers and library APIs before adding code. Extend suitable implementations instead of creating parallel solutions.
 - **DRY:** keep each business rule, validation rule and integration in one authoritative place. Extract genuinely shared logic; do not couple unrelated features merely because their code looks similar.
