@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, memo, useEffect, useMemo, useRef } from "react";
+import { forwardRef } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { cn } from "@/lib/utils";
 
@@ -15,14 +15,7 @@ interface SafeAvatarProps {
 
 export const SafeAvatar = forwardRef<HTMLDivElement, SafeAvatarProps>(
   (
-    {
-      src,
-      className,
-      fallback,
-      fallbackClassName,
-      isBlob = false,
-      color,
-    }: SafeAvatarProps,
+    { src, className, fallback, fallbackClassName, color }: SafeAvatarProps,
     ref,
   ) => {
     return (

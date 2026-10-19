@@ -67,9 +67,11 @@ export function Step({ index, children, className }: StepsProps) {
     count.current++;
 
     return () => {
+      /* oxlint-disable react-hooks/exhaustive-deps -- This ref is a shared numeric counter, not a DOM node; cleanup decrements its current value. */
       count.current--;
+      /* oxlint-enable react-hooks/exhaustive-deps */
     };
-  }, []);
+  }, [count]);
 
   return (
     <div

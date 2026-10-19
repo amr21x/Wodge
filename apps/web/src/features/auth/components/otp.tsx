@@ -12,7 +12,6 @@ import { useAtomValue } from "jotai";
 import { useState } from "react";
 import { emailAtom } from "./email-atom";
 import { useRouter, useSearchParams } from "next/navigation";
-import { env } from "@wodge/env/client";
 
 export function OTP() {
   const [isPending, setIsPending] = useState(false);

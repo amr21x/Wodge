@@ -32,7 +32,8 @@ export function PollOptions({
       <ul className="flex w-full flex-col gap-2">
         {options?.map((option, i) => (
           <li key={i}>
-            <div
+            <button
+              type="button"
               className={cn(
                 buttonVariants({
                   variant: "outline",
@@ -69,7 +70,7 @@ export function PollOptions({
                   <span className="ml-auto">{`${((votes?.[i] ?? 0) / totalVotes) * 100}%`}</span>
                 )}
               </div>
-            </div>
+            </button>
           </li>
         ))}
       </ul>

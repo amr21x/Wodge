@@ -27,9 +27,11 @@ export function ThreadEditor({
   isComment?: boolean;
   rep?: Replicache<ThreadMutators>;
 }) {
-  const { workspaceRep } = useCurrentWorkspace();
+  useCurrentWorkspace();
   const { user } = useCurrentUser();
-  const { teamId } = useParams<{ teamId: string }>();
+  useParams<{
+    teamId: string;
+  }>();
 
   const editor = useThreadEditor({
     placeholder: isQA ? "What's your question?" : "What's happening?",
@@ -96,6 +98,7 @@ export function ThreadEditor({
 
       {(isQA || (!isQA && isPrivileged)) && (
         <>
+          {/* oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- Keyboard shortcuts bubble from the nested editor, which owns focus and textbox semantics. */}
           <div
             className="flex h-full w-full items-start"
             onKeyDown={(e) => {
@@ -111,6 +114,7 @@ export function ThreadEditor({
             />
             <OfflineEditor editor={editor} isThread className="w-full" />
           </div>
+
           <div className="ml-0.5 flex items-center py-1.5 pl-8">
             <FeatureGate feature="attachments">
               <SidebarItemBtn

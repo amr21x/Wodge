@@ -106,8 +106,10 @@ const EmojiList = forwardRef((props: EmojiListProps, ref) => {
           data-emoji-name={item.name}
         >
           {item.fallbackImage ? (
+            /* oxlint-disable next/no-img-element -- User-provided or blob image URLs have no fixed dimensions or image-optimizer contract. */
             <img src={item.fallbackImage} className="h-5 w-5" alt="emoji" />
           ) : (
+            /* oxlint-enable next/no-img-element */
             item.emoji
           )}{" "}
           <span className="truncate text-ellipsis">:{item.name}:</span>

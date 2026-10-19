@@ -5,19 +5,12 @@ import { authClient } from "@/features/auth/client";
 
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { PublicUserType } from "@wodge/domain/user/models";
+
 import type { UserType } from "@wodge/domain/user/models";
 import { usePathname } from "next/navigation";
 
 import { createUserRep } from "@/client/state/create-user-rep";
 import { useAppStore } from "@/client/state/store";
-
-type Session = {
-  sessionToken: string;
-  userId: string;
-  expires: string;
-  user: PublicUserType;
-};
 
 export function useCurrentUser() {
   const { data: session } = authClient.useSession();
@@ -59,7 +52,7 @@ export function useCurrentUser() {
         connectSocket(data?.id);
       }
     }
-  }, [data, isPending]);
+  }, [data, isPending, connectSocket]);
 
   return { user: data, isUserPending: isPending };
 }

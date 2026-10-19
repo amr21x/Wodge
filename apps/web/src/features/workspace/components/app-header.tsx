@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { useParams, useRouter } from "next/navigation";
 import { useChannelPath } from "@/features/workspace/hooks/use-channel-path";
-import { useAppStore } from "@/client/state/store";
+
 import { editorUsersAtoms } from "@/features/editor/block-editor/atoms";
 import { EditorInfo } from "@/features/editor/block-editor/editor-info";
 import { roomAtom } from "../../rooms/state/atoms";

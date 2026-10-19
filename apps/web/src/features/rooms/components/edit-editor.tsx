@@ -39,6 +39,7 @@ export function EditEditor({
 
   return (
     <div className="flex flex-col overflow-hidden bg-transparent p-0">
+      {/* oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- Keyboard shortcuts bubble from the nested editor, which owns focus and textbox semantics. */}
       <div
         onKeyDown={(e) => {
           if (e.key === "Enter") {

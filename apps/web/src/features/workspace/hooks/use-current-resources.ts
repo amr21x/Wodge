@@ -8,7 +8,7 @@ export function useCurrentResources() {
   const { workspaceId } = useCurrentWorkspace();
 
   // fetch teamResources from server
-  const { data, isError } = useQuery({
+  const { data } = useQuery({
     queryFn: async () => {
       const res = await fetch(
         `/api/workspaces/${workspaceId}/files/${teamId}/${btoa(teamId)}`,

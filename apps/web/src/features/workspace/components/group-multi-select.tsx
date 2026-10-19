@@ -1,7 +1,7 @@
 import { BRAND_COLOR } from "@wodge/domain/constants";
 import { DrObj } from "@wodge/domain/types";
 import { Group } from "@wodge/domain/workspace/models";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 
 import { Check, ChevronDown } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -44,12 +44,13 @@ export function GroupMultiSelect({
 
   useEffect(() => {
     onChange?.(value);
-  }, [value]);
+  }, [value, onChange]);
 
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <div
+        <button
+          type="button"
           className={cn(
             buttonVariants({
               variant: "outline",
@@ -57,7 +58,6 @@ export function GroupMultiSelect({
             }),
             "w-full justify-start gap-1.5",
           )}
-          role="button"
         >
           {value.length >= 1 && (
             <GroupItem group={groups.find((g) => g.id === value[0])!} />
@@ -69,7 +69,7 @@ export function GroupMultiSelect({
           )}
 
           <ChevronDown className="ml-auto h-4 w-4" />
-        </div>
+        </button>
       </PopoverTrigger>
       <PopoverContent className="bg-transparent p-0">
         <Command>

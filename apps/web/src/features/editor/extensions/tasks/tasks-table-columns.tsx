@@ -1,9 +1,8 @@
 import { Column, Task } from "@wodge/domain/pages/models";
 import { DrObj } from "@wodge/domain/types";
-import { pageMutators } from "@/client/sync/pages/mutators";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { DeepReadonly, Replicache } from "replicache";
+import { DeepReadonly } from "replicache";
 import { Header } from "@/components/data-table/header";
 import { useEditable } from "use-editable";
 import { useEffect, useRef, useState } from "react";
@@ -42,7 +41,7 @@ export function tasksColumns({
       id: "title",
       header: () => <Header className="!text-sm !font-medium">Title</Header>,
 
-      cell: ({ row }) => {
+      cell: function Cell({ row }) {
         const [title, setTitle] = useState<string | undefined>(
           row.original.title,
         );
@@ -64,7 +63,11 @@ export function tasksColumns({
 
         return (
           <div className="group/task flex h-full w-full max-w-64 items-center">
-            <p
+            {/* oxlint-disable jsx-a11y/prefer-tag-over-role -- useEditable manages this contenteditable textbox; native inputs cannot host its editable DOM. */}
+            <div
+              role="textbox"
+              aria-label="Task title"
+              tabIndex={0}
               ref={titleRef}
               suppressContentEditableWarning
               className={cn(
@@ -77,10 +80,10 @@ export function tasksColumns({
                   onEditTask({ ...row.original, title });
                 }
               }}
-              autoFocus
             >
               {title || "Untitled"}
-            </p>
+            </div>
+            {/* oxlint-enable jsx-a11y/prefer-tag-over-role */}
 
             {isEditing ? (
               <>
@@ -116,7 +119,7 @@ export function tasksColumns({
     {
       id: "status",
       header: () => <Header className="!text-sm !font-medium">Status</Header>,
-      cell: ({ row }) => {
+      cell: function Cell({ row }) {
         const col = columns?.find((c) => c.id === row.original.columnId);
         const [open, setOpen] = useState(false);
 
@@ -164,10 +167,11 @@ export function tasksColumns({
         <Header className="pl-1 !text-sm !font-medium">Assignee</Header>
       ),
 
-      cell: ({ row }) => {
+      cell: function Cell({ row }) {
         const [assignee, setAssignee] = useState(row.original.assignee || []);
 
         return (
+          /* oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- This wrapper only stops events from child controls; it has no independent action. */
           <div onClick={(e) => e.stopPropagation()}>
             <MemberMultiSelect
               value={assignee as Mutable<string[]>}
@@ -190,7 +194,7 @@ export function tasksColumns({
       id: "due",
       header: () => <Header className="pl-1 !text-sm !font-medium">Due</Header>,
 
-      cell: ({ row }) => {
+      cell: function Cell({ row }) {
         const [due, setDue] = useState(
           row.original.due as DateRange | undefined,
         );

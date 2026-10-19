@@ -24,7 +24,7 @@ function PollMakerContent({ isRoom }: { isRoom: boolean }) {
   const [newOption, setNewOption] = useState<string>("");
   const [question, setQuestion] = useState("");
 
-  const { workspaceRep } = useCurrentWorkspace();
+  useCurrentWorkspace();
   const closeRef = useRef<HTMLButtonElement>(null);
   const [options, setOptions] = useState<string[]>([]);
   const newOptionRef = useRef<HTMLInputElement>(null);
@@ -45,7 +45,9 @@ function PollMakerContent({ isRoom }: { isRoom: boolean }) {
     setOptions(arr);
   };
 
-  const { teamId } = useParams<{ teamId: string }>();
+  useParams<{
+    teamId: string;
+  }>();
 
   const { user } = useCurrentUser();
 

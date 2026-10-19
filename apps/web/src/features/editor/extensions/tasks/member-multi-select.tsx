@@ -1,5 +1,5 @@
 import { SafeAvatar } from "@/components/safe-avatar";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -16,12 +16,11 @@ import { useMember } from "@/features/workspace/hooks/use-member";
 import { cn } from "@/lib/utils/index";
 import { Check, Users2 } from "lucide-react";
 import { useParams } from "next/navigation";
-import { forwardRef, useEffect, useMemo, useState } from "react";
+import { forwardRef, useMemo, useState } from "react";
 
 import { canView } from "@wodge/auth/authorization/access";
 import { Member } from "@wodge/domain/workspace/models";
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
-import { isEditing } from "@/features/rooms/state/atoms";
 
 interface MemberMultiSelectProps {
   onChange?: (...event: any[]) => void;
@@ -65,7 +64,7 @@ export function MemberMultiSelect({
           userId: m.id,
         }),
       ),
-    [teamId, channelId, structure, membersArr],
+    [teamId, channelId, structure, membersArr, folderId],
   );
 
   function onSelect(m: Member) {

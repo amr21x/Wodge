@@ -6,3 +6,5 @@ const emptyParameters = {};
 // @ts-expect-error A workspace-scoped route requires its workspace ID.
 const missingWorkspace: InferRequestType<typeof roles.$post>["param"] =
   emptyParameters;
+
+void [missingWorkspace];

@@ -8,7 +8,7 @@ import {
   useMaybeRoomContext,
   useMediaDeviceSelect,
 } from "@livekit/components-react";
-import { mergeProps } from "./merge-props";
+
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils/index";
@@ -67,7 +67,6 @@ export function MediaDeviceList({
   track,
   requestPermissions,
   onError,
-  ...props
 }: MediaDeviceListProps) {
   const room = useMaybeRoomContext();
   const handleError = React.useCallback(
@@ -81,7 +80,7 @@ export function MediaDeviceList({
     },
     [room, onError],
   );
-  const { devices, activeDeviceId, setActiveMediaDevice, className } =
+  const { devices, activeDeviceId, setActiveMediaDevice } =
     useMediaDeviceSelect({
       kind,
       room,
@@ -94,7 +93,7 @@ export function MediaDeviceList({
     if (initialSelection !== undefined) {
       setActiveMediaDevice(initialSelection);
     }
-  }, [setActiveMediaDevice]);
+  }, [setActiveMediaDevice, initialSelection]);
 
   React.useEffect(() => {
     if (typeof onDeviceListChange === "function") {
@@ -106,7 +105,7 @@ export function MediaDeviceList({
     if (activeDeviceId && activeDeviceId !== "") {
       onActiveDeviceChange?.(activeDeviceId);
     }
-  }, [activeDeviceId]);
+  }, [activeDeviceId, onActiveDeviceChange]);
 
   const handleActiveDeviceChange = async (deviceId: string) => {
     try {
@@ -120,10 +119,6 @@ export function MediaDeviceList({
     }
   };
   // Merge Props
-  const mergedProps = React.useMemo(
-    () => mergeProps(props, { className }, { className: "lk-list" }),
-    [className, props],
-  );
 
   function isActive(deviceId: string, activeDeviceId: string, index: number) {
     return (
@@ -142,8 +137,8 @@ export function MediaDeviceList({
           key={device.deviceId}
           id={device.deviceId}
           data-lk-active={isActive(device.deviceId, activeDeviceId, index)}
-          aria-selected={isActive(device.deviceId, activeDeviceId, index)}
-          role="option"
+          aria-checked={isActive(device.deviceId, activeDeviceId, index)}
+          role="menuitemradio"
           onClick={() => handleActiveDeviceChange(device.deviceId)}
         >
           {device.label}

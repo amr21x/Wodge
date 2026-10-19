@@ -10,7 +10,6 @@ import {
   Database,
   GanttChart,
   MessageCircle,
-  Newspaper,
   NotebookText,
 } from "lucide-react";
 import Link from "next/link";

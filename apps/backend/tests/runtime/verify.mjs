@@ -1,4 +1,3 @@
-import { createHmac } from "node:crypto";
 import assert from "node:assert/strict";
 import { builtinModules, createRequire } from "node:module";
 import { mkdtemp, readFile, readdir, realpath, rm } from "node:fs/promises";

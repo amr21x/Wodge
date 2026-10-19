@@ -1,8 +1,4 @@
 import {
-  Camera,
-  MonitorOff,
-  MonitorUp,
-  PhoneCall,
   PhoneOff,
   Rss,
   ScreenShare,
@@ -54,7 +50,7 @@ export function CallCard() {
         deviceId: camDevice,
       });
     },
-    [room],
+    [room, setCamStatus, camDevice],
   );
 
   const deferredScreenStatus = useDeferredValue(screenStatus);
@@ -67,12 +63,12 @@ export function CallCard() {
           audio: true,
         });
         setScreenStatus(c);
-      } catch (e) {
+      } catch {
         toast.error("Failed to share screen");
         setScreenStatus(false);
       }
     },
-    [room],
+    [room, setScreenStatus],
   );
 
   return (
@@ -171,7 +167,7 @@ export function CallCard() {
                         );
                       }
                     }
-                  } catch (e) {
+                  } catch {
                     toast.warning("Changing shared screen cancelled");
                   }
                 }}

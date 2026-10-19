@@ -1,6 +1,5 @@
 "use client";
 
-import { useContext } from "react";
 import { SettingsCollapsiblePlaceHolder } from "../settings";
 import { SidebarItem } from "../../components/sidebar-item";
 import { useIsDesktop } from "@/hooks/use-is-desktop";

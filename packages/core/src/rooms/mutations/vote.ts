@@ -34,7 +34,11 @@ export function voteMutation({ option, curUserId, msgId, msgsArr }: VoteArgs) {
     }
 
     msg.pollVoters?.push({ voter: curUserId, option });
-    msg.votes![option] ? msg.votes![option]!++ : (msg.votes![option] = 1);
+    if (msg.votes![option]) {
+      msg.votes![option]!++;
+    } else {
+      msg.votes![option] = 1;
+    }
   });
 
   return newArr as Message[];

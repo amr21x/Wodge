@@ -27,9 +27,9 @@ const token: InferRequestType<typeof room.token.$get> = {
 };
 
 // @ts-expect-error The API has no such endpoint.
-client.api.users.missing.$get;
+void client.api.users.missing.$get;
 // @ts-expect-error Account lookup is GET only.
-client.api.users.me.$post;
+void client.api.users.me.$post;
 const incompleteProfile = { json: { username: "reader" } };
 // @ts-expect-error Profile updates require displayName.
 const missingName: typeof profile = incompleteProfile;
@@ -53,16 +53,28 @@ const userId: User["id"] = "user";
 const invalidUserId: User["id"] = 42;
 // @ts-expect-error Backend-only dependencies never appear in the public response.
 type Container = User["container"];
-
 type Role = InferResponseType<typeof workspace.authorization.roles.$post, 201>;
 const roleId: Role["id"] = "role";
 // @ts-expect-error Forwarded object responses retain their DTO types.
 const invalidRoleId: Role["id"] = 42;
 
 export type ClientContractChecks = [
+  Container,
   typeof profile,
   typeof role,
   typeof token,
   typeof userId,
   typeof roleId,
+];
+
+void [
+  settings,
+  promotion,
+  missingName,
+  invalidName,
+  invalidPermissions,
+  missingWorkspace,
+  internalParameter,
+  invalidUserId,
+  invalidRoleId,
 ];

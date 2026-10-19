@@ -43,7 +43,7 @@ export function AddPageForm({
 
   useEffect(() => {
     form?.reset(page);
-  }, [page]);
+  }, [page, form]);
 
   async function onSubmit(data: Page) {
     try {

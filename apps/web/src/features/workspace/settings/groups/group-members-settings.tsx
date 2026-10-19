@@ -1,23 +1,22 @@
 import { GeneralMembersTable } from "../general-members-table";
 import { useTable } from "../use-table";
-import { Mutable } from "@/lib/utils/index";
+
 import { DrObj } from "@wodge/domain/types";
-import { Group, Member } from "@wodge/domain/workspace/models";
+import { Group } from "@wodge/domain/workspace/models";
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
-import { useMembersInfo } from "@/features/workspace/hooks/use-members-info";
+
 import { useMemo } from "react";
 import { groupMembersColumns } from "./group-members-columns";
 import { toast } from "sonner";
 
 export function GroupMembersSettings({ group }: { group?: DrObj<Group> }) {
-  const { members, structure, workspaceRep, workspaceId } =
-    useCurrentWorkspace();
+  const { members, workspaceRep, workspaceId } = useCurrentWorkspace();
 
   const nonGroupMembers = useMemo(() => {
     return members.members.filter(
       (member) => !group?.members.includes(member.id),
     );
-  }, [members, structure]);
+  }, [members, group?.members]);
 
   const { table } = useTable({
     data: (group?.members || []) as string[],

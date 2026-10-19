@@ -2,25 +2,15 @@
 
 import { FeatureGate } from "@/components/feature-flags-provider";
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { WorkspaceSchema } from "@wodge/domain/workspace/validation";
-import { Workspace } from "@wodge/domain/workspace/models";
-
 import {
   SettingsContentDescription,
   SettingsContentHeader,
   SettingsContentSection,
 } from "../settings";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
-import { useIsOwnerOrAdmin } from "@/features/workspace/hooks/use-is-owner-or-admin";
+
 import { AvatarBtn } from "@/components/avatar-btn";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { env } from "@wodge/env/client";
-import { toast } from "@/components/ui/toast";
-import { useAvatarUrl } from "@/features/account/hooks/use-avatar-url";
-import { WorkspaceGeneralForm } from "../workspace-general-form";
+import { useQueryClient } from "@tanstack/react-query";
+
 import { useCurrentUser } from "@/features/account/hooks/use-current-user";
 import { AccountGeneralForm } from "./account-general-form";
 import { ModeToggle } from "@/components/toggle";

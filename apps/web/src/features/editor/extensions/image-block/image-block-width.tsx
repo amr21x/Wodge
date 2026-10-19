@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export type ImageBlockWidthProps = {
   onChange: (value: number) => void;

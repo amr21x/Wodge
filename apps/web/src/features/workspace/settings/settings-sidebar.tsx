@@ -1,15 +1,9 @@
 "use client";
 
 import { cn } from "@/lib/utils/index";
-import { SidebarItemBtn } from "../components/sidebar-item-btn";
-import {
-  Building2,
-  PanelLeft,
-  RefreshCcw,
-  User2,
-  UserCircle,
-} from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
+import { Building2, RefreshCcw, User2 } from "lucide-react";
+
 import {
   SettingsSidebarCollapsibleItem,
   SettingsSidebarHeader,
@@ -19,7 +13,7 @@ import {
 import { GroupsSidebar } from "./groups/groups-sidebar";
 import { TeamsSidebar } from "./teams/teams-sidebar";
 import { useIsDesktop } from "@/hooks/use-is-desktop";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { SheetContent } from "@/components/ui/sheet";
 import { useIsOwnerOrAdmin } from "@/features/workspace/hooks/use-is-owner-or-admin";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -75,7 +69,7 @@ export function SettingsSidebar() {
           <SettingsSidebarItem
             label="account"
             href={workspaceSlug ? "/account" : "/"}
-            isDefault={!!!workspaceSlug}
+            isDefault={!workspaceSlug}
           />
         </SettingsSidebarList>
       </div>

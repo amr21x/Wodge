@@ -14,7 +14,7 @@ export type EditorInfoProps = {
   maxLength?: number;
 };
 
-export const EditorInfo = memo(({ users, maxLength = 5 }: EditorInfoProps) => {
+export const EditorInfo = memo(({ users }: EditorInfoProps) => {
   const usersSet = useMemo(() => {
     const set = new Set();
 
@@ -36,7 +36,7 @@ export const EditorInfo = memo(({ users, maxLength = 5 }: EditorInfoProps) => {
       <div className="flex items-center py-2">
         <div className="flex flex-row items-center">
           <div className="relative ml-3 flex flex-row items-center">
-            {usersSet?.map((user, i) => {
+            {usersSet?.map((user, _i) => {
               return (
                 <div key={user?.clientId} className="-ml-2">
                   <TooltipWrapper content={user?.username}>

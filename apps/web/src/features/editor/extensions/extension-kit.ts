@@ -32,7 +32,7 @@ import { Document } from "./document/document";
 import { TrailingNode } from "./trailing-node/trailing-node";
 import { SlashCommand } from "./slash-command/slash-command";
 import { FontSize } from "./font-size/font-size";
-import { Figure } from "./figure/figure";
+
 import { Figcaption } from "./fig-caption/fig-caption";
 import { BlockquoteFigure } from "./blockquote-figure/blockquote-figure";
 import { Link } from "./link/link";

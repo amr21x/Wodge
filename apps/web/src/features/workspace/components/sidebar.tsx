@@ -3,7 +3,7 @@
 import { cn } from "@/lib/utils/index";
 import { useFeatureFlags } from "@/components/feature-flags-provider";
 import { CHANNEL_FEATURES } from "@wodge/core/features/policy";
-import { useParams, usePathname } from "next/navigation";
+import { useParams } from "next/navigation";
 import {
   Database,
   Home,
@@ -15,12 +15,12 @@ import {
 } from "lucide-react";
 import { SidebarItem } from "./sidebar-item";
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 import { useAtom, useAtomValue } from "jotai";
 import { isSidebarOpenAtom } from "@/client/state/global-atoms";
 import { Teamspaces } from "./teamspaces";
 import { ChannelsTypes } from "@wodge/domain/channels/index";
-import { useIsOwnerOrAdmin } from "@/features/workspace/hooks/use-is-owner-or-admin";
+
 import { activeSidebarAtom } from "./sidebar-atoms";
 
 interface Tab {

@@ -3,7 +3,7 @@ import { BRAND_COLOR } from "@wodge/domain/constants";
 
 import { useState } from "react";
 import { HexColorInput, HexColorPicker } from "react-colorful";
-import { Check } from "lucide-react";
+
 import {
   Popover,
   PopoverContent,
@@ -95,7 +95,17 @@ interface SwatchProps extends ButtonProps {
 }
 
 export const Swatch = React.forwardRef<HTMLButtonElement, SwatchProps>(
-  ({ swatchColor, handler, sid, selected, className, ...props }, ref) => (
+  (
+    {
+      swatchColor,
+      handler,
+      className,
+      sid: _sid,
+      selected: _selected,
+      ...props
+    },
+    ref,
+  ) => (
     <Button
       size="sm"
       type="button"

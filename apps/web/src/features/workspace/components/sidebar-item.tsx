@@ -37,10 +37,11 @@ const SidebarItem = forwardRef<HTMLDivElement, SidebarItemProps>(
     }
 
     let jsx = (
+      /* oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- The role and tab order depend on whether the parent Link handles navigation. */
       <div
         ref={ref}
-        tabIndex={0}
-        role="button"
+        tabIndex={href ? -1 : 0}
+        role={href ? undefined : "button"}
         className={cn(
           buttonVariants({
             variant: "ghost",
@@ -52,6 +53,16 @@ const SidebarItem = forwardRef<HTMLDivElement, SidebarItemProps>(
           className,
         )}
         onClick={handler}
+        onKeyDown={(event) => {
+          if (
+            !href &&
+            event.target === event.currentTarget &&
+            (event.key === "Enter" || event.key === " ")
+          ) {
+            event.preventDefault();
+            handler?.();
+          }
+        }}
         {...props}
       >
         {collapsible && (

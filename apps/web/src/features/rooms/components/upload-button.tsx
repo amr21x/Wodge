@@ -12,12 +12,12 @@ import {
 import { SidebarItemBtn } from "../../workspace/components/sidebar-item-btn";
 import { Plus } from "lucide-react";
 import Uppy from "@uppy/core";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import XHRUpload from "@uppy/xhr-upload";
 import { Dashboard } from "@uppy/react";
-import { useSetAtom } from "jotai";
+
 import { useCurrentUser } from "@/features/account/hooks/use-current-user";
-import { useQueryClient } from "@tanstack/react-query";
+
 import { Message } from "@wodge/domain/rooms/models";
 import type { RoomMutators } from "@/client/sync/rooms/mutators";
 import { Replicache } from "replicache";
@@ -44,6 +44,34 @@ function UploadButtonContent({
   const { user } = useCurrentUser();
 
   const token = useUploadToken();
+
+  const completeUpload = useCallback(
+    async (fileId?: string, type?: Message["type"], name?: string) => {
+      if (!user) {
+        return;
+      }
+
+      if (!fileId || !type || !name) {
+        return;
+      }
+
+      try {
+        await rep?.mutate.sendMessage({
+          sender: user.id,
+          content: name,
+          date: new Date().toISOString(),
+          id: fileId,
+          type,
+          pollOptions: [],
+          pollVoters: [],
+          votes: [],
+        });
+      } catch {
+        toast.error("Message send failed");
+      }
+    },
+    [rep, user],
+  );
 
   const uppyRef = useMemo(() => {
     return !token
@@ -96,36 +124,7 @@ function UploadButtonContent({
             completeUpload(fileId, type as Message["type"], name);
           })
           .on("dashboard:show-panel", () => {});
-  }, [rep, token]);
-
-  async function completeUpload(
-    fileId?: string,
-    type?: Message["type"],
-    name?: string,
-  ) {
-    if (!user) {
-      return;
-    }
-
-    if (!fileId || !type || !name) {
-      return;
-    }
-
-    try {
-      await rep?.mutate.sendMessage({
-        sender: user.id,
-        content: name,
-        date: new Date().toISOString(),
-        id: fileId,
-        type,
-        pollOptions: [],
-        pollVoters: [],
-        votes: [],
-      });
-    } catch {
-      toast.error("Message send failed");
-    }
-  }
+  }, [token, channelId, completeUpload, workspaceId, teamId]);
 
   if (!uppyRef) {
     return null;

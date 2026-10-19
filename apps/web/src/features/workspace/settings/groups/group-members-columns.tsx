@@ -1,11 +1,9 @@
-import { DrObj } from "@wodge/domain/types";
-import { Member } from "@wodge/domain/workspace/models";
 import { PublicUserType } from "@wodge/domain/user/models";
 import { queryClient } from "@/client/query/index";
 import { DataTableActions } from "@/components/data-table/data-table-action";
 
 import { Header } from "@/components/data-table/header";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 import { useMember } from "@/features/workspace/hooks/use-member";
 
 import { ColumnDef } from "@tanstack/react-table";
@@ -18,7 +16,6 @@ interface MembersColumnsProps {
 }
 
 export const groupMembersColumns = ({
-  creatorId,
   removeMember,
   workspaceId,
 }: MembersColumnsProps): ColumnDef<string>[] => [
@@ -43,7 +40,7 @@ export const groupMembersColumns = ({
     },
     id: "member",
     header: () => <Header>Member</Header>,
-    cell: ({ row }) => {
+    cell: function Cell({ row }) {
       const memberId = row.original;
       const { member, isMembersPending } = useMember(memberId);
 
@@ -76,7 +73,7 @@ export const groupMembersColumns = ({
 
     header: () => <Header>Username</Header>,
 
-    cell: ({ row }) => {
+    cell: function Cell({ row }) {
       const { member, isMembersPending } = useMember(row.original);
 
       if (isMembersPending) {

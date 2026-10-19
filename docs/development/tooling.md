@@ -39,9 +39,14 @@ workflow checks lint and formatting on pushes and pull requests, including docs-
 changes; these are source checks, not application build/test jobs. The manual Worker
 deploy workflow runs both checks before configuring secrets or deploying.
 
+The quality job skips dependency lifecycle scripts because it only runs source
+checks. The Oxc tools use their installed platform bindings; application native
+modules do not need to be built for linting or formatting.
+
 `.oxlintrc.json` enables native TypeScript, React, Hooks, Next.js, accessibility,
 import and general correctness rules. Correctness findings are warnings; Rules of
-Hooks violations are errors. React Compiler-specific checks are disabled because
+Hooks violations are errors. The lint command fails on either errors or warnings
+now that the existing backlog has been cleaned up. React Compiler-specific checks are disabled because
 this React 18 application does not use React Compiler. This is not exact ESLint rule
 parity: the removed Cloudflare next-on-pages plugin's four provider-specific rules
 and Turbo environment rule have no native replacement here. The retained Pages
@@ -77,3 +82,12 @@ local files, and the backend script does not forward local values with `--with-v
 Database generation and migrations are explicit operations. See the checked-in
 [root scripts](../../package.json), [web scripts](../../apps/web/package.json),
 [backend scripts](../../apps/backend/package.json), and [local setup](setup.md).
+
+## Intentional lint exceptions
+
+Local Oxlint comments retain the existing Replicache subscription dependency contract,
+mutable step counters, provider image URLs, and keyboard/event delegation around
+embedded editors and composite controls. They name the rule and explain the constraint.
+Uploaded audio/video and the demo currently have no caption-track contract; those
+specific media elements remain documented accessibility limitations. No placeholder
+caption tracks are generated to silence a lint rule.

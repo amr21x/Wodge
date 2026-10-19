@@ -1,5 +1,5 @@
 import { useParams } from "next/navigation";
-import { useActionState, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Replicache } from "replicache";
 import type { ThreadMutators } from "@/client/sync/discussions/mutators";
 import { createThreadRep } from "@/client/sync/discussions/create-thread-rep";
@@ -44,7 +44,7 @@ export function useCurrentThreadRep() {
       setRep(repTemp);
       setChannelRep(repTemp);
     }
-  }, [workspaceId, team, channel, structure.teams, user]);
+  }, [workspaceId, team, channel, structure.teams, user, rep, setChannelRep]);
 
   return rep;
 }

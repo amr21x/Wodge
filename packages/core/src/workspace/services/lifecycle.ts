@@ -64,7 +64,7 @@ export class WorkspaceLifecycle {
         },
       });
     });
-    this.workspace.structure = produce(this.workspace.structure, (draft) => {
+    this.workspace.structure = produce(this.workspace.structure, (_draft) => {
       return {
         ...defaultWorkspaceStructure(),
         teams: [createDefaultTeam(userId)],

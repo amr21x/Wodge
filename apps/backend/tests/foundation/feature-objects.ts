@@ -76,7 +76,6 @@ export async function featureObject(
       name: "workspace",
       ctx: { storage: storage },
       env: {
-        ...{},
         User: {
           idFromName: (id: string) => id,
           get: () => ({

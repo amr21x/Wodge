@@ -102,10 +102,13 @@ function fixture(scenario: (typeof scenarios)[number]) {
       },
     },
     env: {
-      ...{ SECRET_KEY: "local-only" },
+      SECRET_KEY: "local-only",
       Workspace: {
         idFromName: (id: string) => id,
-        get: () => ({ setName: async () => {}, fetch: poke }),
+        get: () => ({
+          setName: async () => {},
+          fetch: poke,
+        }),
       },
     },
   };

@@ -1,17 +1,12 @@
-import { DrObj } from "@wodge/domain/types";
-import {
-  Thread,
-  ThreadMessage,
-  ThreadPost,
-} from "@wodge/domain/discussions/models";
+import { ThreadMessage, ThreadPost } from "@wodge/domain/discussions/models";
 import type { ThreadMutators } from "@/client/sync/discussions/mutators";
 import { format } from "date-fns";
 import { SafeDiv } from "../../../components/safe-div";
 import { useMember } from "@/features/workspace/hooks/use-member";
 import { SafeAvatar } from "@/components/safe-avatar";
-import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
+
 import { useParams, useRouter } from "next/navigation";
-import { memo, useState } from "react";
+import { memo } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ThreadDropDown } from "./thread-dropdown";
@@ -21,9 +16,7 @@ import { useIsTeamModerator } from "@/features/workspace/hooks/use-is-team-moder
 import { useEditEditor } from "./use-edit-editor";
 import { cn } from "@/lib/utils/index";
 import { CheckCircle2, CircleDot, MessageCircle } from "lucide-react";
-import { useSetAtom } from "jotai";
-import { recentlyVisitedAtom } from "@/client/state/global-atoms";
-import { produce } from "immer";
+
 import PollUI from "@/features/polls/components/poll";
 import { Replicache } from "replicache";
 import { toast } from "sonner";

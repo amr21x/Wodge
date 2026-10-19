@@ -1,6 +1,6 @@
 import type { JoinPreviewDto } from "@wodge/domain/workspace/dto";
 import { SafeAvatar } from "@/components/safe-avatar";
-import { Button } from "@/components/ui/button";
+
 import {
   Card,
   CardContent,

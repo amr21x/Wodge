@@ -5,7 +5,6 @@ import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/features/auth/client";
 import { useSearchParams } from "next/navigation";
-import { env } from "@wodge/env/client";
 
 export function OAuth() {
   const searchParams = useSearchParams();

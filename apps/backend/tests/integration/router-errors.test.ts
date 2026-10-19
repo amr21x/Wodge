@@ -252,7 +252,7 @@ test("a shared page router isolates request bindings for different objects", asy
       versions: new Map([["globalVersion", 0]]),
       name: "fixture",
       ctx: { storage: {} },
-      env: { ...{} },
+      env: {},
     } as unknown as PageParty;
   }
   const one = party(),
@@ -321,7 +321,7 @@ test("workspace administrative guards protect only their explicit endpoints", as
     poke: vi.fn(async () => {}),
     name: "one",
     ctx: { storage: { get: async () => undefined, put: async () => {} } },
-    env: { ...{} },
+    env: {},
   } as unknown as import("../../src/servers/workspace").default;
   const env = workspaceBindings(party);
   const headers = { "x-user-id": "member" };

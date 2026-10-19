@@ -39,9 +39,9 @@ interface TeamMoreProps {
 
 export function TeamMore({ teamId, folderId, folder }: TeamMoreProps) {
   const [activeTab, setActiveTab] = useState("folder");
-  const { workspaceRep, workspaceSlug, workspaceId } = useCurrentWorkspace();
+  const { workspaceRep, workspaceSlug } = useCurrentWorkspace();
 
-  const setRecentAtom = useSetAtom(recentlyVisitedAtom);
+  useSetAtom(recentlyVisitedAtom);
 
   async function createBlankPage() {
     try {

@@ -1,4 +1,3 @@
-import { env } from "@wodge/env/client";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 

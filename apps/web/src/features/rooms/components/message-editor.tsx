@@ -89,6 +89,7 @@ export function MessageEditor({ rep }: { rep?: Replicache<RoomMutators> }) {
               </DialogContent>
             </Dialog>
           </FeatureGate>
+          {/* oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- Keyboard shortcuts bubble from the nested editor, which owns focus and textbox semantics. */}
           <div
             className="flex w-full items-center overflow-hidden"
             onKeyDown={(e) => {
@@ -99,6 +100,7 @@ export function MessageEditor({ rep }: { rep?: Replicache<RoomMutators> }) {
           >
             <OfflineEditor editor={editor} />
           </div>
+
           <SidebarItemBtn
             Icon={SendHorizonal}
             className="ml-2"

@@ -31,7 +31,10 @@ export function QAPage({ rep }: { rep?: Replicache<ThreadMutators> }) {
     tx.get<ThreadPost[]>("posts"),
   );
 
-  const post = useMemo(() => posts?.find((p) => p.id === postId), [posts]);
+  const post = useMemo(
+    () => posts?.find((p) => p.id === postId),
+    [posts, postId],
+  );
   const { member } = useMember(post?.author);
   const { user } = useCurrentUser();
 

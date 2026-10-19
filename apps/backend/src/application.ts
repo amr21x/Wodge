@@ -12,7 +12,6 @@ import { BillingHandlers } from "./handlers/api/billing";
 import { partyIngress } from "./middleware/ingress";
 import { ApiRoutes } from "./routes/api";
 import type { ApiContext } from "./types/hono-context";
-import type { WorkerEnvironment } from "./types/worker-environment";
 
 @injectable()
 export class BackendApplication {

@@ -75,6 +75,7 @@ export function useSubscribe<
   const [snapshot, setSnapshot] = useState<QueryRet | undefined>(undefined);
   const [isPending, setIsPending] = useState(true);
 
+  /* oxlint-disable react-hooks/exhaustive-deps -- Replicache resubscribes only when the caller-supplied dependencies change; inline query and comparator identities are intentionally ignored. */
   useEffect(() => {
     if (!r) {
       return;
@@ -101,6 +102,7 @@ export function useSubscribe<
       setSnapshot(undefined);
     };
   }, [r, ...dependencies]);
+  /* oxlint-enable react-hooks/exhaustive-deps */
 
   if (snapshot === undefined) {
     return { snapshot: def as Default, isPending };

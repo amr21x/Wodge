@@ -40,11 +40,11 @@ export const LinkMenu = ({ editor, appendTo }: MenuProps): JSX.Element => {
     return null;
   }, [editor]);
 
-  const onShowEdit = useCallback(() => {
+  useCallback(() => {
     setShowEdit(true);
   }, []);
 
-  const onHideEdit = useCallback(() => {
+  useCallback(() => {
     setShowEdit(false);
   }, []);
 

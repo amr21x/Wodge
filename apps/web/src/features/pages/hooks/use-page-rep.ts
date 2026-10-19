@@ -49,7 +49,16 @@ export function useCurrentPageRep() {
       setRep(repTemp);
       setChannelRep(repTemp);
     }
-  }, [workspaceId, team, channel, structure.teams, user]);
+  }, [
+    workspaceId,
+    team,
+    channel,
+    structure.teams,
+    user,
+    setChannelRep,
+    rep,
+    folderId,
+  ]);
 
   return rep;
 }

@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils/index";
 
 import { NodeViewWrapper } from "@tiptap/react";
 import type { NodeViewProps } from "@tiptap/core";
-import { memo, useCallback, useRef } from "react";
+import { useCallback, useRef } from "react";
 
 export const ImageBlockView = (props: NodeViewProps) => {
   const { editor, getPos, node } = props;
@@ -23,7 +23,16 @@ export const ImageBlockView = (props: NodeViewProps) => {
     <NodeViewWrapper>
       <div className={wrapperClassName} style={{ width: node.attrs.width }}>
         <div contentEditable={false} ref={imageWrapperRef}>
-          <img className="block" src={src} alt="" onClick={onClick} />
+          <button
+            type="button"
+            className="block w-full border-0 bg-transparent p-0"
+            aria-label="Select image"
+            onClick={onClick}
+          >
+            {/* oxlint-disable next/no-img-element -- User-provided or blob image URLs have no fixed dimensions or image-optimizer contract. */}
+            <img className="block" src={src} alt="" />
+            {/* oxlint-enable next/no-img-element */}
+          </button>
         </div>
       </div>
     </NodeViewWrapper>

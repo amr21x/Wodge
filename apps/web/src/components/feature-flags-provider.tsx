@@ -106,11 +106,8 @@ export function FeatureRouteGate({ children }: { children: ReactNode }) {
   return (
     <>
       {disabled && (
-        <main
-          className="flex h-dvh flex-col items-center justify-center gap-4"
-          role="status"
-        >
-          <p>This feature is currently unavailable.</p>
+        <main className="flex h-dvh flex-col items-center justify-center gap-4">
+          <output>This feature is currently unavailable.</output>
           <Link href="/">Back to workspaces</Link>
         </main>
       )}

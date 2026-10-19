@@ -13,7 +13,7 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+
 import { useMemo } from "react";
 import { cn } from "@/lib/utils/index";
 import { Folders } from "./folders";
@@ -32,7 +32,7 @@ import { useIsTeamMember } from "@/features/workspace/hooks/use-is-team-member";
 import { SafeAvatar } from "@/components/safe-avatar";
 import { activeSidebarAtom, openTeamsAtom } from "./sidebar-atoms";
 import { useIsTeamModerator } from "@/features/workspace/hooks/use-is-team-moderator";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { TeamRoomsMore } from "./team-rooms-more";
 import { useIsDesktop } from "@/hooks/use-is-desktop";
 import { isSidebarOpenAtom } from "@/client/state/global-atoms";
@@ -86,18 +86,7 @@ function SortableTeamspace({
   isPages = false,
   type,
 }: TeamspaceProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-    activeIndex,
-    overIndex,
-    active,
-    index,
-  } = useSortable({
+  const { setNodeRef, isDragging, overIndex, active, index } = useSortable({
     id: team.id,
     data: {
       type: "team",
@@ -105,13 +94,7 @@ function SortableTeamspace({
     },
   });
 
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
   const isSomethingOver = index === overIndex;
-  const isTeamOver = active?.data?.current?.type === "team";
 
   const [openTeams, setOpenTeams] = useAtom(openTeamsAtom);
 
@@ -126,9 +109,6 @@ function SortableTeamspace({
     active?.data?.current?.teamId !== team.id;
 
   const isChanFoldOver = isSomethingOver && (isChannelOver || isFolderOver);
-
-  const isAbove = activeIndex > overIndex;
-  const isBelow = activeIndex < overIndex;
 
   const isTeamMemberOrModerator = useIsTeamMember(team.id);
 
@@ -146,6 +126,7 @@ function SortableTeamspace({
       }}
     >
       <CollapsibleTrigger asChild>
+        {/* oxlint-disable jsx-a11y/prefer-tag-over-role -- This composite control contains child controls, so it cannot be a native button. */}
         <div
           className={cn(
             // "border-b-2 border-b-blue-200 -py-2",
@@ -163,6 +144,7 @@ function SortableTeamspace({
             ref={setNodeRef}
           />
         </div>
+        {/* oxlint-enable jsx-a11y/prefer-tag-over-role */}
       </CollapsibleTrigger>
 
       <CollapsibleContent
@@ -261,6 +243,7 @@ export const Teamspace = React.forwardRef<
           <span className="select-none truncate">{team.name}</span>
 
           {isMod && (
+            /* oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- This wrapper only stops events from child controls; it has no independent action. */
             <div
               onClick={(e) => {
                 e.stopPropagation();

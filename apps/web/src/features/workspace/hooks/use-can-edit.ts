@@ -55,6 +55,9 @@ export function useCanEdit({
     channelId,
     folderId,
     type,
+    forceChannelId,
+    forceFolderId,
+    forceTeamId,
   ]);
 
   return grant;

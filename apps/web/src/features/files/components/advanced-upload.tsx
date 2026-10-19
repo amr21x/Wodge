@@ -15,7 +15,7 @@ import { useParams } from "next/navigation";
 import { env } from "@wodge/env/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useQuery } from "@tanstack/react-query";
+
 import { useUploadToken } from "../../workspace/components/use-upload-token";
 
 export function AdvancedUploadButton({ workspaceId }: { workspaceId: string }) {
@@ -71,7 +71,7 @@ export function AdvancedUploadButton({ workspaceId }: { workspaceId: string }) {
             };
           },
         });
-  }, [token]);
+  }, [token, path, workspaceId, teamId]);
 
   if (!uppyRef) {
     return null;

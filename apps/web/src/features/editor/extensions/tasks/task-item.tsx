@@ -10,7 +10,7 @@ import { cn, focusElement } from "@/lib/utils/index";
 import { Column, Task } from "@wodge/domain/pages/models";
 import { pageMutators } from "@/client/sync/pages/mutators";
 import { Editor } from "@tiptap/react";
-import { Check, MoreHorizontal, PencilLine, Trash2, X } from "lucide-react";
+import { Check, MoreHorizontal, PencilLine, Trash2 } from "lucide-react";
 import { forwardRef, useEffect, useRef } from "react";
 import { DateRange } from "react-day-picker";
 import { Replicache } from "replicache";
@@ -31,7 +31,7 @@ interface TaskItemProps {
 }
 
 export const TaskItem = forwardRef<HTMLDivElement, TaskItemProps>(
-  ({ task, col, rep, editor, isAbove, isBelow, ...props }, ref) => {
+  ({ task, rep, editor, isAbove, isBelow, col: _col, ...props }, ref) => {
     const { isEditing, setIsEditing, setTitle, title } = useTask();
 
     const titleRef = useRef<HTMLParagraphElement>(null);
@@ -52,7 +52,7 @@ export const TaskItem = forwardRef<HTMLDivElement, TaskItemProps>(
       if (isEditing && titleRef.current) {
         focusElement(titleRef);
       }
-    }, [isEditing]);
+    }, [isEditing, editor]);
 
     async function onEdit(
       newTask?: Omit<Task, "id" | "columnId" | "includeTime">,
@@ -74,6 +74,7 @@ export const TaskItem = forwardRef<HTMLDivElement, TaskItemProps>(
     const noTitle = !title || title?.trim() === "";
 
     return (
+      /* oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- This wrapper only stops events from child controls; it has no independent action. */
       <div
         ref={ref}
         onClick={(e) => {
@@ -98,7 +99,11 @@ export const TaskItem = forwardRef<HTMLDivElement, TaskItemProps>(
           )}
         />
         <div className="flex h-full items-center">
-          <p
+          {/* oxlint-disable jsx-a11y/prefer-tag-over-role -- useEditable manages this contenteditable textbox; native inputs cannot host its editable DOM. */}
+          <div
+            role="textbox"
+            aria-label="Task title"
+            tabIndex={0}
             ref={titleRef}
             suppressContentEditableWarning
             className={cn(
@@ -112,11 +117,11 @@ export const TaskItem = forwardRef<HTMLDivElement, TaskItemProps>(
                 setIsEditing(false);
               }
             }}
-            autoFocus
           >
             {!isEditing && (noTitle ? "Untitled" : task?.title)}
             {isEditing && title}
-          </p>
+          </div>
+          {/* oxlint-enable jsx-a11y/prefer-tag-over-role */}
 
           {isEditing ? (
             <>
@@ -182,6 +187,7 @@ export const TaskItem = forwardRef<HTMLDivElement, TaskItemProps>(
           )}
         </div>
 
+        {/* oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- This wrapper only stops events from child controls; it has no independent action. */}
         <div
           className="flex flex-col gap-0.5"
           onClick={(e) => {

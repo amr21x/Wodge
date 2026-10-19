@@ -1,7 +1,7 @@
-import { cn, focusElement } from "@/lib/utils/index";
+import { cn } from "@/lib/utils/index";
 import { pageMutators } from "@/client/sync/pages/mutators";
 import { Task } from "@wodge/domain/pages/models";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 import { Replicache } from "replicache";
 import { useEditable } from "use-editable";
 import { MemberMultiSelect } from "./member-multi-select";
@@ -12,7 +12,7 @@ import OfflineEditor from "../../block-editor/offline-editor";
 import { useThreadEditor } from "@/features/discussions/hooks/use-thread-editor";
 import { useAtomValue } from "jotai";
 import { isSidebarOpenAtom } from "@/client/state/global-atoms";
-import { useDebounce, useDebouncedCallback } from "use-debounce";
+import { useDebounce } from "use-debounce";
 import { toast } from "sonner";
 import { useTask } from "./task-provider";
 import { DateRange } from "react-day-picker";
@@ -36,33 +36,36 @@ export function TaskSheet({ task, rep }: TaskSheetProps) {
 
   const [debouncedEditor] = useDebounce(editor?.state.doc.content, 500, {});
 
+  const onEdit = useCallback(
+    async (
+      newTask?: Omit<Task, "id" | "columnId" | "includeTime">,
+      includeTime?: boolean,
+    ) => {
+      try {
+        await rep?.mutate.editTask({
+          task: {
+            ...task,
+            includeTime: includeTime || task.includeTime,
+            ...newTask,
+          },
+        });
+      } catch {
+        toast.error("Failed to edit task");
+      }
+    },
+    [rep, task],
+  );
+
   useEffect(() => {
     if (debouncedEditor && editor?.getHTML() !== task?.overview) {
       onEdit({ overview: editor?.getHTML() });
     }
-  }, [debouncedEditor]);
+  }, [debouncedEditor, editor, onEdit, task.overview]);
 
   useEditable(titleRef, (t) => {
     setTitle(t);
     onEdit({ title: t });
   });
-
-  async function onEdit(
-    newTask?: Omit<Task, "id" | "columnId" | "includeTime">,
-    includeTime?: boolean,
-  ) {
-    try {
-      await rep?.mutate.editTask({
-        task: {
-          ...task,
-          includeTime: includeTime || task.includeTime,
-          ...newTask,
-        },
-      });
-    } catch (e) {
-      toast.error("Failed to edit task");
-    }
-  }
 
   return (
     <SheetContent
@@ -86,7 +89,6 @@ export function TaskSheet({ task, rep }: TaskSheetProps) {
             !title && "text-muted-foreground",
           )}
           suppressContentEditableWarning
-          autoFocus
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               return;

@@ -33,8 +33,8 @@ export function SettingsSearchInput<TData>({
         ref={inputRef}
       />
       <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 transform" />
-      <X
-        role="button"
+      <button
+        type="button"
         aria-label="clear search"
         className={cn(
           "absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 transform opacity-50 hover:opacity-100",
@@ -45,7 +45,9 @@ export function SettingsSearchInput<TData>({
         onClick={() => {
           table.getColumn(searchColumn)?.setFilterValue("");
         }}
-      />
+      >
+        <X className="h-4 w-4" />
+      </button>
     </div>
   );
 }

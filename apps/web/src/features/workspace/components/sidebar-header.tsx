@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  ArrowDownWideNarrow,
-  Filter,
-  PanelLeftClose,
-  Search,
-} from "lucide-react";
+import { PanelLeftClose } from "lucide-react";
 import { SidebarItemBtn } from "./sidebar-item-btn";
 import { WorkspaceSwitcher } from "./workspace-switcher";
 import { useAtom } from "jotai";

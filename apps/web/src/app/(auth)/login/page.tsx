@@ -4,7 +4,6 @@ import { Logo } from "@/components/logo";
 import { LoginWrapper } from "@/features/auth/components/login-wrapper";
 import { useEffect } from "react";
 import { localStoragePersister, queryClient } from "@/client/query";
-import { env } from "@wodge/env/client";
 
 function LoginPage() {
   useEffect(() => {

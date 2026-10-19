@@ -9,6 +9,7 @@ import type {
 } from "../../src/types/hono-context";
 import { createTestEnvironment } from "../helpers/environment";
 // @vitest-environment node
+// @vitest-environment node
 import { BillingService } from "@wodge/core/billing/services/billing";
 import { DiscussionService } from "@wodge/core/discussions/services/posts";
 import { RoomService } from "@wodge/core/rooms/services/messages";
@@ -98,10 +99,9 @@ function workspace() {
     name: "workspace",
     ctx: { storage: store },
     env: {
-      ...{},
       User: {
         idFromName: (id: string) => id,
-        get: (id: string) => ({
+        get: (_id: string) => ({
           setName: async () => {},
           fetch: async (path: string) =>
             path.includes("add-workspace")

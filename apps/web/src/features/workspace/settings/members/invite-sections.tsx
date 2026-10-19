@@ -1,6 +1,6 @@
 import { env } from "@wodge/env/client";
 import { useState } from "react";
-import { Check, Copy, RefreshCcw, Repeat } from "lucide-react";
+import { Check, Copy, RefreshCcw } from "lucide-react";
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
 import { useInvites } from "./use-invites";
 import { TooltipWrapper } from "@/components/tooltip-wrapper";

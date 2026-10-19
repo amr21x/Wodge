@@ -1,9 +1,8 @@
 import { DrObj } from "@wodge/domain/types";
-import { Team } from "@wodge/domain/workspace/models";
+
 import { ThreadPost } from "@wodge/domain/discussions/models";
 import type { ThreadMutators } from "@/client/sync/discussions/mutators";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { TabsContent } from "@/components/ui/tabs";
+
 import { useMemo } from "react";
 import { Post } from "./post";
 import { Replicache } from "replicache";

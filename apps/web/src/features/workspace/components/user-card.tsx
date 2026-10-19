@@ -51,7 +51,8 @@ export function UserCard() {
     >
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <div
+          <button
+            type="button"
             className={cn(
               buttonVariants({
                 size: "fit",
@@ -59,7 +60,7 @@ export function UserCard() {
               }),
               "group/card relative w-full select-none justify-start gap-3 overflow-hidden",
             )}
-            role="button"
+
             aria-label={user?.displayName || "User card"}
           >
             <SafeAvatar
@@ -80,7 +81,7 @@ export function UserCard() {
             <p className="absolute left-9 top-1/2 -translate-y-1/2 text-sm transition-all group-hover/card:top-0 group-hover/card:-translate-y-full">
               {user?.displayName}
             </p>
-          </div>
+          </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
           <DropdownMenuItem

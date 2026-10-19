@@ -1,12 +1,9 @@
-import Link from "next/link";
-
 import { EmailWrapper } from "./email-wrapper";
 import { OAuth } from "./oauth";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";

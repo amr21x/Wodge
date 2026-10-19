@@ -14,9 +14,7 @@ import { useIsTeamModerator } from "@/features/workspace/hooks/use-is-team-moder
 import { Folders } from "../../../../../../../features/files/components/folders";
 import { Files } from "../../../../../../../features/files/components/files";
 
-function TeamResourcePage({
-  params: { path },
-}: {
+function TeamResourcePage(_input: {
   params: {
     path: string[];
   };
@@ -27,9 +25,9 @@ function TeamResourcePage({
 
   const { workspaceId } = useCurrentWorkspace();
 
-  const { files, dirs } = useCurrentResources();
+  useCurrentResources();
 
-  const router = useRouter();
+  useRouter();
 
   const isTeamModerator = useIsTeamModerator();
 

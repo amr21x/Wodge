@@ -44,7 +44,6 @@ interface DataTableProps<TData> {
 function DataTable<TData>({
   table,
   label,
-  withForm,
   placeholder,
   className,
   withHeader,

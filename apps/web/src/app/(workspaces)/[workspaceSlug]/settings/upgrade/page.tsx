@@ -123,7 +123,7 @@ function UpgradePage() {
       router.push(data.url);
     },
 
-    onError: (e) => {
+    onError: (_e) => {
       toast.error("Failed to upgrade");
     },
   });
@@ -143,7 +143,7 @@ function UpgradePage() {
       router.push(data.url);
     },
 
-    onError: (e) => {
+    onError: (_e) => {
       toast.error("Failed to revert");
     },
   });
@@ -170,7 +170,7 @@ function UpgradePage() {
       monthlyPrice: 50,
       description: "Perfect for owners of small & medium businesses",
       features: ["Storage up to 100GB", "Up to 50 members"],
-      actionLabel: workspace?.isPremium! ? "Current Plan" : "Upgrade",
+      actionLabel: workspace?.isPremium ? "Current Plan" : "Upgrade",
       exclusive: true,
       disabled: workspace?.isPremium,
       action: upgrade,

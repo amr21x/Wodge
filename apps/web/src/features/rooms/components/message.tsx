@@ -2,7 +2,7 @@ import { useMember } from "@/features/workspace/hooks/use-member";
 import { differenceInMinutes, format } from "date-fns";
 import { DrObj } from "@wodge/domain/types";
 import { Message as MessageType } from "@wodge/domain/rooms/models";
-import React, { memo, useRef } from "react";
+import React, { memo } from "react";
 import { SafeAvatar } from "@/components/safe-avatar";
 import { SafeDiv } from "@/components/safe-div";
 import { ImageMessage } from "./image-message";
@@ -37,7 +37,7 @@ export const Message = memo(
 
     const isTeamModerator = useIsTeamModerator();
 
-    const { isEditing, onCancelEdit, onEdit, setIsEditing } = useEditEditor();
+    const { isEditing, onCancelEdit, setIsEditing } = useEditEditor();
 
     if (isMembersPending) {
       return null;

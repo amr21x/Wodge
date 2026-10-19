@@ -29,7 +29,7 @@ import { cn } from "@/lib/utils/index";
 import { useMember } from "@/features/workspace/hooks/use-member";
 import { SafeAvatar } from "@/components/safe-avatar";
 import { TrackMutedIndicator } from "./track-muted-indicator";
-import { Button } from "@/components/ui/button";
+
 import { isCarouselOpenAtom } from "../state/atoms";
 import { useAtomValue } from "jotai";
 
@@ -130,7 +130,20 @@ export const ParticipantTile = React.forwardRef<
   });
 
   return (
+    /* oxlint-disable jsx-a11y/prefer-tag-over-role -- This composite control contains child controls, so it cannot be a native button. */
     <div
+      role="button"
+      tabIndex={0}
+      aria-label={inFocus ? "Clear participant focus" : "Focus participant"}
+      onKeyDown={(event) => {
+        if (
+          event.target === event.currentTarget &&
+          (event.key === "Enter" || event.key === " ")
+        ) {
+          event.preventDefault();
+          event.currentTarget.click();
+        }
+      }}
       ref={ref}
       style={
         {
@@ -228,5 +241,6 @@ export const ParticipantTile = React.forwardRef<
         </ParticipantContextIfNeeded>
       </TrackRefContextIfNeeded>
     </div>
+    /* oxlint-enable jsx-a11y/prefer-tag-over-role */
   );
 });

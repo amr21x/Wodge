@@ -11,7 +11,7 @@ import { Server } from "partyserver";
 import { initializeWorkspace } from "../di/runtime";
 import { handleIngress, handleStartup } from "../errors/handler";
 import type { UserGateway } from "../gateways/user";
-import { WorkspaceHandlers } from "../handlers/workspace/handlers";
+
 import { AuthorizationInvalidations } from "../lib/authorization/invalidation";
 import { WorkspaceRoutes } from "../routes/workspace";
 import type { WorkerEnvironment } from "../types/worker-environment";

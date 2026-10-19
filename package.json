@@ -10,7 +10,7 @@
     "migrate": "pnpm --filter backend db:migration:cloud",
     "migrate:local": "turbo db:migration:local",
     "drop": "turbo db:drop",
-    "lint": "oxlint .",
+    "lint": "oxlint --deny-warnings .",
     "add:comp": "turbo add:comp",
     "reset:app": "rm -rf ./apps/web/.wrangler ./apps/backend/.wrangler",
     "init:app": "pnpm --filter backend db:migration:local",
@@ -18,7 +18,7 @@
     "deploy:app": "turbo deploy:app",
     "check:boundaries": "node scripts/check-boundaries.mjs",
     "test:feature-flags": "vitest run --workspace vitest.feature-flags.workspace.ts --no-cache --maxWorkers=2 --minWorkers=1",
-    "lint:fix": "oxlint --fix .",
+    "lint:fix": "oxlint --fix --deny-warnings .",
     "format": "oxfmt --write .",
     "format:check": "oxfmt --check ."
   },

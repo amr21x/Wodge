@@ -28,7 +28,7 @@ function JoinWorkspaceFormContent() {
 
   const router = useRouter();
 
-  const queryClient = useQueryClient();
+  useQueryClient();
 
   async function onSubmit(data: z.infer<typeof JoinWorkspaceSchema>) {
     router.push(data.url);

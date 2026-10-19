@@ -20,14 +20,13 @@ export function TeamSettings({
   team?: DrObj<Team>;
   isAddition?: boolean;
 }) {
-  const { structure, members, workspaceRep, workspaceId } =
-    useCurrentWorkspace();
+  const { members, workspaceRep, workspaceId } = useCurrentWorkspace();
 
   const nonTeamMembers = useMemo(() => {
     return members.members.filter(
       (member) => !team?.members.includes(member.id),
     );
-  }, [members, structure, team]);
+  }, [members, team]);
 
   const teamMembers = useMemo(() => team?.members || [], [team]) as string[];
 

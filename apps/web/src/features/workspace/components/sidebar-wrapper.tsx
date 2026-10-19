@@ -10,7 +10,7 @@ import { UserCard } from "./user-card";
 import { roomAtom } from "../../rooms/state/atoms";
 
 export function SidebarWrapper() {
-  const [isSidebarOpen, setIsSidebarOpen] = useAtom(isSidebarOpenAtom);
+  const [isSidebarOpen] = useAtom(isSidebarOpenAtom);
   const room = useAtomValue(roomAtom);
 
   return (
