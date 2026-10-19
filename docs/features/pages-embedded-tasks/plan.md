@@ -4,8 +4,9 @@
 
 The [current project](../../development/documentation.md) retains the existing editor,
 product behavior, Replicache tasks, and Yjs collaboration while making the necessary
-backend/runtime compatibility changes. Preserve the original premium editor packages;
-no removal or replacement is authorized by the foundation work.
+backend/runtime compatibility changes. The owner subsequently authorized replacing
+the private extensions with their public Tiptap v2 equivalents while preserving
+editor node formats and behavior.
 
 Local compilation and shared D1 fixture checks do not establish page/task acceptance.
 Integrated editing, synchronization, permissions, persistence, recovery, and existing

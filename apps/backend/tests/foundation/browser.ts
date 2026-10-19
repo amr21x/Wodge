@@ -1,3 +1,14 @@
-// Bundle this for the browser and inspect the metafile for server dependencies.
-export { NewWorkspaceSchema, makeWorkspaceAvatarKey } from "@repo/data";
-export { createPageRep, replicacheWrapper } from "@repo/data/browser";
+import { canView } from "@wodge/auth/authorization/access";
+import { discussionInputSchemas } from "@wodge/domain/discussions/validation";
+import { createEntityId } from "@wodge/domain/identifiers";
+import { pageInputSchemas } from "@wodge/domain/pages/validation";
+import { roomInputSchemas } from "@wodge/domain/rooms/validation";
+import { workspaceInputSchemas } from "@wodge/domain/workspace/validation";
+export const browserContracts = {
+  createEntityId,
+  workspaceInputSchemas,
+  roomInputSchemas,
+  pageInputSchemas,
+  discussionInputSchemas,
+  canView,
+};

@@ -9,7 +9,7 @@ import {
 import { Check, MoreHorizontal, Trash2, X } from "lucide-react";
 import { Row, Table } from "@tanstack/react-table";
 import { Children } from "react";
-import { SidebarItemBtn } from "@/app/(workspaces)/[workspaceSlug]/(workspace)/_components/sidebar-item-btn";
+import { SidebarItemBtn } from "@/features/workspace/components/sidebar-item-btn";
 
 interface DataTableActionsProps<TData> {
   table: Table<TData>;
@@ -70,6 +70,7 @@ export function DataTableActions<TData>({
                 if (item.type === "separator") {
                   return <DropdownMenuSeparator key={idx} />;
                 }
+
                 return (
                   <DropdownMenuItem
                     key={idx}

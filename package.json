@@ -4,21 +4,22 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
-    "dev": "turbo dev",
+    "dev": "turbo dev dev:api",
     "studio": "turbo db:studio",
     "generate": "turbo db:generate",
-    "migrate": "turbo db:migration",
+    "migrate": "pnpm --filter backend db:migration:cloud",
     "migrate:local": "turbo db:migration:local",
     "drop": "turbo db:drop",
     "lint": "turbo lint",
     "add:comp": "turbo add:comp",
-    "reset:app": "rm -r ./apps/web/.wrangler && rm -r ./apps/backend/.partykit",
-    "init:app": "pnpm generate && pnpm migrate:local && mkdir -p ./apps/backend/.partykit",
+    "reset:app": "rm -rf ./apps/web/.wrangler ./apps/backend/.wrangler",
+    "init:app": "pnpm --filter backend db:migration:local",
     "livekit": "livekit-server --dev --bind 0.0.0.0",
-    "deploy:app": "turbo deploy:app"
+    "deploy:app": "turbo deploy:app",
+    "check:boundaries": "node scripts/check-boundaries.mjs"
   },
   "devDependencies": {
-    "@repo/ts": "workspace:*",
+    "@wodge/ts": "workspace:*",
     "eslint": "8.56.0",
     "eslint-config-turbo": "^2.0.0",
     "tsx": "^4.7.1",

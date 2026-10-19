@@ -32,6 +32,7 @@ export function Stepper({ children, startStep, className }: StepperProps) {
   const nextStep = () =>
     setCurrentStep((s) => (s === count.current ? s : s + 1));
   const prevStep = () => setCurrentStep((s) => (s === 1 ? s : s - 1));
+
   return (
     <Context.Provider value={{ currentStep, nextStep, prevStep, count }}>
       <div className={className}>{children}</div>
@@ -51,9 +52,11 @@ export function StepperContainer({
 
 export function useStepper() {
   const context = useContext(Context);
+
   if (!context) {
     throw new Error("useStepper must be used within a Stepper");
   }
+
   return context;
 }
 

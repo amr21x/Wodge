@@ -132,7 +132,11 @@ incorrect temporary module root. The final run used permitted loopback access an
 an explicit temporary module root and passed. Earlier failed attempts are not
 reported as successful runs.
 
-## Reproduce
+## Historical reproduction commands
+
+These commands describe the captured checkout. The superseded foundation build
+configuration has since been removed; use the current [backend commands](../../apps/backend/README.md#development)
+for the maintained Worker build and compatibility checks.
 
 With a working pinned pnpm 9.4.0 and Node >=22.19:
 

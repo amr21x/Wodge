@@ -2,28 +2,31 @@
 
 [Docs home](../README.md) · [Operate Wodge](README.md)
 
-The [current project scope](../development/documentation.md) selects a fresh
-portfolio setup without old-account/data migration. No deployment or remote
-provisioning is authorized by the local foundation work.
+The backend implementation uses a Hono Worker, PartyServer Durable Objects, Better
+Auth and D1. Authentication can start fresh. Existing application data is not deleted
+or silently relinked. No remote deployment or resource migration was performed.
 
 ## Local configuration
 
-Use ignored application environment files and explicit local bindings, as described
-in [setup](../development/setup.md). The foundation Worker configuration uses a
-placeholder local D1 identifier and SQLite Durable Object classes. It is a local
-compatibility fixture; production routing and deployed binding wiring are incomplete.
+Copy the public root `.env.example` to `apps/web/.env.local`. Copy backend secrets
+from `apps/backend/.dev.vars.example` into its ignored `.dev.vars`. Production and
+local Worker bindings are defined in `apps/backend/wrangler.jsonc`; the separate
+foundation configuration remains a compatibility fixture. Web has no D1 binding
+or backend secrets. See [setup](../development/setup.md).
 
 ## Deployment boundary
 
-The web application remains Next.js with the retained UI. Backend services migrate
-toward PartyServer/Better Auth/D1. Existing PartyKit and Supabase paths remain in
-source until their separate migrations. Stripe remains in test mode. Calls and
-hosted generation must be disabled for the current milestone; a replacement call
-provider is not selected here.
+The web UI remains Next-on-Pages. Backend now owns authentication, application
+APIs, billing and scoped collaboration. Supabase and the PartyKit CLI have been
+removed from active application code. Provider credentials, callback registrations,
+web-origin API routes and existing Durable Object/Yjs data cutover remain external
+setup work. The manually triggered deployment workflow uses Wrangler.
 
-Deployed secrets belong in provider-managed configuration. The owner-directed
-secret-export CLI removal changes local scripts only; no remote secret values or
-provider settings were migrated. See the [foundation evidence](../development/backend-foundation.md).
+Secrets belong in Cloudflare-managed bindings. The backend uses `BETTER_AUTH_SECRET`
+for sessions and `SECRET_KEY` for internal calls and signed, session-bound tickets.
+Google/GitHub credentials, Resend and payment/storage credentials stay out of web.
+The production public auth base URL is `APP_DOMAIN` with `/api/auth/*` routed to
+the Worker. Existing PartySocket hosts can keep using the backend hostname.
 
 ## Verification limits
 

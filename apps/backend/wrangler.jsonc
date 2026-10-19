@@ -1,0 +1,57 @@
+{
+  "$schema": "../../config/workers/node_modules/wrangler/config-schema.json",
+  "name": "wodge-backend",
+  "main": "src/server.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "INTEGRATION_MODE": "partial",
+    "APP_DOMAIN": "http://localhost:3000",
+    "BACKEND_DOMAIN": "http://localhost:8787",
+    "AVATARS_URL": "https://avatars.wodge.xyz",
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "wodge",
+      "database_id": "f17da2ae-c255-422f-99ad-b8b93733b758",
+      "migrations_dir": "../../packages/domain/migrations",
+    },
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "User",
+        "class_name": "UserServer",
+      },
+      {
+        "name": "Workspace",
+        "class_name": "WorkspaceServer",
+      },
+      {
+        "name": "Room",
+        "class_name": "RoomServer",
+      },
+      {
+        "name": "Thread",
+        "class_name": "ThreadServer",
+      },
+      {
+        "name": "Page",
+        "class_name": "PageServer",
+      },
+    ],
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": [
+        "UserServer",
+        "WorkspaceServer",
+        "RoomServer",
+        "ThreadServer",
+        "PageServer",
+      ],
+    },
+  ],
+}

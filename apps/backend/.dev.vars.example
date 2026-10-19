@@ -1,0 +1,45 @@
+# Required: signs and protects Better Auth sessions and authentication data.
+# Use a strong random value, different from SECRET_KEY.
+BETTER_AUTH_SECRET=
+# Required: signs internal authorization and realtime connection tickets.
+# Use a separate strong random value; this is not a provider API key.
+SECRET_KEY=
+
+# partial allows unavailable integrations locally; ready requires email, storage and Stripe test settings.
+INTEGRATION_MODE=partial
+
+# Provider credentials are temporarily optional for partial local development.
+# Missing configuration makes the corresponding operations unavailable.
+
+# Authorizes Resend to deliver email sign-in codes. Required for email OTP sign-in.
+RESEND_API_KEY=
+# Verified Resend sender address used for sign-in emails; configuration, not a secret.
+RESEND_EMAIL_FROM=
+
+# Identifies the Google OAuth application. Optional; configure with its client secret.
+GOOGLE_CLIENT_ID=
+# Authenticates the backend when exchanging Google OAuth codes for tokens.
+GOOGLE_CLIENT_SECRET=
+# Identifies the GitHub OAuth application. Optional; configure with its client secret.
+GITHUB_CLIENT_ID=
+# Authenticates the backend when exchanging GitHub OAuth codes for tokens.
+GITHUB_CLIENT_SECRET=
+
+# S3-compatible storage endpoint for workspace files and avatars; not a secret.
+R2_ENDPOINT=
+# Identifies the storage API credential used for bucket and object operations.
+R2_ACCESS_KEY=
+# Signs storage API requests and temporary upload/download URLs. Required for file storage.
+R2_SECRET_KEY=
+
+# Identifies the LiveKit application used by the retained call-token integration.
+LIVEKIT_API_KEY=
+# Signs LiveKit room access tokens. Leave unset while calls are unavailable locally.
+LIVEKIT_API_SECRET=
+
+# Authorizes Stripe Checkout, billing portal and price API requests. Use a test-mode key locally.
+STRIPE_SECRET_KEY=
+# Verifies incoming Stripe webhook signatures before subscription state is changed.
+STRIPE_WH_SECRET=
+# Selects the Stripe subscription price for Checkout by lookup key; not a secret.
+STRIPE_LOOKUP_KEY=

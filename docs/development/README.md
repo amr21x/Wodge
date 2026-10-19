@@ -4,15 +4,15 @@
 
 Begin with local setup and the recorded baseline. Use the engineering references to understand the system before changing it; use Linear for executable work and delivery state.
 
-| Read | What you will find |
-| --- | --- |
-| [Local setup and current commands](setup.md) | Local setup and current commands, separated from revival targets. |
-| [Engineering policy](engineering-policy.md) | Engineering expectations, ownership, and validation policy. |
-| [Development Tooling](tooling.md) | Development tools and the approved tooling direction. |
-| [Code Structure & Design](code-structure.md) | Package boundaries, dependency direction, and code organization. |
-| [Development and delivery workflow](workflow.md) | The delivery workflow, approvals, and execution tracking. |
-| [Testing Strategy](testing-strategy.md) | Testing strategy and evidence needed to validate the revival. |
-| [Documentation workflow](documentation-workflow.md) | How to read, edit, review, and maintain the repository docs. |
+| Read                                                | What you will find                                                |
+| --------------------------------------------------- | ----------------------------------------------------------------- |
+| [Local setup and current commands](setup.md)        | Local setup and current commands, separated from revival targets. |
+| [Engineering policy](engineering-policy.md)         | Engineering expectations, ownership, and validation policy.       |
+| [Development Tooling](tooling.md)                   | Development tools and the approved tooling direction.             |
+| [Code Structure & Design](code-structure.md)        | Package boundaries, dependency direction, and code organization.  |
+| [Development and delivery workflow](workflow.md)    | The delivery workflow, approvals, and execution tracking.         |
+| [Testing Strategy](testing-strategy.md)             | Testing strategy and evidence needed to validate the revival.     |
+| [Documentation workflow](documentation-workflow.md) | How to read, edit, review, and maintain the repository docs.      |
 
 ## Understand the system
 

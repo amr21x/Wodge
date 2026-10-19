@@ -1,11 +1,11 @@
 "use client";
 
-import { useCurrentUser } from "@/hooks/use-current-user";
+import { useCurrentUser } from "@/features/account/hooks/use-current-user";
 
 import { useParams } from "next/navigation";
-import { useCurrentWorkspace } from "@/components/workspace-provider";
-import { useUpdateRecentlyVisited } from "@/hooks/use-recently-visited";
-import { PageEditor } from "../../../page-editor";
+import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
+import { useUpdateRecentlyVisited } from "@/features/workspace/hooks/use-recently-visited";
+import { PageEditor } from "../../../../../../../../features/pages/components/page-editor";
 
 function ChannelPage() {
   useUpdateRecentlyVisited("page");
@@ -19,7 +19,9 @@ function ChannelPage() {
 
   const { workspaceId } = useCurrentWorkspace();
 
-  if (!user || !workspaceId) return null;
+  if (!user || !workspaceId) {
+    return null;
+  }
 
   return (
     <div className="h-full w-full px-2 py-3">

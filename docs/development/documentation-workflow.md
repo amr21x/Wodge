@@ -8,15 +8,15 @@ Read and edit the Markdown directly in GitHub. Repository files own product and 
 
 Start from the [documentation home and feature index](../README.md). Explore explains the product, Develop guides engineering work, and Operate covers deployment and support. Each section has a README index; individual pages link back to their section and the docs home.
 
-| Folder | Content |
-| --- | --- |
-| [product](../product/README.md) | Goals, scope, terminology, and feasibility |
+| Folder                                    | Content                                                                          |
+| ----------------------------------------- | -------------------------------------------------------------------------------- |
+| [product](../product/README.md)           | Goals, scope, terminology, and feasibility                                       |
 | [architecture](../architecture/README.md) | System boundaries, stack, domain/data models, security, and quality requirements |
-| [design](../design/README.md) | Shared UX, navigation, and interaction patterns |
-| [development](README.md) | Setup, tooling, workflow, testing, and engineering evidence |
-| [operations](../operations/README.md) | Environments, CI/CD, observability, release, maintenance, and runbooks |
-| [features](../README.md#features) | Feature specifications, designs, and warranted delivery approaches |
-| [decisions](../decisions/README.md) | Decisions, rationale, consequences, and approval evidence |
+| [design](../design/README.md)             | Shared UX, navigation, and interaction patterns                                  |
+| [development](README.md)                  | Setup, tooling, workflow, testing, and engineering evidence                      |
+| [operations](../operations/README.md)     | Environments, CI/CD, observability, release, maintenance, and runbooks           |
+| [features](../README.md#features)         | Feature specifications, designs, and warranted delivery approaches               |
+| [decisions](../decisions/README.md)       | Decisions, rationale, consequences, and approval evidence                        |
 
 ## Edit and review
 

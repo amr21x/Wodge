@@ -2,9 +2,11 @@
 
 [Docs home](../README.md) · [Architecture](README.md)
 
-The foundation retains the existing domain schemas in `packages/data/schemas`:
-users, workspaces and memberships, teams, channels, pages, threads, and rooms.
-Existing keys and mutation models remain in `packages/data`.
+Shared definitions now live in `packages/domain/src`, grouped by user, workspace
+(including membership and teams), pages, discussions and rooms. Shared permission
+calculations, keys and pure mutations have explicit public entries. D1 table
+definitions are isolated behind `@wodge/domain/schema`; browser-safe contracts do
+not import live persistence or browser clients.
 
 Replicache handles structured local-first state, while Yjs handles collaborative
 text. D1 persistence and schema definitions remain distinct from browser adapters.

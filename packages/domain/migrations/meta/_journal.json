@@ -1,0 +1,62 @@
+{
+  "version": "5",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1718917824078,
+      "tag": "0000_warm_steel_serpent",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1719678500494,
+      "tag": "0001_glorious_ghost_rider",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1719697310465,
+      "tag": "0002_abnormal_slayback",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1792244944295,
+      "tag": "0003_better_auth",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1792262060292,
+      "tag": "0004_organization_membership",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1792264779373,
+      "tag": "0005_canonical_organizations",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1792281157149,
+      "tag": "0006_canonical_users",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1792356949660,
+      "tag": "0007_billing_subscription_order",
+      "breakpoints": true
+    }
+  ]
+}

@@ -30,6 +30,7 @@ declare module "@tanstack/react-table" {
     discard: (idx: number) => void;
   }
 }
+
 interface DataTableProps<TData> {
   table: TableType<TData>;
   withPagination?: boolean;
@@ -38,7 +39,6 @@ interface DataTableProps<TData> {
   placeholder?: string;
   className?: string;
   withHeader?: boolean;
-  
 }
 
 function DataTable<TData>({
@@ -49,8 +49,11 @@ function DataTable<TData>({
   className,
   withHeader,
 }: DataTableProps<TData>) {
-  if (!table.options?.meta) return null;
+  if (!table.options?.meta) {
+    return null;
+  }
   // const [isEditing, setIsEditing] = React.useState(false);
+
   const { isEditing, setIsEditing, setEdited } = table.options.meta;
 
   return (

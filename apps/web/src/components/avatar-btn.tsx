@@ -32,6 +32,7 @@ export function AvatarBtn({
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
+
     if (file) {
       setBlobUrl(URL.createObjectURL(file));
       onUpload?.(file);
