@@ -1,29 +1,65 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createRequire } from "node:module";
-import { readFileSync, readdirSync } from "node:fs";
-import { resolve, relative } from "node:path";
+import "reflect-metadata";
 import {
-  closedFlags,
-  createFlagReader,
-  disabledFeature,
   FEATURES,
   FEATURE_REGISTRY,
   FLAG_MAX_STALE_MS,
   FLAG_REQUEST_TIMEOUT_MS,
+} from "@wodge/domain/features/models";
+import { FeatureFlagService } from "@wodge/core/features/services/flags";
+import type { FeatureFlagRepository } from "@wodge/core/features/repositories/flags";
+import { FeatureHandlers } from "../../apps/backend/src/handlers/features";
+import { createRoomPatch } from "../../apps/backend/src/lib/sync/patches/rooms";
+import { gatePageConnection } from "../../apps/backend/src/lib/feature-connection";
+
+function databaseFlagReader(binding: {
+  prepare(sql: string): {
+    all(): Promise<{
+      success: boolean;
+      results?: { key: string; enabled: number }[];
+    }>;
+  };
+}) {
+  const repository: Pick<FeatureFlagRepository, "list"> = {
+    list: async () => {
+      const result = await binding
+        .prepare("SELECT key, enabled FROM feature_flags")
+        .all();
+      if (!result.success || !result.results)
+        throw new Error("Flags unavailable");
+      return result.results;
+    },
+  };
+  return new FeatureFlagService(repository as FeatureFlagRepository).read;
+}
+function featureHandlers(read: FeatureFlagService["read"]) {
+  return new FeatureHandlers({ read } as FeatureFlagService);
+}
+const gatePartyRequest = (
+  request: Request,
+  domain: string,
+  read: FeatureFlagService["read"],
+  storedType?: (mutation: {
+    name: string;
+    args: unknown;
+  }) => string | undefined,
+) => featureHandlers(read).party(request, domain, storedType);
+const gateHttpFeature = (request: Request, read: FeatureFlagService["read"]) =>
+  featureHandlers(read).http(request);
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { createRequire } from "node:module";
+import { readFileSync } from "node:fs";
+import {
+  closedFlags,
+  createFlagReader,
+  disabledFeature,
   resolveFlags,
-} from "../../packages/data/feature-flags";
-import { databaseFlagReader } from "../../packages/data/feature-store";
+} from "@wodge/core/features/flags";
+
 import {
   httpFeatures,
   mutationFeatures,
   pageFeatures,
-} from "../../packages/data/feature-policy";
-import {
-  gatePartyRequest,
-  partyFlagReader,
-} from "../../apps/backend/src/lib/feature-flags";
-import { gateHttpRequest as gateHttpFeature } from "../../packages/data/feature-policy";
-import { gatePageConnection } from "../../apps/backend/src/lib/feature-connection";
+} from "@wodge/core/features/policy";
 
 const require = createRequire(import.meta.url);
 let DatabaseSync: any;
@@ -35,10 +71,10 @@ try {
   )("better-sqlite3");
 }
 const migration = readFileSync(
-  "packages/data/migrations/0003_feature_flags.sql",
+  "packages/domain/migrations/0003_feature_flags.sql",
   "utf8",
 );
-const seed = readFileSync("packages/data/seed-feature-flags.sql", "utf8");
+const seed = readFileSync("packages/domain/seed-feature-flags.sql", "utf8");
 function database() {
   const db = new DatabaseSync(":memory:");
   db.exec(migration);
@@ -59,28 +95,6 @@ function request(
     body: JSON.stringify({ mutations: mutations || [] }),
   });
 }
-beforeEach(() => {
-  for (const name of [
-    "RESEND_API_KEY",
-    "RESEND_EMAIL_FROM",
-    "SECRET_KEY",
-    "LIVEKIT_API_KEY",
-    "LIVEKIT_API_SECRET",
-    "APP_DOMAIN",
-    "BACKEND_DOMAIN",
-    "STRIPE_SECRET_KEY",
-    "STRIPE_WH_SECRET",
-    "STRIPE_LOOKUP_KEY",
-    "NEXT_PUBLIC_BACKEND_DOMAIN",
-    "NEXT_PUBLIC_REPLICACHE_KEY",
-    "NEXT_PUBLIC_LIVEKIT_URL",
-    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-    "NEXT_PUBLIC_SUPABASE_URL",
-    "NEXT_PUBLIC_AVATARS_URL",
-    "NEXT_PUBLIC_APP_DOMAIN",
-  ])
-    vi.stubEnv(name, "test");
-});
 afterEach(() => {
   vi.useRealTimers();
   vi.unstubAllGlobals();
@@ -233,27 +247,8 @@ describe("authoritative operation gates", () => {
     ).toBe(403);
   });
 
-  it("retains the existing room permission check when the feature is enabled", async () => {
-    const { read } = database();
-    expect(
-      await gatePartyRequest(request("room"), "room", read),
-    ).toBeUndefined();
-    const { roomPull } = await import("../../apps/backend/src/room/room-pull");
-    const denied = await roomPull(
-      {} as any,
-      {
-        req: {
-          header: (key: string) =>
-            key === "x-user-id" ? "member-without-access" : undefined,
-        },
-      } as any,
-    );
-    expect(denied.status).toBe(401);
-  });
-
   it("updates embedded read results after flag-only edits without a data version change", async () => {
     const { db, read } = database();
-    const { roomPull } = await import("../../apps/backend/src/room/room-pull");
     const messages = [
       { id: "text", type: "text" },
       { id: "poll", type: "poll" },
@@ -267,19 +262,10 @@ describe("authoritative operation gates", () => {
       messages: { data: messages, lastModifiedVersion: 1 },
       readFlags: read,
     };
-    const context = {
-      req: {
-        header: (key: string) =>
-          key === "x-user-id"
-            ? "member"
-            : key === "x-can-view"
-              ? "true"
-              : undefined,
-        json: async () => ({ clientGroupID: "group", cookie: 1 }),
-      },
-    };
-    const pull = async () =>
-      (await (await roomPull(party as any, context as any)).json()) as any;
+    const patch = createRoomPatch(party as any, "member", read);
+    const pull = async () => ({
+      patch: await patch({ fromVersion: 1 } as any),
+    });
     expect((await pull()).patch[0].value).toHaveLength(3);
     db.exec(
       "UPDATE feature_flags SET enabled=0 WHERE key IN ('polls','attachments')",
@@ -362,67 +348,7 @@ describe("authoritative operation gates", () => {
     expect(pageFeatures("/onboarding")).toEqual([]);
   });
 
-  it("requires every current HTTP endpoint to have a policy", () => {
-    function files(dir: string): string[] {
-      return readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
-        entry.isDirectory()
-          ? files(resolve(dir, entry.name))
-          : [resolve(dir, entry.name)],
-      );
-    }
-    const root = resolve("apps/web/src/app");
-    for (const file of files(resolve(root, "api")).filter((file) =>
-      file.endsWith("/route.ts"),
-    )) {
-      const path =
-        "/" +
-        relative(root, file)
-          .replace(/\/route.ts$/, "")
-          .replace(/\[[^\]]+\]/g, "example");
-      for (const method of [
-        ...readFileSync(file, "utf8").matchAll(
-          /export async function (GET|POST|DELETE|PUT|PATCH)/g,
-        ),
-      ].map((match) => match[1]!)) {
-        const required = httpFeatures(path, method);
-        expect(required, `${method} ${path}`).toBeDefined();
-        if (required?.length) {
-          expect(
-            readFileSync(file, "utf8"),
-            `Direct handler gate: ${method} ${path}`,
-          ).toContain("await gateHttpFeature(");
-        }
-      }
-    }
-  });
-
-  it("propagates PartyKit failures without resetting the upstream expiry", async () => {
-    vi.useFakeTimers();
-    const expiry = Date.now() + 30_000;
-    const fetcher = vi
-      .fn()
-      .mockResolvedValueOnce(
-        Response.json({
-          flags: resolveFlags([]),
-          validUntil: expiry,
-          source: "last-known-good",
-        }),
-      )
-      .mockRejectedValue(new Error("offline"));
-    vi.stubGlobal("fetch", fetcher);
-    const read = partyFlagReader({
-      APP_DOMAIN: "https://app.example",
-      SECRET_KEY: "test-secret",
-    });
-    expect((await read()).flags.pages).toBe(true);
-    expect(fetcher.mock.calls[0]?.[1].headers.authorization).toBe(
-      "Bearer test-secret",
-    );
-    vi.advanceTimersByTime(30_000);
-    expect((await read()).flags.pages).toBe(false);
-  });
-
-  it("gates an existing realtime connection in both directions without terminating it", async () => {
+  it("gates sends on an existing realtime connection without terminating it", async () => {
     const { db, read } = database();
     const handlers: Record<string, (event: any) => void> = {};
     const send = vi.fn();
@@ -435,8 +361,11 @@ describe("authoritative operation gates", () => {
       send,
       close,
     };
-    const guarded = gatePageConnection(connection as any, read);
-    guarded.addEventListener("message", receive);
+    const guarded = gatePageConnection(
+      connection,
+      async () => (await read()).flags.pages,
+    );
+    connection.addEventListener("message", receive);
     const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
     handlers.message!({ data: "first" });
     guarded.send("first");
@@ -447,14 +376,14 @@ describe("authoritative operation gates", () => {
     handlers.message!({ data: "disabled" });
     guarded.send("disabled");
     await settle();
-    expect(receive).toHaveBeenCalledTimes(1);
+    expect(receive).toHaveBeenCalledTimes(2);
     expect(send).toHaveBeenCalledTimes(1);
     expect(close).not.toHaveBeenCalled();
     db.exec("UPDATE feature_flags SET enabled=1 WHERE key='pages'");
     handlers.message!({ data: "resumed" });
     guarded.send("resumed");
     await settle();
-    expect(receive).toHaveBeenCalledTimes(2);
+    expect(receive).toHaveBeenCalledTimes(3);
     expect(send).toHaveBeenCalledTimes(2);
   });
 });

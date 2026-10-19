@@ -14,7 +14,10 @@ export default function Component({
   const router = useRouter();
 
   useEffect(() => {
-    if (countdown <= 0) return;
+    if (countdown <= 0) {
+      return;
+    }
+
     const interval = setInterval(() => {
       setCountdown(countdown - 1);
     }, 1000);

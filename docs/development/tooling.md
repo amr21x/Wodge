@@ -1,66 +1,51 @@
----
-description: "Development tools and the approved tooling direction."
-icon: screwdriver-wrench
----
+# Development tooling
 
-# Development Tooling
+[Docs home](../README.md) · [Develop Wodge](README.md)
 
-## Confirmed tooling
+The current foundation retains the existing tooling and selects only the runtime
+and dependency changes needed by the portfolio milestone. See the
+[current scope](documentation.md) and [executed foundation evidence](backend-foundation.md).
 
-* **pnpm:** upgrade to the latest release.
-* **Turborepo:** upgrade to the latest release for the monorepo.
-* **TypeScript:** upgrade to version 7.
-* **Oxlint:** replace ESLint.
-* **Oxfmt:** replace Prettier. Oxfmt is the formatter referred to as “oxformatter”.
+## Runtime and package manager
 
-## Secrets
+Node.js must be >=22.19.0; `.node-version` selects 24.19.0. The package-manager pin
+is pnpm 9.4.0. The host's inherited pnpm launcher failed during verification;
+checks invoked an existing pinned CLI directly. This is not a global launcher repair.
 
-Move secrets from Infisical to Cloudflare.
+## Retained tools
 
-## Reproducible migration commands
+- TypeScript remains on the resolved 5.3.3 compiler.
+- ESLint and Prettier remain the linter and formatter. No replacement is selected.
+- Turborepo remains on the retained 2.x dependency line.
+- Vitest remains in the existing workspaces. Protocol-package peer compatibility
+  uses its separately pinned version; it is not a repository-wide runner upgrade.
 
-The following is the target command contract for the approved CI setup; it is not a claim that every script already exists in the capstone checkout.
+Broader tooling modernization is deferred. There is no current mandate to install
+the latest package-manager, monorepo, compiler, linter, or formatter release.
 
-* **pnpm install --frozen-lockfile:** CI installation using the committed lockfile and pinned package-manager version.
-* **pnpm lint:** Oxlint checks.
-* **pnpm format:check:** Oxfmt checks without modifying files.
-* **pnpm typecheck:** TypeScript checks across affected packages.
-* **pnpm test:run:** non-interactive Vitest tests.
-* **pnpm test:e2e:** Playwright critical browser journeys.
-* **pnpm build:** application/package builds through Turborepo.
-  The current root already defines dev, build, lint, and database scripts; migration adds or updates the checks above and removes their old Next/ESLint/Infisical assumptions.
+## Commands and verification
 
-## Local and deployed environments
+`pnpm build` and `pnpm lint` retain their existing application behavior; the current
+web lint task still invokes `next lint`. Root format/type/test gate scripts have
+not been added. Do not describe target commands as implemented CI gates.
 
-Cloudflare holds deployed secrets. Local development uses private local environment files and local bindings, without production-secret exports into web build files. Server-only credentials do not enter browser environment exports.
-Current scripts pull Infisical values into web and backend files, run a local LiveKit server, and use PartyKit/Next-on-Pages commands. Those scripts belong to the migration rather than the final setup.
+`pnpm --filter backend build` compiles the production Worker through Wrangler's
+dry run. `pnpm --filter backend test:foundation` builds and runs the retained
+compatibility fixture, import-boundary checks and local Worker/D1 checks. These do not deploy or validate all product journeys.
+The evidence records explicit backend, protocol, and shared-data type commands.
 
-## Database and runtime configuration
+Worker tooling is isolated in `config/workers`: Wrangler 4.148.0 uses Workers v5
+types, while backend/shared code uses the compatible v4 types. The retained web
+adapter keeps Wrangler 3.50.0 until its separately scoped migration.
 
-D1/Drizzle migration generation and application remain explicit operations. PartyServer namespaces, D1, and R2 are backend bindings. The selected toolchain versions and runtime configuration must be committed together with the lockfile when the migration is implemented.
+## Configuration and secrets
 
-## Verified current scripts
+Local development uses ignored environment files and explicit local bindings.
+Deployed secrets are managed with the hosting provider. Secret-export CLI
+integration and its workspace configuration have been removed at the owner's
+instruction. Deployment scripts do not export production secrets or overwrite
+local files, and the backend script does not forward local values with `--with-vars`.
 
-[package.json](<https://github.com/AMR-21/Wodge/blob/d875c2d369f2bed15ba4e7257242131fddcbfa0a/package.json>)
-[apps/web/package.json](<https://github.com/AMR-21/Wodge/blob/d875c2d369f2bed15ba4e7257242131fddcbfa0a/apps/web/package.json>)
-[apps/backend/package.json](<https://github.com/AMR-21/Wodge/blob/d875c2d369f2bed15ba4e7257242131fddcbfa0a/apps/backend/package.json>)
-[turbo.json](<https://github.com/AMR-21/Wodge/blob/d875c2d369f2bed15ba4e7257242131fddcbfa0a/turbo.json>)
-
-## Stack
-
-[Tech Stack](../architecture/tech-stack.md)
-
-## References
-
-* [pnpm](<https://pnpm.io/>)
-* [Turborepo](<https://turborepo.com/docs>)
-* [TypeScript 7](<https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/>)
-* [Oxlint](<https://oxc.rs/docs/guide/usage/linter>)
-* [Oxfmt](<https://oxc.rs/docs/guide/usage/formatter/quickstart>)
-
-## Source and revision
-
-- Migrated from [Development Tooling](https://linear.app/amr21/document/development-tooling-1d556cdf4aee), document ID `01acfd7d-38ed-4651-a27a-9fee46918cf9`.
-- Source revision: 2026-10-06T23:57:41.788Z; source author: Amr Yasser; last editor: Amr Yasser.
-- Repository migration revision: `migration-draft-1`, 2026-10-09. The user confirmed preparation and placement in this chat. Approval of this rewritten repository revision and remote canonical-link cutover is pending.
-- Existing decision/approval statements are source evidence, not new approvals or proof of implementation.
+Database generation and migrations are explicit operations. See the checked-in
+[root scripts](../../package.json), [web scripts](../../apps/web/package.json),
+[backend scripts](../../apps/backend/package.json), and [local setup](setup.md).

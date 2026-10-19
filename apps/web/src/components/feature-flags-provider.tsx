@@ -5,15 +5,17 @@ import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import {
-  closedFlags,
-  createFlagReader,
-  disabledFeature,
   Feature,
   FeatureFlags,
   FLAG_REFRESH_MS,
   FLAG_REQUEST_TIMEOUT_MS,
-} from "@repo/data/feature-flags";
-import { pageFeatures } from "@repo/data/feature-policy";
+} from "@wodge/domain/features/models";
+import {
+  closedFlags,
+  createFlagReader,
+  disabledFeature,
+} from "@wodge/core/features/flags";
+import { pageFeatures } from "@wodge/core/features/policy";
 
 const FeatureFlagsContext = createContext<FeatureFlags>(closedFlags());
 

@@ -1,8 +1,8 @@
 "use client";
 
-import { useCurrentThreadRep } from "@/hooks/use-thread-rep";
+import { useCurrentThreadRep } from "@/features/discussions/hooks/use-thread-rep";
 
-import { QAPage } from "../../qa-page";
+import { QAPage } from "../../../../../../../../../features/discussions/components/qa-page";
 
 function ChannelPage() {
   const rep = useCurrentThreadRep();

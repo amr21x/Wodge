@@ -1,31 +1,36 @@
----
-description: "Find your way from local setup to verified delivery."
-icon: code
-layout:
-  width: default
-  description:
-    visible: true
-  tableOfContents:
-    visible: true
-  outline:
-    visible: false
-  pagination:
-    visible: true
----
+# Develop Wodge
 
-# Development
+[Docs home](../README.md)
 
-Use the setup guide, engineering policies, and testing strategy to understand how work moves through the repository and Linear.
+Begin with local setup and the recorded baseline. Use the engineering references to understand the system before changing it; use Linear for executable work and delivery state.
 
-<table data-view="cards">
-  <thead><tr><th width="48"></th><th></th><th></th><th data-hidden data-card-target data-type="content-ref"></th></tr></thead>
-  <tbody>
-    <tr><td><i class="fa-terminal"></i></td><td><strong>Local setup and current commands</strong></td><td>Local setup and current commands, separated from revival targets.</td><td><a href="setup.md">Local setup and current commands</a></td></tr>
-    <tr><td><i class="fa-clipboard-check"></i></td><td><strong>Engineering policy</strong></td><td>Engineering expectations, ownership, and validation policy.</td><td><a href="engineering-policy.md">Engineering policy</a></td></tr>
-    <tr><td><i class="fa-screwdriver-wrench"></i></td><td><strong>Development Tooling</strong></td><td>Development tools and the approved tooling direction.</td><td><a href="tooling.md">Development Tooling</a></td></tr>
-    <tr><td><i class="fa-folder-tree"></i></td><td><strong>Code Structure &amp; Design</strong></td><td>Package boundaries, dependency direction, and code organization.</td><td><a href="code-structure.md">Code Structure &amp; Design</a></td></tr>
-    <tr><td><i class="fa-code-branch"></i></td><td><strong>Development and delivery workflow</strong></td><td>The delivery workflow, approvals, and execution tracking.</td><td><a href="workflow.md">Development and delivery workflow</a></td></tr>
-    <tr><td><i class="fa-flask"></i></td><td><strong>Testing Strategy</strong></td><td>Testing strategy and evidence needed to validate the revival.</td><td><a href="testing-strategy.md">Testing Strategy</a></td></tr>
-    <tr><td><i class="fa-book-open"></i></td><td><strong>Documentation ownership, coverage and open questions</strong></td><td>Documentation ownership, engineering coverage, and unresolved questions.</td><td><a href="documentation.md">Documentation ownership, coverage and open questions</a></td></tr>
-  </tbody>
-</table>
+| Read                                                | What you will find                                                |
+| --------------------------------------------------- | ----------------------------------------------------------------- |
+| [Local setup and current commands](setup.md)        | Local setup and current commands, separated from revival targets. |
+| [Engineering policy](engineering-policy.md)         | Engineering expectations, ownership, and validation policy.       |
+| [Development Tooling](tooling.md)                   | Development tools and the approved tooling direction.             |
+| [Code Structure & Design](code-structure.md)        | Package boundaries, dependency direction, and code organization.  |
+| [Development and delivery workflow](workflow.md)    | The delivery workflow, approvals, and execution tracking.         |
+| [Testing Strategy](testing-strategy.md)             | Testing strategy and evidence needed to validate the revival.     |
+| [Documentation workflow](documentation-workflow.md) | How to read, edit, review, and maintain the repository docs.      |
+
+## Understand the system
+
+- [Architecture](../architecture/README.md) — runtime boundaries, stack, domain/data models, and security.
+- [Shared design](../design/README.md) — navigation, UX principles, and interaction patterns.
+- [Feature specifications and designs](../README.md#features) — intended behavior and acceptance criteria.
+- [Decisions](../decisions/README.md) — reasoning and significant engineering choices.
+- [Baseline and known failures](baseline.md), [failure inventory](failure-inventory.md), and [smoke-test matrix](smoke-test-matrix.md) — recorded evidence and checks.
+- [Operate Wodge](../operations/README.md) — deployment and operational guidance.
+
+## Evidence and history
+
+- [Security evidence](security-evidence.md) — recorded security findings and verification limits.
+- [Documentation migration history](documentation-history.md) — source provenance, approvals, coverage, and earlier integration inspections.
+
+## Current scope and foundation
+
+- [Project scope and authority](documentation.md) — the current portfolio milestone and approval boundary.
+- [Backend foundation](backend-foundation.md) — implementation observations and validation limits.
+
+- [Hosted generation removal](hosted-generation-removal.md) — total removal and local verification limits.

@@ -1,0 +1,26 @@
+import BlockEditor from "@/features/editor/block-editor/block-editor";
+import { useYDoc } from "@/features/pages/hooks/use-y-doc";
+import type { UserType } from "@wodge/domain/user/models";
+
+export function PageEditor({
+  channelId,
+  folderId,
+  workspaceId,
+  teamId,
+  user,
+}: {
+  channelId: string;
+  folderId: string;
+  workspaceId: string;
+  teamId: string;
+  user: UserType;
+}) {
+  const { provider } = useYDoc({
+    channelId,
+    folderId,
+    teamId,
+    workspaceId,
+  });
+
+  return <BlockEditor ydoc={provider.doc} provider={provider} user={user} />;
+}

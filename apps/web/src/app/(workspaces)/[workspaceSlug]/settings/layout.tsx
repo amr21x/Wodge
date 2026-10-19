@@ -1,11 +1,11 @@
 "use client";
 
-import { SettingsContent } from "@/app/(workspaces)/[workspaceSlug]/settings/settings";
-import { SettingsSidebar } from "@/app/(workspaces)/[workspaceSlug]/settings/settings-sidebar";
-import { isAdmin, isOwner } from "@repo/data";
+import { SettingsContent } from "@/features/workspace/settings/settings";
+import { SettingsSidebar } from "@/features/workspace/settings/settings-sidebar";
+import { isAdmin, isOwner } from "@wodge/auth/authorization/access";
 import { Sheet } from "@/components/ui/sheet";
-import { useCurrentUser } from "@/hooks/use-current-user";
-import { useCurrentWorkspace } from "@/components/workspace-provider";
+import { useCurrentUser } from "@/features/account/hooks/use-current-user";
+import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 

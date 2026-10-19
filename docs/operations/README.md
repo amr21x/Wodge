@@ -1,31 +1,26 @@
----
-description: "Understand the environments and release responsibilities."
-icon: server
-layout:
-  width: default
-  description:
-    visible: true
-  tableOfContents:
-    visible: true
-  outline:
-    visible: false
-  pagination:
-    visible: true
----
+# Operate Wodge
 
-# Operations
+[Docs home](../README.md)
 
-Explore runtime topology, deployment gates, rollout coordination, observability, and maintenance expectations.
+Use the existing environment and release guidance to prepare operational work. These pages describe procedures and readiness requirements; they do not establish that a live revival deployment exists.
 
-<table data-view="cards">
-  <thead><tr><th width="48"></th><th></th><th></th><th data-hidden data-card-target data-type="content-ref"></th></tr></thead>
-  <tbody>
-    <tr><td><i class="fa-server"></i></td><td><strong>Environments and runtime topology</strong></td><td>Environment responsibilities and runtime topology.</td><td><a href="environments.md">Environments and runtime topology</a></td></tr>
-    <tr><td><i class="fa-code-branch"></i></td><td><strong>CI/CD and deployment gates</strong></td><td>Recorded pipeline behavior, approved gates, and gaps in enforcement.</td><td><a href="ci-cd.md">CI/CD and deployment gates</a></td></tr>
-    <tr><td><i class="fa-flag-checkered"></i></td><td><strong>Release policy</strong></td><td>Release readiness, approval evidence, and rollback expectations.</td><td><a href="release-policy.md">Release policy</a></td></tr>
-    <tr><td><i class="fa-list-check"></i></td><td><strong>Revival deployment coordination</strong></td><td>Additional deployment coordination for the revival.</td><td><a href="runbooks/revival-deployment.md">Revival deployment coordination</a></td></tr>
-    <tr><td><i class="fa-chart-line"></i></td><td><strong>Observability</strong></td><td>Operational visibility, diagnostics, and observability gaps.</td><td><a href="observability.md">Observability</a></td></tr>
-    <tr><td><i class="fa-screwdriver-wrench"></i></td><td><strong>Maintenance and feedback</strong></td><td>Maintenance expectations and the feedback process.</td><td><a href="maintenance.md">Maintenance and feedback</a></td></tr>
-    <tr><td><i class="fa-toggle-on"></i></td><td><strong>Feature flags</strong></td><td>Capability coverage, database edits, propagation, and recovery.</td><td><a href="runbooks/feature-flags.md">Feature flags</a></td></tr>
-  </tbody>
-</table>
+| Read                                                              | What you will find                                                   |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------- |
+| [Environments and runtime topology](environments.md)              | Environment responsibilities and runtime topology.                   |
+| [CI/CD and deployment gates](ci-cd.md)                            | Recorded pipeline behavior, approved gates, and gaps in enforcement. |
+| [Release policy](release-policy.md)                               | Release readiness, approval evidence, and rollback expectations.     |
+| [Revival deployment coordination](runbooks/revival-deployment.md) | Additional deployment coordination for the revival.                  |
+| [Observability](observability.md)                                 | Operational visibility, diagnostics, and observability gaps.         |
+| [Maintenance and feedback](maintenance.md)                        | Maintenance expectations and the feedback process.                   |
+
+## Troubleshoot and verify
+
+- [Observability](observability.md) — diagnostics and visibility.
+- [Failure inventory](../development/failure-inventory.md) — failure boundaries and current error contracts.
+- [Smoke-test matrix](../development/smoke-test-matrix.md) — checks for retained journeys and recovery.
+- [Local setup](../development/setup.md) — reproduce the application environment.
+- [Execution project](https://linear.app/amr21/project/wodge-revival-and-enhancements-ee86a6345a5d) — operational delivery work.
+
+Follow the applicable approval gates before provisioning, deployment, recovery, or other production actions.
+
+- [Database-controlled feature flags](runbooks/feature-flags.md) — capability coverage, propagation, and recovery.

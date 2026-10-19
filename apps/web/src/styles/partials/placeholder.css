@@ -1,7 +1,7 @@
 .ProseMirror {
   /* Placeholder Styles */
   .is-empty::before {
-    @apply text-black/40 dark:text-white/40 float-left h-0 pointer-events-none w-full;
+    @apply pointer-events-none float-left h-0 w-full text-black/40 dark:text-white/40;
   }
 
   &.ProseMirror-focused {
@@ -10,7 +10,9 @@
       content: attr(data-placeholder);
     }
 
-    > [data-type='columns'] > [data-type='column'] > p.is-empty.has-focus::before {
+    > [data-type="columns"]
+      > [data-type="column"]
+      > p.is-empty.has-focus::before {
       content: attr(data-placeholder);
     }
   }
@@ -22,11 +24,11 @@
 
   /* Blockquote Placeholder */
   blockquote .is-empty:not(.is-editor-empty):first-child:last-child::before {
-    content: 'Enter a quote';
+    content: "Enter a quote";
   }
 
   blockquote + figcaption.is-empty:not(.is-editor-empty)::before {
-    content: 'Author';
+    content: "Author";
   }
 
   [data-placeholder][data-suggestion]::before,

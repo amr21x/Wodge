@@ -8,7 +8,7 @@ Read the [repository documentation and feature index](docs/README.md) for the re
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Replicache](https://img.shields.io/badge/Replicache-local--first-6E56CF)](https://replicache.dev/)
 [![PartyKit](https://img.shields.io/badge/PartyKit-realtime-FF5D01)](https://www.partykit.io/)
-[![Supabase](https://img.shields.io/badge/Supabase-auth-3FCF8E?logo=supabase&logoColor=white)](https://supabase.com/)
+[![Better Auth](https://img.shields.io/badge/Better_Auth-auth-black)](https://better-auth.com/)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
 
 [![Watch the Wodge walkthrough](https://img.youtube.com/vi/IBZvqOu6Xro/maxresdefault.jpg)](https://youtu.be/IBZvqOu6Xro)
@@ -19,12 +19,12 @@ Read the [repository documentation and feature index](docs/README.md) for the re
 
 Wodge is a collaborative workspace that brings structured team communication, real-time rooms, shared knowledge, and task management into one product. It was built as a five-member engineering capstone and received an **A+ evaluation**.
 
-The project explores a local-first architecture in which users can interact with workspace data through responsive local state while synchronization is coordinated through Replicache and PartyKit services. Collaborative documents use Yjs/CRDT-based editing, and live audio/video rooms are powered by LiveKit.
+The project explores a local-first architecture in which users can interact with workspace data through responsive local state while synchronization is coordinated through Replicache and PartyServer Durable Objects. Collaborative documents use Yjs/CRDT-based editing, and live audio/video rooms are powered by LiveKit.
 
 ## Highlights
 
 - **Local-first synchronization** using Replicache with separate synchronized models for workspaces, pages, threads, rooms, and users.
-- **Real-time collaboration** through PartyKit services and presence-aware workspace flows.
+- **Real-time collaboration** through PartyServer Durable Objects and presence-aware workspace flows.
 - **Collaborative documents** built with Tiptap and Yjs/CRDTs.
 - **Team communication** through channels, threaded posts, comments, chat, polls, and audio/video rooms.
 - **Embedded task management** with assignees, priorities, table views, and Kanban-style organization.
@@ -62,10 +62,10 @@ The project explores a local-first architecture in which users can interact with
 ```mermaid
 flowchart LR
     U[Browser] --> W[Next.js web application]
-    W --> A[Supabase authentication]
+    W --> A[Better Auth authentication]
 
     W --> R[Replicache clients]
-    R <--> P[PartyKit real-time services]
+    R <--> P[PartyServer Durable Objects]
     P --> E[Workspace, page, thread, room, and user state]
 
     W <--> Y[Tiptap + Yjs collaborative editor]
@@ -74,27 +74,27 @@ flowchart LR
     W <--> L[LiveKit audio and video]
     W --> D[Drizzle data layer]
     D --> S[(SQLite / Cloudflare D1)]
-    D --> PG[(PostgreSQL / Supabase)]
+    D --> D1[(Cloudflare D1)]
 ```
 
 ### Synchronization model
 
-Wodge separates synchronized state by domain rather than treating the whole product as one global document. Workspace structure, threads, pages, rooms, and user state each have their own models and mutation flows. Replicache handles local-first reads and mutations, while PartyKit coordinates real-time synchronization and presence. Yjs is used specifically for collaborative rich-text editing.
+Wodge separates synchronized state by domain rather than treating the whole product as one global document. Workspace structure, threads, pages, rooms, and user state each have their own models and mutation flows. Replicache handles local-first reads and mutations, while PartyServer coordinates real-time synchronization and presence. Yjs is used specifically for collaborative rich-text editing.
 
 ## Technology
 
-| Area | Technologies |
-| --- | --- |
-| Web application | Next.js, React, TypeScript, Tailwind CSS, Radix UI |
-| Local-first data | Replicache, shared mutation models, Zod validation |
-| Real-time backend | PartyKit, WebSockets, presence-aware services |
-| Collaborative editing | Tiptap, Yjs, y-partykit |
-| Audio and video | LiveKit |
-| Data layer | Drizzle ORM, SQLite/Cloudflare D1, PostgreSQL/Supabase |
-| Authentication | Supabase Auth |
-| State and data fetching | TanStack Query, Zustand, Jotai, Immer |
-| Tooling | Turborepo, pnpm, Vitest, ESLint, Prettier, Wrangler |
-| Deployment | Cloudflare Pages, PartyKit, GitHub Actions |
+| Area                    | Technologies                                              |
+| ----------------------- | --------------------------------------------------------- |
+| Web application         | Next.js, React, TypeScript, Tailwind CSS, Radix UI        |
+| Local-first data        | Replicache, shared mutation models, Zod validation        |
+| Real-time backend       | PartyServer, WebSockets, presence-aware services          |
+| Collaborative editing   | Tiptap, Yjs, y-partykit                                   |
+| Audio and video         | LiveKit                                                   |
+| Data layer              | Drizzle ORM, SQLite/Cloudflare D1                         |
+| Authentication          | Better Auth                                               |
+| State and data fetching | TanStack Query, Zustand, Jotai, Immer                     |
+| Tooling                 | Turborepo, pnpm, Vitest, ESLint, Prettier, Wrangler       |
+| Deployment              | Cloudflare Pages, Workers/Durable Objects, GitHub Actions |
 
 ## Repository Structure
 
@@ -102,7 +102,7 @@ Wodge separates synchronized state by domain rather than treating the whole prod
 .
 ├── apps/
 │   ├── web/          # Next.js application, UI, routes, editor, and API handlers
-│   └── backend/      # PartyKit services for workspace, room, thread, page, and user sync
+│   └── backend/      # PartyServer Durable Objects for workspace, room, thread, page, and user sync
 ├── packages/
 │   ├── data/         # Shared schemas, models, mutations, keys, and database utilities
 │   ├── env/          # Shared environment configuration
@@ -115,7 +115,7 @@ Wodge separates synchronized state by domain rather than treating the whole prod
 
 ### Prerequisites
 
-- Node.js 18 or newer
+- Node.js 22.19 or newer (`.node-version` selects 24.19.0)
 - pnpm 9
 - A Linux-based development environment is recommended
 - LiveKit Server for local audio/video development
@@ -133,10 +133,16 @@ Create the application environment files:
 
 ```bash
 cp .env.example apps/web/.env.local
-cp .env.example apps/backend/.env
+cp apps/backend/.dev.vars.example apps/backend/.dev.vars
 ```
 
-Fill the required values in both files. The repository contains integrations that are not required for every local workflow, so only configure the services you intend to run.
+Backend owns the D1 binding in `apps/backend/wrangler.jsonc`. Web has public
+configuration only; backend secrets live in its ignored `.dev.vars` file. Better
+Auth supports email OTP, Google and GitHub. The web dev server forwards API calls
+to the backend Worker. See [backend setup](apps/backend/README.md).
+
+Production uses manually triggered Wrangler deployment. Namespace/data cutover,
+provider credentials and web-origin routing must be configured before deployment.
 
 Initialize the local application state and database:
 
@@ -172,14 +178,14 @@ pnpm lint            # Run linting across the monorepo
 pnpm generate        # Generate database artifacts
 pnpm migrate:local   # Apply local database migrations
 pnpm studio          # Open the database studio
-pnpm reset:app       # Reset local generated PartyKit/Wrangler state
+pnpm reset:app       # Reset local generated Wrangler state
 ```
 
 ## Project Status
 
-The public repository contains the capstone version of Wodge and is suitable for architecture review and local exploration. The codebase includes deployment automation for Cloudflare Pages and PartyKit, but a complete turnkey self-hosting guide is still being consolidated.
+The public repository contains the capstone version of Wodge and is suitable for architecture review and local exploration. The codebase includes deployment automation for Cloudflare Pages and Workers, but a complete turnkey self-hosting guide is still being consolidated.
 
-Some integrations require third-party credentials, including Supabase, LiveKit, Cloudflare, and other optional services represented in `.env.example`.
+Some integrations require third-party credentials, including Better Auth OAuth providers, Resend, LiveKit, Cloudflare, and other optional services represented in `.env.example`.
 
 ## Team and Contribution
 

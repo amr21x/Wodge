@@ -1,18 +1,18 @@
 "use client";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useChannelPath } from "@/hooks/use-channel-path";
-import { useCurrentResources } from "@/hooks/use-current-resources";
-import { useCurrentWorkspace } from "@/components/workspace-provider";
+import { useChannelPath } from "@/features/workspace/hooks/use-channel-path";
+import { useCurrentResources } from "@/features/workspace/hooks/use-current-resources";
+import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
 
-import { AdvancedUploadButton } from "@/app/(workspaces)/[workspaceSlug]/(workspace)/resources/advanced-upload";
+import { AdvancedUploadButton } from "@/features/files/components/advanced-upload";
 
 import { useRouter } from "next/navigation";
-import { FoldersBreadcrumbs } from "@/app/(workspaces)/[workspaceSlug]/(workspace)/resources/folders-breadcrumbs";
-import { useUpdateRecentlyVisited } from "@/hooks/use-recently-visited";
-import { useIsTeamModerator } from "@/hooks/use-is-team-moderator";
-import { Folders } from "./folders";
-import { Files } from "./files";
+import { FoldersBreadcrumbs } from "@/features/files/components/folders-breadcrumbs";
+import { useUpdateRecentlyVisited } from "@/features/workspace/hooks/use-recently-visited";
+import { useIsTeamModerator } from "@/features/workspace/hooks/use-is-team-moderator";
+import { Folders } from "../../../../../../../features/files/components/folders";
+import { Files } from "../../../../../../../features/files/components/files";
 
 function TeamResourcePage({
   params: { path },
@@ -33,7 +33,9 @@ function TeamResourcePage({
 
   const isTeamModerator = useIsTeamModerator();
 
-  if (!workspaceId) return null;
+  if (!workspaceId) {
+    return null;
+  }
 
   // if ((files?.length === 0 || dirs?.length === 0) && path?.length > 0) {
   //   router.back();

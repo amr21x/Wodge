@@ -1,32 +1,15 @@
----
-description: "Design system direction, visual foundations, and shared components."
-icon: palette
----
+# Retained design system
 
-# Design System
+[Docs home](../README.md) · [Design](README.md)
 
-## Visual direction
+The current portfolio milestone preserves the existing frontend UI, Tailwind CSS 3,
+Radix components, and editor integrations. Necessary React/runtime compatibility
+work must preserve that behavior. See the [current project scope](../development/documentation.md).
 
-The existing Wodge visual direction remains the basis of the revival. Usability changes accompany the migration; a full visual redesign has not been selected.
+A visual redesign, replacement component primitives, or a styling-system major
+upgrade is not selected here. Broader UI modernization is deferred and requires
+its own reviewed scope.
 
-## Component foundation
-
-The confirmed UI foundation is React 19, Tailwind CSS 4, and shadcn/ui using Base UI.
-
-## Required interaction behavior
-
-Controls expose accessible names, keyboard paths, and current state. Forms and actions provide success/error feedback. Status, role, priority, presence, and usage information use text alongside visual cues. Task movement supports keyboard interaction alongside drag controls.
-
-## Existing feature designs
-
-Feature UX defines the actual journeys and required states. The technology migration preserves those behaviors.
-[UX Principles](ux-principles.md)
-[Shared Patterns](shared-patterns.md)
-[Tech Stack](../architecture/tech-stack.md)
-
-## Source and revision
-
-- Migrated from [Design System](https://linear.app/amr21/document/design-system-616dad8f1759), document ID `69082b9b-ef8b-46fb-94fd-2318f37118a2`.
-- Source revision: 2026-10-06T23:58:12.310Z; source author: Amr Yasser; last editor: Amr Yasser.
-- Repository migration revision: `migration-draft-1`, 2026-10-09. The user confirmed preparation and placement in this chat. Approval of this rewritten repository revision and remote canonical-link cutover is pending.
-- Existing decision/approval statements are source evidence, not new approvals or proof of implementation.
+Use the existing components and visual conventions for current changes. Record
+actual browser/accessibility validation instead of carrying forward approval or
+completion claims from unrelated source documents.

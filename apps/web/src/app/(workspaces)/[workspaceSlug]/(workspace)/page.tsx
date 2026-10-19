@@ -1,7 +1,7 @@
 "use client";
 
-import { useCurrentUser } from "@/hooks/use-current-user";
-import { RecentCarousel } from "./recent-carousel";
+import { useCurrentUser } from "@/features/account/hooks/use-current-user";
+import { RecentCarousel } from "../../../../features/workspace/components/recent-carousel";
 
 function HomePage() {
   const { user } = useCurrentUser();

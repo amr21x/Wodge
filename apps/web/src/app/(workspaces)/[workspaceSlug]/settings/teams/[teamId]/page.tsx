@@ -1,7 +1,7 @@
 "use client";
 
-import { TeamSettings } from "@/app/(workspaces)/[workspaceSlug]/settings/teams/team-settings";
-import { useCurrentWorkspace } from "@/components/workspace-provider";
+import { TeamSettings } from "@/features/workspace/settings/teams/team-settings";
+import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
 import { useMemo } from "react";
 
 function TeamSettingsPage({
@@ -16,7 +16,9 @@ function TeamSettingsPage({
     [teamId, structure.teams],
   );
 
-  if (!team) return <p>Team not found</p>;
+  if (!team) {
+    return <p>Team not found</p>;
+  }
 
   return <TeamSettings team={team} />;
 }

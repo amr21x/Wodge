@@ -1,13 +1,13 @@
+import {
+  FLAG_MAX_STALE_MS,
+  FLAG_REFRESH_MS,
+} from "@wodge/domain/features/models";
 import React from "react";
 import { afterEach, expect, it, vi } from "vitest";
 import { createRoot, Root } from "react-dom/client";
 import { act } from "react-dom/test-utils";
 import { createRequire } from "node:module";
-import {
-  FLAG_MAX_STALE_MS,
-  FLAG_REFRESH_MS,
-  resolveFlags,
-} from "../../packages/data/feature-flags";
+import { resolveFlags } from "@wodge/core/features/flags";
 import {
   FeatureFlagsProvider,
   FeatureGate,
@@ -15,7 +15,7 @@ import {
 } from "../../apps/web/src/components/feature-flags-provider";
 
 const { JSDOM } = createRequire(
-  new URL("../../packages/data/package.json", import.meta.url),
+  new URL("../../apps/backend/package.json", import.meta.url),
 )("jsdom");
 const { PathnameContext } = createRequire(
   new URL("../../apps/web/package.json", import.meta.url),

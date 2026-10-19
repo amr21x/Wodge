@@ -1,19 +1,24 @@
-import type * as Party from "partykit/server";
+import "reflect-metadata";
+import { backendApplication } from "./di/runtime";
+import type { WorkerEnvironment } from "./types/worker-environment";
 
-export default class Server implements Party.Server {
-  constructor(readonly room: Party.Room) {}
+// Wrangler discovers Durable Object classes through these entry-point exports.
+export { default as UserServer } from "./servers/user";
+export { default as WorkspaceServer } from "./servers/workspace";
+export { default as RoomServer } from "./servers/room";
+export { default as ThreadServer } from "./servers/thread";
+export { default as PageServer } from "./servers/page";
 
-  onConnect(connection: Party.Connection) {}
-
-  static async onFetch(
-    req: Party.Request,
-    lobby: Party.FetchLobby,
-    ctx: Party.ExecutionContext
+export default {
+  fetch(
+    request: Request,
+    environment: WorkerEnvironment,
+    context?: ExecutionContext,
   ) {
-    return new Response("Hello, from Wodge " + lobby.env.APP_DOMAIN, {
-      status: 200,
-    });
-  }
-}
-
-Server satisfies Party.Worker;
+    return backendApplication(environment).router.fetch(
+      request,
+      environment,
+      context,
+    );
+  },
+};

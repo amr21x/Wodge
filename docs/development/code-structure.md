@@ -1,64 +1,122 @@
----
-description: "Package boundaries, dependency direction, and code organization."
-icon: folder-tree
----
+# Code structure and purpose
 
-# Code Structure & Design
+[Docs home](../README.md) · [Backend review path](backend-review-handoff.md)
 
-Detailed folder organization, code patterns, and coding rules are deferred to implementation by project-owner decision. The existing content records the established architecture boundaries and general guidance; it does not settle the deferred conventions. The project owner will author `AGENTS.md`.
+The application runs as a Hono Worker and five PartyServer Durable Objects.
+Packages use the `@wodge` scope and expose their owning modules directly.
 
-## Separate applications
+```text
+apps/backend/src/
+  server.ts                     Worker fetch export and Durable Object class exports
+  application.ts                Hono middleware order, auth, webhooks and API mounts
+  container.ts                  one backend registration entrypoint
+  di/
+    register-services.ts        core/auth classes and their lifetimes
+    register-repositories.ts         persistence repository classes and their lifetimes
+    register-transport.ts       routes, handlers, gateways and sync adapters
+    register-providers.ts       technical integration classes
+    providers.ts                lazy database and Better Auth factories
+    adapters.ts                 capability tokens mapped to implementations
+    runtime.ts                  Worker cache and awaited object initialization
+  servers/                      Cloudflare lifecycle adapters; no containers
+  routes/                       method/path definitions; injected handler instances
+  handlers/                     validation, authorization and coordination
+  middleware/                   native Hono middleware factories
+  validators/                   transport schemas composed from domain schemas
+  gateways/                     calls to other objects through the HTTP client
+  lib/
+    sync/                       dispatch, acknowledgements, patches and validation
+    authorization/              invalidation delivery and retry coordination
+    helpers/                    request parsing and identity helpers
+  errors/                       global HTTP error mapping
+  types/                        Worker bindings, Hono contexts and request actors
 
-The web application and backend remain separate within the pnpm/Turborepo monorepo. TanStack Start provides the web app; shared product APIs reside in the backend so a possible future mobile client can use them.
+packages/core/src/
+  <feature>/
+    services/                   business operations and persistence coordination
+    repositories/                    pure database/object data access
+    mutations/                  pure transformations, including optimistic reuse
+    errors.ts                   application error factories where needed
+  errors.ts                     application error class
 
-## Product state
+packages/domain/src/
+  <feature>/
+    models.ts                   declarative business and stored record shapes
+    dto.ts                      operation inputs and response types
+    validation.ts               shared schemas
+    errors.ts                   error code types where needed
+  auth/schema/                  canonical identity and organization table schemas
+  sync/                         shared record/protocol definitions and keys
+  identifiers.ts                UUIDv7 defaults and legacy identifier validation
 
-Replicache handles structured local-first state. Yjs handles collaborative page text. Task table/Kanban views share one page-owned collection; the embedded block does not own that data.
+packages/auth/src/
+  server.ts                     Better Auth configuration
+  client.ts                     browser auth client
+  membership.ts                 identity and organization membership operations
+  tickets.ts                    session-bound connection tickets
+  tokens.ts                     signing and verification
+  authorization/                workspace policies, roles, grants and evaluation
 
-## Server integrations
+packages/infra/
+  database/                     Drizzle configuration
+  src/
+    database/                   database construction and types
+    durable-objects/            technical record storage and alarm contracts
+    http/                       general HTTP client; supports object stub transport
+    email/                      generic delivery integration
+    storage/                    object storage SDK
+    payments/                   payment SDK
+    calls/                      call token SDK
+```
 
-The backend uses PartyServer directly on Cloudflare Workers for realtime server behavior, with the required Yjs server addons. Better Auth and Cloudflare Calls are confirmed migration targets. MCP exposes permitted member actions rather than a hosted AI writer.
+Not every feature needs every file. Avoid empty modules, barrel files, re-export
+wrappers and generic dependency bags.
 
-## Existing-code revival
+## Dependency flow
 
-The migration starts from the existing codebase and approved behavior. The separate backend is a confirmed architectural constraint.
+Routes receive handlers; handlers receive services and transport integrations;
+services receive repositories; repositories receive configured database/storage instances.
+Handlers do not import repositories. Services do not call HTTP endpoints or Durable
+Object gateways. Infrastructure contains no feature repositories or business policies.
+Auth owns permission evaluation, while core repository modules persist policy records.
+Domain schemas may execute validation and identifier defaults; feature mutation
+implementations and access evaluation live in core and auth respectively.
 
-## Package responsibilities
+Cross-object workflows are coordinated in backend handlers. A gateway selects a
+Durable Object namespace/stub and sends a request through `HttpClient`. The
+`https://internal` hostname is synthetic; the stub selects the destination.
+`/parties/:namespace/:id/*` remains the PartyServer routing convention.
 
-* **apps/web:** TanStack Start routes, UI, browser state, editor/task views, and client integration with the separate backend.
-* **apps/backend:** Hono routes, verified actor context, authorization, PartyServer services, auth/MCP handlers, provider integration, and authoritative mutations.
-* **packages/data:** existing domain schemas, keys, shared mutation models, and data utilities, with browser-safe and server-only entry points kept distinct.
-* **packages/env:** public configuration separated from server environment/bindings and secrets.
-* **Shared TypeScript configuration:** remains in the existing monorepo configuration rather than being duplicated per feature.
-  These preserve existing monorepo responsibilities; the audit does not establish that every current import already respects them.
+## Injection and runtime lifetimes
 
-## Dependency direction
+All registrations live in the backend. `container.ts` calls the focused `di/`
+registration modules once. Classes use `@injectable()` and explicit constructor
+`@inject` tokens, without registering themselves. Registrations choose
+`ContainerScoped`; factories cache their result within the owning runtime.
 
-Shared domain/schema code cannot depend on web routes or Next.js request context. The separate backend cannot require a web server action to execute shared product behavior. Browser code cannot import database access or provider credentials.
-The current D1 factory imports Next-on-Pages, server model functions carry Next server-action directives, and shared data exports mix schemas, mutators, and client adapters. The migration removes framework coupling from the backend-consumed paths.
-[packages/data/lib/create-db.ts](<https://github.com/AMR-21/Wodge/blob/d875c2d369f2bed15ba4e7257242131fddcbfa0a/packages/data/lib/create-db.ts>)
-[packages/data/models/auth/auth.ts](<https://github.com/AMR-21/Wodge/blob/d875c2d369f2bed15ba4e7257242131fddcbfa0a/packages/data/models/auth/auth.ts>)
-[packages/data/index.ts](<https://github.com/AMR-21/Wodge/blob/d875c2d369f2bed15ba4e7257242131fddcbfa0a/packages/data/index.ts>)
+The Worker caches one application graph per environment object. Each Durable
+Object activation initializes one graph during awaited `onStart`. The DI startup
+boundary restores persisted records and supplies ready instances to the server.
+There are no per-request or per-alarm containers, and request callbacks do not
+resolve handlers. Identity, request headers and mutation revisions are explicit
+operation arguments or Hono context values.
 
-## Domain and state boundaries
+Cloudflare controls Durable Object construction, so its server classes cannot be
+constructed directly by TSyringe. This is why the single startup boundary exists.
+The required Worker class exports are runtime registration, not package barrels.
 
-User, workspace, page, thread, and room remain the existing synchronization domains. Team roles replace group/moderator assumptions in those domains. Task views share page-owned state; they do not maintain independent collections.
-Replicache manages structured local-first state. Yjs owns collaborative text. Transient UI state remains distinct from authoritative role, quota, and plan state.
+## Identity, authorization and persistence
 
-## Design rules
+Better Auth owns canonical D1 users, sessions, organizations and memberships.
+Workspace internals and resource authorization policies belong to the workspace
+Durable Object. Backend handlers coordinate identity writes and projection updates;
+public Better Auth mutations that bypass this coordination are restricted.
 
-The Software Engineering System applies SOLID pragmatically and requires reuse of existing logic. HTTP and MCP adapters invoke the same authorized product operations rather than duplicating permission semantics. Interfaces represent actual contracts or substitution boundaries; they are not added for every function.
-Failures remain explicit at the client boundary. Denied or failed mutations are not represented as successful persisted changes. Async writes, acknowledgement updates, quota checks, and reconnect recovery receive integration validation.
+Objects are SQLite-backed but currently persist KV records. Native Durable Object
+storage gates protect local storage operations; they do not create a transaction
+spanning D1, another object or an arbitrary asynchronous request. Full relational
+SQL migration and durable cross-store reconciliation remain follow-up work.
 
-## Related knowledge
-
-[Tech Stack](../architecture/tech-stack.md)
-[Architecture](../architecture/overview.md)
-[Pages & Embedded Tasks](../features/pages-embedded-tasks/spec.md)
-
-## Source and revision
-
-- Migrated from [Code Structure & Design](https://linear.app/amr21/document/code-structure-and-design-ce5526d17e55), document ID `38d2b1a4-e006-4c1b-bf02-64ef884b1912`.
-- Source revision: 2026-10-06T23:57:14.623Z; source author: Amr Yasser; last editor: Amr Yasser.
-- Repository migration revision: `migration-draft-1`, 2026-10-09. The user confirmed preparation and placement in this chat. Approval of this rewritten repository revision and remote canonical-link cutover is pending.
-- Existing decision/approval statements are source evidence, not new approvals or proof of implementation.
+Web contains presentation, browser authentication and optimistic sync adapters.
+It can reuse core pure mutation modules, but cannot import core services, repositories,
+DI, database clients or provider integrations. Browser bundling checks enforce this.

@@ -1,10 +1,10 @@
 "use client";
 
-import { RoomHeader } from "@/app/(workspaces)/[workspaceSlug]/(workspace)/room/room-header";
-import { useCurrentRoomRep } from "@/hooks/use-room-rep";
-import { useUpdateRecentlyVisited } from "@/hooks/use-recently-visited";
-import { MessageList } from "./message-list";
-import { MessageEditor } from "./message-editor";
+import { RoomHeader } from "@/features/rooms/components/room-header";
+import { useCurrentRoomRep } from "@/features/rooms/hooks/use-room-rep";
+import { useUpdateRecentlyVisited } from "@/features/workspace/hooks/use-recently-visited";
+import { MessageList } from "../../../../../../../features/rooms/components/message-list";
+import { MessageEditor } from "../../../../../../../features/rooms/components/message-editor";
 
 function ChannelPage() {
   useUpdateRecentlyVisited("room");

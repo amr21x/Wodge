@@ -1,17 +1,25 @@
 {
-  "name": "@repo/env",
+  "name": "@wodge/env",
   "version": "0.1.0",
   "private": true,
-  "main": "index.js",
-  "scripts": {},
+  "main": "./client.ts",
+  "scripts": {
+    "typecheck": "tsc --incremental false --pretty false"
+  },
   "dependencies": {
     "@t3-oss/env-nextjs": "^0.8.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@repo/ts": "workspace:*",
+    "@wodge/ts": "workspace:*",
     "@types/node": "^20.11.20",
     "eslint": "^8",
-    "typescript": "^5"
+    "typescript": "^5",
+    "@cloudflare/workers-types": "4.20260424.1"
+  },
+  "exports": {
+    ".": "./client.ts",
+    "./client": "./client.ts",
+    "./server": "./server.ts"
   }
 }

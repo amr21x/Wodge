@@ -1,34 +1,10 @@
----
-description: "Connect member-provided agents to permitted Wodge knowledge and tasks."
-icon: robot
-layout:
-  width: default
-  description:
-    visible: true
-  tableOfContents:
-    visible: true
-  outline:
-    visible: false
-  pagination:
-    visible: true
----
+# Member-controlled MCP
 
-# Agent Access
+[Docs home](../../README.md) · [Feature index](../../README.md#features)
 
-Start with the spec for behavior and acceptance criteria, then the design for journeys and interaction details. These documents retain their recorded status and evidence.
+The current increment covers permitted discovery, page reading, and task creation/update through member-controlled MCP. Requests must follow the acting member's access. Expanded agent actions are deferred. The dependency foundation selects the compatible auth/MCP packages; its checks do not establish an implemented agent connection flow.
 
-<table data-view="cards">
-  <thead><tr><th width="48"></th><th></th><th></th><th data-hidden data-card-target data-type="content-ref"></th></tr></thead>
-  <tbody>
-    <tr><td><i class="fa-list-check"></i></td><td><strong>Spec</strong></td><td>Behavior, scope, acceptance criteria, and approval evidence.</td><td><a href="spec.md">Spec</a></td></tr>
-    <tr><td><i class="fa-pen-ruler"></i></td><td><strong>Design</strong></td><td>User journeys, interaction states, and design constraints.</td><td><a href="design.md">Design</a></td></tr>
-    <tr><td><i class="fa-route"></i></td><td><strong>Delivery approach</strong></td><td>Sequencing, dependencies, and validation for delivery.</td><td><a href="plan.md">Delivery approach</a></td></tr>
-  </tbody>
-</table>
-
-## Delivery in Linear
-
-[Open the delivery project](https://linear.app/axxi-labs/project/wodge-agent-access-a097a3305099) for current status, ownership, dependencies and evidence.
-
-- [WDG-54 — Integrate official MCP/OAuth authorization and connection controls](https://linear.app/axxi-labs/issue/WDG-54/integrate-official-mcpoauth-authorization-and-connection-controls)
-- [WDG-161 — Verify MCP exclusions and access-loss enforcement](https://linear.app/axxi-labs/issue/WDG-161/verify-mcp-exclusions-and-access-loss-enforcement)
+- [Current feature scope](spec.md)
+- [Retained UI](design.md)
+- [Portfolio project scope](../../development/documentation.md)
+- [Recorded smoke checks](../../development/smoke-test-matrix.md)

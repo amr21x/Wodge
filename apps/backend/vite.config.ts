@@ -1,14 +1,21 @@
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      "cloudflare:workers": fileURLToPath(
+        new URL("./tests/helpers/cloudflare.ts", import.meta.url),
+      ),
+    },
+  },
   test: {
-    environment: "miniflare",
-    // Configuration is automatically loaded from `.env`, `package.json` and
-    // `wrangler.toml` files by default, but you can pass any additional Miniflare
-    // API options here:
-    environmentOptions: {
-      bindings: { KEY: "value" },
-      kvNamespaces: ["TEST_NAMESPACE"],
+    name: "backend",
+    setupFiles: ["./tests/helpers/setup.ts"],
+    environment: "node",
+    include: ["tests/**/*.test.ts"],
+    server: {
+      deps: { inline: ["partyserver", "y-partyserver", "hono-party"] },
     },
   },
 });

@@ -1,3 +1,4 @@
+import type { JoinPreviewDto } from "@wodge/domain/workspace/dto";
 import { SafeAvatar } from "@/components/safe-avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -6,12 +7,10 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { createClient } from "@/lib/supabase/server";
-import { invites, memberships, users, workspaces } from "@repo/data";
-import { createDb } from "@repo/data/server";
-import { and, eq } from "drizzle-orm";
-import { alias } from "drizzle-orm/sqlite-core";
-import { AcceptButton } from "./accept-button";
+import { cookies } from "next/headers";
+import { env } from "@wodge/env/client";
+
+import { AcceptButton } from "../../../../../features/workspace/components/accept-button";
 import { redirect } from "next/navigation";
 
 async function JoinWorkspacePage({
@@ -19,53 +18,48 @@ async function JoinWorkspacePage({
 }: {
   params: { token: string; workspaceSlug: string };
 }) {
-  const db = createDb();
+  const response = await fetch(
+    `${env.NEXT_PUBLIC_BACKEND_DOMAIN}/api/workspaces/preview/${encodeURIComponent(params.workspaceSlug)}/${encodeURIComponent(params.token)}`,
+    {
+      headers: { cookie: cookies().toString() },
+      cache: "no-store",
+    },
+  );
 
-  const supabase = createClient();
-  const userSession = await supabase.auth.getUser();
-
-  if (!userSession || !userSession?.data.user?.id)
+  if (response.status === 401) {
     return redirect(
-      `/login?redirect=/${params.workspaceSlug}/join/${params.token}`,
+      `/login?redirect=${encodeURIComponent(`/${params.workspaceSlug}/join/${params.token}`)}`,
     );
+  }
 
-  const [invitesArr, workspacesArr, membershipsArr] = await db.batch([
-    db
-      .select()
-      .from(invites)
-      .innerJoin(users, eq(users.id, invites.createdBy))
-      .where(eq(invites.token, params.token)),
-    db.select().from(workspaces).where(eq(workspaces.id, params.workspaceSlug)),
-    db
-      .select()
-      .from(memberships)
-      .where(
-        and(
-          eq(memberships.workspaceId, params.workspaceSlug),
-          eq(memberships.userId, userSession?.data.user?.id),
-        ),
-      ),
-  ]);
+  if (!response.ok) {
+    return <div>Unable to load invite</div>;
+  }
 
-  const [data] = invitesArr;
-  const [workspace] = workspacesArr;
-  const [membership] = membershipsArr;
+  const { data, workspace, membership } =
+    (await response.json()) as JoinPreviewDto;
 
-  if (!data || !workspace) return <div>Invalid invite</div>;
+  if (!data || !workspace) {
+    return <div>Invalid invite</div>;
+  }
 
   const { users: user, invites: invite } = data;
 
-  if (!workspace || !workspace.isInviteLinkEnabled)
+  if (!workspace || !workspace.isInviteLinkEnabled) {
     return <div>Invalid invite</div>;
+  }
 
-  if (workspace.id !== invite.workspaceId)
+  if (workspace.id !== invite.workspaceId) {
     return (
       <div className="flex h-full w-full items-center justify-center">
         Invalid invite
       </div>
     );
+  }
 
-  if (membership) return redirect(`/${workspace.slug}`);
+  if (membership) {
+    return redirect(`/${workspace.slug}`);
+  }
 
   return (
     <div className="flex h-full w-full items-center justify-center">

@@ -1,7 +1,7 @@
 "use client";
 
-import { GroupSettings } from "@/app/(workspaces)/[workspaceSlug]/settings/groups/group-settings";
-import { useCurrentWorkspace } from "@/components/workspace-provider";
+import { GroupSettings } from "@/features/workspace/settings/groups/group-settings";
+import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
 import { useMemo } from "react";
 
 function GroupSettingsPage({
@@ -16,7 +16,9 @@ function GroupSettingsPage({
     [groupId, structure.groups],
   );
 
-  if (!group) return <p>Team not found</p>;
+  if (!group) {
+    return <p>Team not found</p>;
+  }
 
   return <GroupSettings group={group} />;
 }

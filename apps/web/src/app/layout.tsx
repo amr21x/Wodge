@@ -15,7 +15,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Providers } from "@/components/providers";
 import { FeatureRouteGate } from "@/components/feature-flags-provider";
 import { Toaster } from "@/components/ui/toast";
-import { CallWindow } from "./(workspaces)/[workspaceSlug]/(workspace)/room/[teamId]/[channelId]/call-window";
+import { CallWindow } from "../features/rooms/components/call-window";
 
 /** Runtime = edge require in order to make next-auth works with cf-pages */
 export const runtime = "edge";

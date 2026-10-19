@@ -29,12 +29,23 @@ export function getValidNumber(
 
   if (!isNaN(numericValue)) {
     if (!loop) {
-      if (numericValue > max) numericValue = max;
-      if (numericValue < min) numericValue = min;
+      if (numericValue > max) {
+        numericValue = max;
+      }
+
+      if (numericValue < min) {
+        numericValue = min;
+      }
     } else {
-      if (numericValue > max) numericValue = min;
-      if (numericValue < min) numericValue = max;
+      if (numericValue > max) {
+        numericValue = min;
+      }
+
+      if (numericValue < min) {
+        numericValue = max;
+      }
     }
+
     return numericValue.toString().padStart(2, "0");
   }
 
@@ -42,17 +53,26 @@ export function getValidNumber(
 }
 
 export function getValidHour(value: string) {
-  if (isValidHour(value)) return value;
+  if (isValidHour(value)) {
+    return value;
+  }
+
   return getValidNumber(value, { max: 23 });
 }
 
 export function getValid12Hour(value: string) {
-  if (isValid12Hour(value)) return value;
+  if (isValid12Hour(value)) {
+    return value;
+  }
+
   return getValidNumber(value, { max: 12 });
 }
 
 export function getValidMinuteOrSecond(value: string) {
-  if (isValidMinuteOrSecond(value)) return value;
+  if (isValidMinuteOrSecond(value)) {
+    return value;
+  }
+
   return getValidNumber(value, { max: 59 });
 }
 
@@ -67,10 +87,13 @@ export function getValidArrowNumber(
   { min, max, step }: GetValidArrowNumberConfig,
 ) {
   let numericValue = parseInt(value, 10);
+
   if (!isNaN(numericValue)) {
     numericValue += step;
+
     return getValidNumber(String(numericValue), { min, max, loop: true });
   }
+
   return "00";
 }
 
@@ -84,19 +107,25 @@ export function getValidArrowMinuteOrSecond(value: string, step: number) {
 
 export function setMinutes(date: Date, value: string) {
   const minutes = getValidMinuteOrSecond(value);
+
   date.setMinutes(parseInt(minutes, 10));
+
   return date;
 }
 
 export function setSeconds(date: Date, value: string) {
   const seconds = getValidMinuteOrSecond(value);
+
   date.setSeconds(parseInt(seconds, 10));
+
   return date;
 }
 
 export function setHours(date: Date, value: string) {
   const hours = getValidHour(value);
+
   date.setHours(parseInt(hours, 10));
+
   return date;
 }
 

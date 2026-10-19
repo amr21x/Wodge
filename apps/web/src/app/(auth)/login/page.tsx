@@ -1,13 +1,10 @@
 "use client";
 
 import { Logo } from "@/components/logo";
-import { LoginWrapper } from "@/app/(auth)/login/login-wrapper";
+import { LoginWrapper } from "@/features/auth/components/login-wrapper";
 import { useEffect } from "react";
-import {
-  localStoragePersister,
-  queryClient,
-} from "@repo/data/lib/query-client";
-import { env } from "@repo/env";
+import { localStoragePersister, queryClient } from "@/client/query";
+import { env } from "@wodge/env/client";
 
 function LoginPage() {
   useEffect(() => {

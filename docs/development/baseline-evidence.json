@@ -1,0 +1,451 @@
+{
+  "recorded_date": "2026-10-16",
+  "reviewed_revision": "3f7c59372334db7fc20d87f4964964bf16759421",
+  "branch": "dev",
+  "host_default_node": "24.19.0",
+  "execution_node": "20.20.2",
+  "pinned_pnpm": "9.4.0",
+  "existing_dependency_versions": {
+    "typescript": "5.3.3",
+    "vitest": "1.5.0",
+    "next": "14.1.0",
+    "tiptap_core": "2.27.3"
+  },
+  "locked_tiptap_core": "2.3.0",
+  "provider_credentials_inherited": false,
+  "synthetic_fixture_note": "Only tests-fixture supplied synthetic strings plus loopback URLs to the 17 required app/provider variables; no real services were configured. See baseline.md.",
+  "application_source_changed": false,
+  "raw_log_location": "$EVIDENCE_LOGS; local harness artifacts, not published; selected signatures and summaries are preserved here.",
+  "runs": [
+    {
+      "id": "build-pinned",
+      "cwd": "$BASELINE_SNAPSHOT",
+      "command": [
+        "node",
+        "$PACKAGE_MANAGER_CACHE/_npx/acca81db8e179ada/node_modules/pnpm/bin/pnpm.cjs",
+        "build"
+      ],
+      "exit_code": 1,
+      "timeout": false,
+      "seconds": 8.34,
+      "environment": "Node 20 PATH, empty npm auth config, no application/provider environment values inherited",
+      "result": "Fail",
+      "raw_log_sha256": "69d74c07f0456af3ed00a5e640d262fabfafedb69716d858f80ff67748d59418",
+      "dependency_mode": "existing workspace node_modules symlinked into tracked-source snapshot",
+      "synthetic_environment_fixture": false,
+      "tooling_note": "Temporary PATH shim selected pnpm 9.4.0 for Turbo child tasks.",
+      "output_signatures": ["web:build: Error: Invalid environment variables"]
+    },
+    {
+      "id": "build",
+      "cwd": "$BASELINE_SNAPSHOT",
+      "command": [
+        "node",
+        "$PACKAGE_MANAGER_CACHE/_npx/acca81db8e179ada/node_modules/pnpm/bin/pnpm.cjs",
+        "build"
+      ],
+      "exit_code": 1,
+      "timeout": false,
+      "seconds": 7.15,
+      "environment": "Node 20 PATH, empty npm auth config, no application/provider environment values inherited",
+      "result": "Fail",
+      "raw_log_sha256": "275c644029053269f9fd38008cde935c91d56085c8a718eff53766fcdbc93b4f",
+      "dependency_mode": "existing workspace node_modules symlinked into tracked-source snapshot",
+      "synthetic_environment_fixture": false,
+      "tooling_note": "Turbo selected the ambient global pnpm launcher, which failed before the task ran.",
+      "output_signatures": ["web:build: [ERROR] unable to open database file"]
+    },
+    {
+      "id": "dev-start",
+      "cwd": "$BASELINE_SNAPSHOT/apps/web",
+      "command": [
+        "node",
+        "node_modules/next/dist/bin/next",
+        "dev",
+        "-p",
+        "3106"
+      ],
+      "exit_code": 7,
+      "timeout": false,
+      "seconds": 1.92,
+      "environment": "Node 20 PATH, empty npm auth config, no application/provider environment values inherited",
+      "result": "Fail",
+      "raw_log_sha256": "b01b284680bee686f446d407c35fe63e8ce61230b6e62ec45df33c77eb27cfb3",
+      "dependency_mode": "existing workspace node_modules symlinked into tracked-source snapshot",
+      "synthetic_environment_fixture": false,
+      "output_signatures": ["Error: Invalid environment variables"]
+    },
+    {
+      "id": "install",
+      "cwd": "$INSTALL_SNAPSHOT",
+      "command": [
+        "node",
+        "$PACKAGE_MANAGER_CACHE/_npx/acca81db8e179ada/node_modules/pnpm/bin/pnpm.cjs",
+        "install",
+        "--frozen-lockfile",
+        "--ignore-scripts",
+        "--fetch-retries",
+        "0",
+        "--fetch-timeout",
+        "15000",
+        "--store-dir",
+        "$PUBLIC_PACKAGE_STORE"
+      ],
+      "exit_code": 1,
+      "timeout": false,
+      "seconds": 7.73,
+      "environment": "Node 20 PATH, empty npm auth config, no application/provider environment values inherited",
+      "result": "Fail",
+      "raw_log_sha256": "a94322929e3808364b51f71fa069f7b34ec00f66a0e1ef46aadde0161a29f4f9",
+      "dependency_mode": "fresh installation attempt; retained lockfile; reused public store",
+      "synthetic_environment_fixture": false,
+      "output_signatures": [
+        "ERR_PNPM_FETCH_403\u2009 GET https://registry.tiptap.dev/@tiptap-pro/extension-node-range/-/extension-node-range-2.8.1.tgz: Forbidden - 403",
+        "No authorization header was set for the request."
+      ]
+    },
+    {
+      "id": "lint-direct",
+      "cwd": "$BASELINE_SNAPSHOT/apps/web",
+      "command": [
+        "node",
+        "node_modules/eslint/bin/eslint.js",
+        "--no-ignore",
+        "--format",
+        "json",
+        "src"
+      ],
+      "exit_code": 1,
+      "timeout": false,
+      "seconds": 20.41,
+      "environment": "Node 20 PATH, empty npm auth config, no application/provider environment values inherited",
+      "result": "Fail",
+      "raw_log_sha256": "d13c351174199e14beb472db2f22eaa26fa9c094f06aa9dc4948a020961f93d1",
+      "dependency_mode": "existing workspace node_modules symlinked into tracked-source snapshot",
+      "synthetic_environment_fixture": false,
+      "summary": {
+        "files_scanned": 421,
+        "errors": 902,
+        "warnings": 53,
+        "fatal_errors": 0,
+        "rules": {
+          "no-unused-vars": 559,
+          "no-undef": 65,
+          "react-hooks/exhaustive-deps": 50,
+          "react/display-name": 132,
+          "react/no-unescaped-entities": 4,
+          "no-empty-pattern": 1,
+          "turbo/no-undeclared-env-vars": 4,
+          "@next/next/no-img-element": 3,
+          "react-hooks/rules-of-hooks": 17,
+          "no-extra-boolean-cast": 4,
+          "no-empty": 3,
+          "react/prop-types": 106,
+          "no-redeclare": 1,
+          "react/no-unknown-property": 1,
+          "no-case-declarations": 5
+        }
+      },
+      "representative_diagnostics": [
+        {
+          "path": "apps/web/src/actions/user-actions.ts",
+          "line": 5,
+          "rule": "no-unused-vars",
+          "severity": 2,
+          "message": "'redirect' is defined but never used."
+        },
+        {
+          "path": "apps/web/src/actions/workspace-actions.ts",
+          "line": 5,
+          "rule": "no-unused-vars",
+          "severity": 2,
+          "message": "'NewWorkspace' is defined but never used."
+        },
+        {
+          "path": "apps/web/src/actions/workspace-actions.ts",
+          "line": 6,
+          "rule": "no-unused-vars",
+          "severity": 2,
+          "message": "'NewWorkspaceSchema' is defined but never used."
+        },
+        {
+          "path": "apps/web/src/app/(auth)/login/email-form.tsx",
+          "line": 9,
+          "rule": "no-unused-vars",
+          "severity": 2,
+          "message": "'useSetAtom' is defined but never used."
+        },
+        {
+          "path": "apps/web/src/app/(auth)/login/email-form.tsx",
+          "line": 21,
+          "rule": "no-unused-vars",
+          "severity": 2,
+          "message": "'successOTP' is assigned a value but never used."
+        },
+        {
+          "path": "apps/web/src/app/(auth)/login/email-form.tsx",
+          "line": 21,
+          "rule": "no-unused-vars",
+          "severity": 2,
+          "message": "'setSuccessOTP' is assigned a value but never used."
+        },
+        {
+          "path": "apps/web/src/app/(auth)/login/login-wrapper.tsx",
+          "line": 1,
+          "rule": "no-unused-vars",
+          "severity": 2,
+          "message": "'Link' is defined but never used."
+        },
+        {
+          "path": "apps/web/src/app/(auth)/login/login-wrapper.tsx",
+          "line": 9,
+          "rule": "no-unused-vars",
+          "severity": 2,
+          "message": "'CardFooter' is defined but never used."
+        },
+        {
+          "path": "apps/web/src/app/(auth)/login/otp.tsx",
+          "line": 30,
+          "rule": "no-unused-vars",
+          "severity": 2,
+          "message": "'session' is assigned a value but never used."
+        },
+        {
+          "path": "apps/web/src/app/(auth)/login/page.tsx",
+          "line": 10,
+          "rule": "no-unused-vars",
+          "severity": 2,
+          "message": "'env' is defined but never used."
+        },
+        {
+          "path": "apps/web/src/app/(auth)/onboarding/complete-profile-form.tsx",
+          "line": 3,
+          "rule": "no-unused-vars",
+          "severity": 2,
+          "message": "'useRef' is defined but never used."
+        },
+        {
+          "path": "apps/web/src/app/(auth)/onboarding/complete-profile-form.tsx",
+          "line": 3,
+          "rule": "no-unused-vars",
+          "severity": 2,
+          "message": "'useState' is defined but never used."
+        }
+      ]
+    },
+    {
+      "id": "lint-pinned",
+      "cwd": "$BASELINE_SNAPSHOT",
+      "command": [
+        "node",
+        "$PACKAGE_MANAGER_CACHE/_npx/acca81db8e179ada/node_modules/pnpm/bin/pnpm.cjs",
+        "lint"
+      ],
+      "exit_code": 7,
+      "timeout": false,
+      "seconds": 8.35,
+      "environment": "Node 20 PATH, empty npm auth config, no application/provider environment values inherited",
+      "result": "Fail",
+      "raw_log_sha256": "1ddbed457c91bb72a975ad0bef227d4d3d80dd45e44915f11d75c2a9dead9e05",
+      "dependency_mode": "existing workspace node_modules symlinked into tracked-source snapshot",
+      "synthetic_environment_fixture": false,
+      "tooling_note": "Temporary PATH shim selected pnpm 9.4.0 for Turbo child tasks.",
+      "output_signatures": ["web:lint: Error: Invalid environment variables"]
+    },
+    {
+      "id": "lint",
+      "cwd": "$BASELINE_SNAPSHOT",
+      "command": [
+        "node",
+        "$PACKAGE_MANAGER_CACHE/_npx/acca81db8e179ada/node_modules/pnpm/bin/pnpm.cjs",
+        "lint"
+      ],
+      "exit_code": 1,
+      "timeout": false,
+      "seconds": 6.43,
+      "environment": "Node 20 PATH, empty npm auth config, no application/provider environment values inherited",
+      "result": "Fail",
+      "raw_log_sha256": "d6f97ba01d88de26975abdf2124a49817230e5ca73848e297250e1c9d7c6ee98",
+      "dependency_mode": "existing workspace node_modules symlinked into tracked-source snapshot",
+      "synthetic_environment_fixture": false,
+      "tooling_note": "Turbo selected the ambient global pnpm launcher, which failed before the task ran.",
+      "output_signatures": ["web:lint: [ERROR] unable to open database file"]
+    },
+    {
+      "id": "tests-fixture",
+      "cwd": "$BASELINE_SNAPSHOT",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "--maxWorkers=2",
+        "--minWorkers=1"
+      ],
+      "exit_code": 1,
+      "timeout": false,
+      "seconds": 8.94,
+      "environment": "Node 20 PATH, empty npm auth config, no application/provider environment values inherited",
+      "result": "Fail",
+      "raw_log_sha256": "3612f6fe1f305568fbd1d0b279fdaf81451e50f3f249a83a8f1d7df2d8be9f8e",
+      "dependency_mode": "existing workspace node_modules symlinked into tracked-source snapshot",
+      "synthetic_environment_fixture": true,
+      "output_signatures": [
+        "\u2192 Cannot delete the last team",
+        "FAIL  |data| __tests__/workspace/channels.test.ts [ packages/data/__tests__/workspace/channels.test.ts ]",
+        "Error: No test suite found in file $BASELINE_SNAPSHOT/packages/data/__tests__/workspace/channels.test.ts",
+        "FAIL  |data| __tests__/workspace/chat.test.ts [ packages/data/__tests__/workspace/chat.test.ts ]",
+        "Error: No test suite found in file $BASELINE_SNAPSHOT/packages/data/__tests__/workspace/chat.test.ts",
+        "FAIL  |data| __tests__/workspace/init.test.ts [ packages/data/__tests__/workspace/init.test.ts ]",
+        "Error: No test suite found in file $BASELINE_SNAPSHOT/packages/data/__tests__/workspace/init.test.ts",
+        "FAIL  |data| __tests__/workspace/teams.test.ts > Workspace teams' unit mutations > create a team",
+        "AssertionError: expected [ { id: 'EIjHKsu9pngFZ6xm', \u2026(8) } ] to deep equally contain { \u2026(9) }",
+        "FAIL  |data| __tests__/workspace/teams.test.ts > Workspace teams' unit mutations > update a team",
+        "AssertionError: expected { teams: [ { \u2026(9) } ], groups: [] } to deeply equal { teams: [ { \u2026(9) } ], groups: [] }",
+        "FAIL  |data| __tests__/workspace/teams.test.ts > Workspace teams' unit mutations > update team members",
+        "FAIL  |data| __tests__/workspace/teams.test.ts > Workspace teams' unit mutations > update team folders",
+        "FAIL  |data| __tests__/workspace/teams.test.ts > Workspace teams' unit mutations > delete a team",
+        "Error: Cannot delete the last team",
+        "10|     throw new Error(\"Cannot delete the last team\");",
+        "FAIL  |data| __tests__/workspace/thread.test.ts > Workspace threads' unit mutations > Create thread message",
+        "TypeError: createThreadMessageMutation is not a function",
+        "FAIL  |data| __tests__/workspace/thread.test.ts > Workspace threads' unit mutations > Delete thread message",
+        "TypeError: deleteThreadMessageMutation is not a function",
+        "FAIL  |data| __tests__/workspace/thread.test.ts > Workspace threads' unit mutations > edit thread message",
+        "TypeError: editThreadMessageMutation is not a function",
+        "Test Files  5 failed | 1 passed (6)",
+        "Tests  8 failed | 6 passed (14)"
+      ]
+    },
+    {
+      "id": "tests",
+      "cwd": "$BASELINE_SNAPSHOT",
+      "command": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "--maxWorkers=2",
+        "--minWorkers=1"
+      ],
+      "exit_code": 1,
+      "timeout": false,
+      "seconds": 16.3,
+      "environment": "Node 20 PATH, empty npm auth config, no application/provider environment values inherited",
+      "result": "Fail",
+      "raw_log_sha256": "840e1bac841f9adb61f17bbfc5469931c0127565905c207393b100db421102e7",
+      "dependency_mode": "existing workspace node_modules symlinked into tracked-source snapshot",
+      "synthetic_environment_fixture": false,
+      "output_signatures": [
+        "FAIL  |data| __tests__/workspace/channels.test.ts [ packages/data/__tests__/workspace/channels.test.ts ]",
+        "Error: No test suite found in file $BASELINE_SNAPSHOT/packages/data/__tests__/workspace/channels.test.ts",
+        "FAIL  |data| __tests__/workspace/chat.test.ts [ packages/data/__tests__/workspace/chat.test.ts ]",
+        "Error: No test suite found in file $BASELINE_SNAPSHOT/packages/data/__tests__/workspace/chat.test.ts",
+        "FAIL  |data| __tests__/workspace/init.test.ts [ packages/data/__tests__/workspace/init.test.ts ]",
+        "Error: No test suite found in file $BASELINE_SNAPSHOT/packages/data/__tests__/workspace/init.test.ts",
+        "FAIL  |data| __tests__/workspace/rbac.test.ts [ packages/data/__tests__/workspace/rbac.test.ts ]",
+        "FAIL  |data| __tests__/workspace/teams.test.ts [ packages/data/__tests__/workspace/teams.test.ts ]",
+        "FAIL  |data| __tests__/workspace/thread.test.ts [ packages/data/__tests__/workspace/thread.test.ts ]",
+        "Error: Invalid environment variables",
+        "Test Files  6 failed (6)",
+        "Tests  no tests"
+      ]
+    },
+    {
+      "id": "types-backend",
+      "cwd": "$BASELINE_SNAPSHOT",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--project",
+        "apps/backend/tsconfig.json",
+        "--incremental",
+        "false",
+        "--pretty",
+        "false"
+      ],
+      "exit_code": 0,
+      "timeout": false,
+      "seconds": 17.25,
+      "environment": "Node 20 PATH, empty npm auth config, no application/provider environment values inherited",
+      "result": "Pass",
+      "raw_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "dependency_mode": "existing workspace node_modules symlinked into tracked-source snapshot",
+      "synthetic_environment_fixture": false,
+      "output_signatures": []
+    },
+    {
+      "id": "types-data",
+      "cwd": "$BASELINE_SNAPSHOT",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--project",
+        "packages/data/tsconfig.json",
+        "--incremental",
+        "false",
+        "--pretty",
+        "false"
+      ],
+      "exit_code": 2,
+      "timeout": false,
+      "seconds": 14.85,
+      "environment": "Node 20 PATH, empty npm auth config, no application/provider environment values inherited",
+      "result": "Fail",
+      "raw_log_sha256": "3a62a890e5ee73e00444183c2cc9057bc849e1282c901eff5b3c09ba283366e4",
+      "dependency_mode": "existing workspace node_modules symlinked into tracked-source snapshot",
+      "synthetic_environment_fixture": false,
+      "output_signatures": [
+        "packages/data/__tests__/workspace/thread.test.ts(10,10): error TS2305: Module '\"../../models/thread/mutators/delete-comment\"' has no exported member 'deleteThreadMessageMutation'.",
+        "packages/data/__tests__/workspace/thread.test.ts(11,10): error TS2305: Module '\"../../models/thread/mutators/create-comment\"' has no exported member 'createThreadMessageMutation'.",
+        "packages/data/__tests__/workspace/thread.test.ts(12,10): error TS2305: Module '\"../../models/thread/mutators/edit-comment\"' has no exported member 'editThreadMessageMutation'.",
+        "packages/data/models/workspace/mutators/make-movement.ts(114,16): error TS2322: Type 'UniqueIdentifier' is not assignable to type 'string'.",
+        "packages/data/models/workspace/mutators/make-movement.ts(114,32): error TS2339: Property 'teamId' does not exist on type '{ teamId: string; folderId: string; idx: number; } | { teamId: string; folderId: UniqueIdentifier; } | { teamId: UniqueIdentifier; } | { teamId: string; idx: number; } | { ...; } | { ...; }'.",
+        "packages/data/models/workspace/mutators/make-movement.ts(120,65): error TS2339: Property 'folderId' does not exist on type '{ teamId: string; folderId: string; channelId: UniqueIdentifier; idx: number; } | { teamId: string; folderId: string; channelId: UniqueIdentifier; idx: number; } | { ...; } | { ...; } | { ...; } | { ...; }'.",
+        "packages/data/models/workspace/mutators/make-movement.ts(122,10): error TS2339: Property 'folderId' does not exist on type '{ teamId: string; folderId: string; channelId: UniqueIdentifier; idx: number; } | { teamId: string; folderId: string; channelId: UniqueIdentifier; idx: number; } | { ...; } | { ...; } | { ...; } | { ...; }'.",
+        "packages/data/models/workspace/mutators/make-movement.ts(122,26): error TS2339: Property 'folderId' does not exist on type '{ teamId: string; folderId: string; idx: number; } | { teamId: string; folderId: UniqueIdentifier; } | { teamId: UniqueIdentifier; } | { teamId: string; idx: number; } | { ...; } | { ...; }'.",
+        "packages/data/models/workspace/mutators/make-movement.ts(124,48): error TS2339: Property 'folderId' does not exist on type '{ teamId: string; folderId: string; idx: number; } | { teamId: string; folderId: UniqueIdentifier; } | { teamId: UniqueIdentifier; } | { teamId: string; idx: number; } | { ...; } | { ...; }'.",
+        "packages/data/models/workspace/mutators/make-movement.ts(131,31): error TS2339: Property 'idx' does not exist on type '{ teamId: string; folderId: string; idx: number; } | { teamId: string; folderId: UniqueIdentifier; } | { teamId: UniqueIdentifier; } | { teamId: string; idx: number; } | { ...; } | { ...; }'.",
+        "packages/data/models/workspace/mutators/make-movement.ts(143,16): error TS2322: Type 'UniqueIdentifier' is not assignable to type 'string'.",
+        "packages/data/models/workspace/mutators/make-movement.ts(143,32): error TS2339: Property 'teamId' does not exist on type '{ teamId: string; folderId: string; idx: number; } | { teamId: string; folderId: UniqueIdentifier; } | { teamId: UniqueIdentifier; } | { teamId: string; idx: number; } | { ...; } | { ...; }'.",
+        "packages/data/models/workspace/mutators/make-movement.ts(149,65): error TS2339: Property 'folderId' does not exist on type '{ teamId: string; folderId: string; channelId: UniqueIdentifier; idx: number; } | { teamId: string; folderId: string; channelId: UniqueIdentifier; idx: number; } | { ...; } | { ...; } | { ...; } | { ...; }'.",
+        "packages/data/models/workspace/mutators/make-movement.ts(151,10): error TS2339: Property 'folderId' does not exist on type '{ teamId: string; folderId: string; channelId: UniqueIdentifier; idx: number; } | { teamId: string; folderId: string; channelId: UniqueIdentifier; idx: number; } | { ...; } | { ...; } | { ...; } | { ...; }'.",
+        "packages/data/models/workspace/mutators/make-movement.ts(151,26): error TS2339: Property 'folderId' does not exist on type '{ teamId: string; folderId: string; idx: number; } | { teamId: string; folderId: UniqueIdentifier; } | { teamId: UniqueIdentifier; } | { teamId: string; idx: number; } | { ...; } | { ...; }'.",
+        "packages/data/models/workspace/mutators/make-movement.ts(153,48): error TS2339: Property 'folderId' does not exist on type '{ teamId: string; folderId: string; idx: number; } | { teamId: string; folderId: UniqueIdentifier; } | { teamId: UniqueIdentifier; } | { teamId: string; idx: number; } | { ...; } | { ...; }'."
+      ]
+    },
+    {
+      "id": "types-web",
+      "cwd": "$BASELINE_SNAPSHOT",
+      "command": [
+        "node",
+        "node_modules/typescript/bin/tsc",
+        "--project",
+        "apps/web/tsconfig.json",
+        "--incremental",
+        "false",
+        "--pretty",
+        "false"
+      ],
+      "exit_code": 2,
+      "timeout": false,
+      "seconds": 28.99,
+      "environment": "Node 20 PATH, empty npm auth config, no application/provider environment values inherited",
+      "result": "Fail",
+      "raw_log_sha256": "879640db6fea900c3b8d3b0879eddfdedb860db6fe5a5484b25ab6ee4150038f",
+      "dependency_mode": "existing workspace node_modules symlinked into tracked-source snapshot",
+      "synthetic_environment_fixture": false,
+      "output_signatures": [
+        "apps/web/src/components/editor/content-item-menu/content-item-menu.tsx(1,24): error TS2307: Cannot find module '@tiptap-pro/extension-drag-handle-react' or its corresponding type declarations.",
+        "apps/web/src/components/editor/extensions/emoji-suggestions/emoji-list.tsx(1,27): error TS2307: Cannot find module '@tiptap-pro/extension-emoji' or its corresponding type declarations.",
+        "apps/web/src/components/editor/extensions/emoji-suggestions/types.ts(1,27): error TS2307: Cannot find module '@tiptap-pro/extension-emoji' or its corresponding type declarations.",
+        "apps/web/src/components/editor/extensions/extension-kit.ts(10,37): error TS2307: Cannot find module '@tiptap-pro/extension-emoji' or its corresponding type declarations.",
+        "apps/web/src/components/editor/extensions/extension-kit.ts(22,29): error TS2307: Cannot find module '@tiptap-pro/extension-file-handler' or its corresponding type declarations.",
+        "apps/web/src/components/editor/extensions/image-block/image-block.ts(114,34): error TS2345: Argument of type 'MemoExoticComponent<(props: ImageBlockViewProps) => Element>' is not assignable to parameter of type 'ComponentType<ReactNodeViewProps<HTMLElement>>'.",
+        "apps/web/src/components/editor/table-of-contents.tsx(5,40): error TS2307: Cannot find module '@tiptap-pro/extension-table-of-contents' or its corresponding type declarations.",
+        "apps/web/src/components/editor/table-of-contents.tsx(40,32): error TS7006: Parameter 'item' implicitly has an 'any' type.",
+        "apps/web/src/hooks/use-message-editor.ts(7,37): error TS2307: Cannot find module '@tiptap-pro/extension-emoji' or its corresponding type declarations."
+      ]
+    }
+  ],
+  "integrated_smoke_result": "Unverified: dev startup failed environment validation; no integrated browser/provider/MCP/sync pass claimed.",
+  "path_normalization": "Temporary execution directories are represented by semantic placeholders. Recorded log hashes identify the original logs; results, diagnostics and timings are unchanged."
+}
