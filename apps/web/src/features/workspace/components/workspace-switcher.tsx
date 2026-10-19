@@ -1,6 +1,7 @@
 "use client";
 
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
+import { FeatureGate } from "@/components/feature-flags-provider";
 
 import { useUserWorkspaces } from "@/features/workspace/hooks/use-user-workspaces";
 import { cn } from "@/lib/utils/index";
@@ -81,20 +82,24 @@ export function WorkspaceSwitcher() {
             </DropdownMenuItem>
           </Link>
 
-          <Link href={`/${workspaceSlug}/settings`}>
-            <DropdownMenuItem className="gap-2 text-sm">
-              <Settings className="h-4 w-4" />
-              Workspace settings
-            </DropdownMenuItem>
-          </Link>
+          <FeatureGate feature="workspaceSettings">
+            <Link href={`/${workspaceSlug}/settings`}>
+              <DropdownMenuItem className="gap-2 text-sm">
+                <Settings className="h-4 w-4" />
+                Workspace settings
+              </DropdownMenuItem>
+            </Link>
+          </FeatureGate>
           {isPrivileged && (
             <>
-              <Link href={`/${workspaceSlug}/settings/members`}>
-                <DropdownMenuItem className="gap-2 text-sm">
-                  <Users2 className="h-4 w-4" />
-                  Manage members
-                </DropdownMenuItem>
-              </Link>
+              <FeatureGate feature="membership">
+                <Link href={`/${workspaceSlug}/settings/members`}>
+                  <DropdownMenuItem className="gap-2 text-sm">
+                    <Users2 className="h-4 w-4" />
+                    Manage members
+                  </DropdownMenuItem>
+                </Link>
+              </FeatureGate>
             </>
           )}
         </DropdownMenuGroup>

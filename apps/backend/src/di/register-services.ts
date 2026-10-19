@@ -1,3 +1,4 @@
+import { FeatureFlagService } from "@wodge/core/features/services/flags";
 import { BillingService } from "@wodge/core/billing/services/billing";
 import { DiscussionService } from "@wodge/core/discussions/services/posts";
 import { PageService } from "@wodge/core/pages/services/page";
@@ -23,6 +24,11 @@ import { Lifecycle, type DependencyContainer } from "tsyringe";
 
 // Lifetimes are declared here, never as module-import side effects in the classes.
 export function registerServices(container: DependencyContainer) {
+  container.register(
+    FeatureFlagService,
+    { useClass: FeatureFlagService },
+    { lifecycle: Lifecycle.ContainerScoped },
+  );
   container.register(
     BillingService,
     { useClass: BillingService },

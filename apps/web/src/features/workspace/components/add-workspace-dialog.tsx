@@ -1,3 +1,5 @@
+"use client";
+import { useFeatureFlags } from "@/components/feature-flags-provider";
 import { JoinWorkspaceForm } from "./join-workspace-form";
 import { CreateWorkspaceForm } from "./create-workspace-form";
 import {
@@ -10,17 +12,27 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export function AddWorkspaceDialog() {
+  const flags = useFeatureFlags();
+  if (!flags.membership && !flags.workspaceCreation) return null;
   return (
     <Dialog>
       <DialogTrigger className="mt-6 w-full" asChild>
         <Button className="w-full">Add a Workspace</Button>
       </DialogTrigger>
       <DialogContent className="max-w-sm">
-        <Tabs defaultValue="join" className="w-full">
+        <Tabs
+          key={`${flags.membership}-${flags.workspaceCreation}`}
+          defaultValue={flags.membership ? "join" : "create"}
+          className="w-full"
+        >
           <DialogHeader>
             <TabsList className="grid w-full grid-cols-2 transition-all">
-              <TabsTrigger value="join">Join a Workspace</TabsTrigger>
-              <TabsTrigger value="create">Create a Workspace</TabsTrigger>
+              {flags.membership && (
+                <TabsTrigger value="join">Join a Workspace</TabsTrigger>
+              )}
+              {flags.workspaceCreation && (
+                <TabsTrigger value="create">Create a Workspace</TabsTrigger>
+              )}
             </TabsList>
 
             <TabsContent value="join">

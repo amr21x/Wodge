@@ -1,3 +1,10 @@
+import { Feature } from "@wodge/domain/features/models";
+
+const commandFeatures: Record<string, Feature> = {
+  aiWriter: "hostedGeneration",
+  tasksDb: "tasks",
+  image: "attachments",
+};
 import { Editor, Extension } from "@tiptap/core";
 import { ReactRenderer } from "@tiptap/react";
 import Suggestion, {
@@ -82,7 +89,9 @@ export const SlashCommand = Extension.create({
 
           view.dispatch(tr);
 
-          props.action(editor);
+          const feature = commandFeatures[props.name];
+          if (!feature || editor.storage.featureFlags?.[feature])
+            props.action(editor);
           view.focus();
         },
         items: ({ query }: { query: string }) => {
@@ -90,6 +99,9 @@ export const SlashCommand = Extension.create({
             ...group,
             commands: group.commands
               .filter((item) => {
+                const feature = commandFeatures[item.name];
+                if (feature && !this.editor.storage.featureFlags?.[feature])
+                  return false;
                 const labelNormalized = item.label.toLowerCase().trim();
                 const queryNormalized = query.toLowerCase().trim();
 

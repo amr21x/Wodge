@@ -16,7 +16,8 @@
     "init:app": "pnpm --filter backend db:migration:local",
     "livekit": "livekit-server --dev --bind 0.0.0.0",
     "deploy:app": "turbo deploy:app",
-    "check:boundaries": "node scripts/check-boundaries.mjs"
+    "check:boundaries": "node scripts/check-boundaries.mjs",
+    "test:feature-flags": "vitest run --workspace vitest.feature-flags.workspace.ts --no-cache --maxWorkers=2 --minWorkers=1"
   },
   "devDependencies": {
     "@wodge/ts": "workspace:*",

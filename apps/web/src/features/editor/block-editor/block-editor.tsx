@@ -1,5 +1,7 @@
 "use client";
 
+import { useFeatureFlags } from "@/components/feature-flags-provider";
+
 import { EditorContent } from "@tiptap/react";
 import React, { memo, useEffect, useMemo, useRef } from "react";
 import { TiptapProps } from "./types";
@@ -25,6 +27,7 @@ export const BlockEditor = ({
 }: TiptapProps & {
   user: UserType;
 }) => {
+  const flags = useFeatureFlags();
   const menuContainerRef = useRef(null);
   const editorRef = useRef<HTMLDivElement | null>(null);
 
@@ -33,6 +36,8 @@ export const BlockEditor = ({
     provider,
     user,
   });
+
+  if (editor) editor.storage.featureFlags = flags;
 
   const setUserEditors = useSetAtom(editorUsersAtoms);
 

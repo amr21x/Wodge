@@ -1,10 +1,12 @@
+import { gatePageConnection } from "../lib/feature-connection";
+import type { FeatureHandlers } from "../handlers/features";
 import type { PageRecordRepository } from "@wodge/core/pages/repositories/records";
 import type {
   PagePartyInterface,
   PageState,
   Versions,
 } from "@wodge/domain/sync/state";
-import type { Connection, ConnectionContext } from "partyserver";
+import type { Connection, ConnectionContext, WSMessage } from "partyserver";
 import { YServer } from "y-partyserver";
 import * as Y from "yjs";
 import { initializePage } from "../di/runtime";
@@ -16,6 +18,7 @@ export default class PageServer
   extends YServer<WorkerEnvironment>
   implements PagePartyInterface
 {
+  private features!: FeatureHandlers;
   private router!: PageRoutes["router"];
   private persistence!: PageRecordRepository;
 
@@ -28,6 +31,7 @@ export default class PageServer
   async onStart() {
     await handleStartup(async () => {
       const dependencies = await initializePage(this);
+      this.features = dependencies.features;
       this.persistence = dependencies.records;
       this.router = dependencies.routes.router;
       await super.onStart();
@@ -49,12 +53,36 @@ export default class PageServer
     );
   }
 
-  onConnect(connection: Connection, context: ConnectionContext) {
+  private pagesEnabled = async () => !(await this.features.check(["pages"]));
+
+  *getConnections<TState = unknown>(
+    tag?: string,
+  ): Iterable<Connection<TState>> {
+    for (const connection of super.getConnections<TState>(tag)) {
+      yield gatePageConnection(connection, this.pagesEnabled);
+    }
+  }
+
+  async onMessage(connection: Connection, message: WSMessage) {
+    if (await this.pagesEnabled()) {
+      super.onMessage(
+        gatePageConnection(connection, this.pagesEnabled),
+        message,
+      );
+    }
+  }
+
+  async onConnect(connection: Connection, context: ConnectionContext) {
     connection.setState({
       canEdit: context.request.headers.get("x-can-edit") === "true",
     });
 
-    return super.onConnect(connection, context);
+    if (await this.pagesEnabled()) {
+      return super.onConnect(
+        gatePageConnection(connection, this.pagesEnabled),
+        context,
+      );
+    }
   }
 
   // Enforce read-only access on Yjs updates as well as on ordinary HTTP mutations.
@@ -65,6 +93,9 @@ export default class PageServer
   async onRequest(request: Request): Promise<Response> {
     if (request.headers.get("authorization") !== this.env.SECRET_KEY)
       return new Response(null, { status: 401 });
-    return handleIngress(() => this.router.fetch(request, this.env));
+    return handleIngress(async () => {
+      const denied = await this.features.party(request, "page");
+      return denied ?? this.router.fetch(request, this.env);
+    });
   }
 }

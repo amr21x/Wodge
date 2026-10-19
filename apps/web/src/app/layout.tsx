@@ -13,6 +13,7 @@ import "@/styles/globals.css";
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { Providers } from "@/components/providers";
+import { FeatureRouteGate } from "@/components/feature-flags-provider";
 import { Toaster } from "@/components/ui/toast";
 import { CallWindow } from "../features/rooms/components/call-window";
 
@@ -89,7 +90,7 @@ export default async function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
+            <FeatureRouteGate>{children}</FeatureRouteGate>
             <CallWindow />
           </ThemeProvider>
         </Providers>

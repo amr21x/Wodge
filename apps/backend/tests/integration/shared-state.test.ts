@@ -12,9 +12,9 @@ import {
 } from "replicache";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { queryClient } from "../../../web/src/client/query";
-import { threadMutators } from "../../../web/src/client/sync/discussions/mutators";
-import { roomMutators } from "../../../web/src/client/sync/rooms/mutators";
-import { workspaceMutators } from "../../../web/src/client/sync/workspace/mutators";
+import { createThreadMutators } from "../../../web/src/client/sync/discussions/mutators";
+import { createRoomMutators } from "../../../web/src/client/sync/rooms/mutators";
+import { createWorkspaceMutators } from "../../../web/src/client/sync/workspace/mutators";
 import type { RunnerParams } from "../../src/lib/sync/replicache";
 import type RoomParty from "../../src/servers/room";
 import type ThreadParty from "../../src/servers/thread";
@@ -84,10 +84,10 @@ function storage() {
   };
 }
 
-test("workspace optimism uses the relocated actor cache and backend authorization still gates writes", async () => {
+test("workspace optimism uses its bound actor identity and backend authorization still gates writes", async () => {
   const state = { teams: [], groups: [] };
   const instance = client({
-    ...workspaceMutators,
+    ...createWorkspaceMutators("owner"),
     async seed(tx: WriteTransaction) {
       await tx.set(makeWorkspaceStructureKey(), state);
     },
@@ -129,8 +129,8 @@ test("workspace optimism uses the relocated actor cache and backend authorizatio
 });
 
 test("room messages and discussion posts agree across client transactions and backend handlers", async () => {
-  const messages = client(roomMutators);
-  const posts = client(threadMutators);
+  const messages = client(createRoomMutators("owner"));
+  const posts = client(createThreadMutators("owner"));
   const roomStorage = storage();
   const postStorage = storage();
   const room = {
@@ -175,7 +175,7 @@ test("room messages and discussion posts agree across client transactions and ba
 });
 
 test("sender impersonation is rejected without persisted client or backend messages", async () => {
-  const messages = client(roomMutators);
+  const messages = client(createRoomMutators("owner"));
   const persisted = storage();
   const room = {
     messages: { data: [], lastModifiedVersion: 0, deleted: false },

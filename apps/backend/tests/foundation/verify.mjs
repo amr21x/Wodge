@@ -38,7 +38,7 @@ async function check(name, test) {
 }
 
 const forbidden =
-  /(?:apps\/backend\/src\/|tsyringe|reflect-metadata|next-on-pages|(?:^|\/)next\/|packages\/env\/index|packages\/core\/src\/(?!errors\.ts|(?:pages|rooms|discussions|workspace)\/(?:mutations\/|errors\.ts|defaults\.ts))|packages\/infra\/src\/(?:database\/|storage\/|payments\/|auth\/(?:tokens|supabase))|domain\/src\/(?:persistence|user\/schema|workspace\/schema|auth\/schema)|packages\/auth\/src\/(?:server|tickets|membership)|better-auth\/dist\/(?:auth|api|db|adapters)\/)/;
+  /(?:apps\/backend\/src\/|tsyringe|reflect-metadata|next-on-pages|(?:^|\/)next\/|packages\/env\/index|packages\/core\/src\/(?!features\/(?:flags|policy)\.ts|errors\.ts|(?:pages|rooms|discussions|workspace)\/(?:mutations\/|errors\.ts|defaults\.ts))|packages\/infra\/src\/(?:database\/|storage\/|payments\/|auth\/(?:tokens|supabase))|domain\/src\/(?:persistence|user\/schema|workspace\/schema|auth\/schema)|packages\/auth\/src\/(?:server|tickets|membership)|better-auth\/dist\/(?:auth|api|db|adapters)\/)/;
 
 const common = {
   absWorkingDir: root,
@@ -138,6 +138,8 @@ try {
           "apps/backend/tests/foundation/browser.ts",
           "apps/web/src/features/auth/client.ts",
           "apps/web/src/client/api.ts",
+          "packages/core/src/features/flags.ts",
+          "packages/core/src/features/policy.ts",
           ...["pages", "rooms", "discussions", "workspace"].map(
             (feature) => `apps/web/src/client/sync/${feature}/mutators.ts`,
           ),

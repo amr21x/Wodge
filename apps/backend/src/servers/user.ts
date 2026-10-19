@@ -1,3 +1,4 @@
+import type { FeatureHandlers } from "../handlers/features";
 import type { PokeMessage } from "@wodge/domain/sync/index";
 import type { UserPartyInterface, Versions } from "@wodge/domain/sync/state";
 import { Server, type Connection, type ConnectionContext } from "partyserver";
@@ -11,6 +12,7 @@ export default class UserServer
   extends Server<WorkerEnvironment>
   implements UserPartyInterface
 {
+  private features!: FeatureHandlers;
   private router!: UserRoutes["router"];
   private workspaceGateway!: WorkspaceGateway;
 
@@ -28,6 +30,7 @@ export default class UserServer
   async onStart() {
     await handleStartup(async () => {
       const dependencies = await initializeUser(this);
+      this.features = dependencies.features;
       this.router = dependencies.routes.router;
       this.workspaceGateway = dependencies.workspaceGateway;
     });
@@ -73,7 +76,10 @@ export default class UserServer
   async onRequest(req: Request): Promise<Response> {
     if (req.headers.get("authorization") !== this.env.SECRET_KEY)
       return new Response(null, { status: 401 });
-    return handleIngress(() => this.router.fetch(req, this.env));
+    return handleIngress(async () => {
+      const denied = await this.features.party(req, "user");
+      return denied ?? this.router.fetch(req, this.env);
+    });
   }
 
   poke(data?: PokeMessage) {

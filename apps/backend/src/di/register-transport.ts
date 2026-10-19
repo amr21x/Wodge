@@ -1,3 +1,4 @@
+import { FeatureHandlers } from "../handlers/features";
 import { BackendApplication } from "../application";
 import { RoomGateway } from "../gateways/room";
 import { UserNotifications } from "../gateways/user-notifications";
@@ -41,6 +42,11 @@ import { Lifecycle, type DependencyContainer } from "tsyringe";
 
 // Lifetimes are declared here, never as module-import side effects in the classes.
 export function registerTransport(container: DependencyContainer) {
+  container.register(
+    FeatureHandlers,
+    { useClass: FeatureHandlers },
+    { lifecycle: Lifecycle.ContainerScoped },
+  );
   container.register(
     BackendApplication,
     { useClass: BackendApplication },

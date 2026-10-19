@@ -132,7 +132,7 @@ async function inspect(directory, owner) {
       if (
         owner.manifest.name === "web" &&
         filename.includes("/src/") &&
-        !/^@wodge\/core\/(?:pages|rooms|discussions|workspace)\/mutations\//.test(
+        !/^@wodge\/core\/(?:(?:pages|rooms|discussions|workspace)\/mutations\/|features\/(?:flags|policy)$)/.test(
           specifier,
         ) &&
         /^(?:@wodge\/(?:core|infra)(?:\/|$)|@wodge\/auth\/(?:server|tickets|membership)(?:\/|$)|(?:tsyringe|reflect-metadata)(?:\/|$)|@supabase\/|better-auth(?:$|\/(?!react|client)))/.test(
@@ -271,7 +271,7 @@ async function inspect(directory, owner) {
       if (
         productionSource &&
         owner.manifest.name === "web" &&
-        !/^@wodge\/core\/(?:pages|rooms|discussions|workspace)\/mutations\//.test(
+        !/^@wodge\/core\/(?:(?:pages|rooms|discussions|workspace)\/mutations\/|features\/(?:flags|policy)$)/.test(
           specifier,
         ) &&
         /^\s*["']use client["'];/.test(source.text) &&

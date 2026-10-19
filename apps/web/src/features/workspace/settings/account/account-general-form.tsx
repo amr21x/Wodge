@@ -1,4 +1,5 @@
 import { api } from "@/client/api";
+import { FeatureGate } from "@/components/feature-flags-provider";
 import {
   Form,
   FormControl,
@@ -24,7 +25,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { env } from "@wodge/env/client";
 import { useCurrentUser } from "@/features/account/hooks/use-current-user";
 
-export function AccountGeneralForm() {
+function AccountGeneralFormContent() {
   const queryClient = useQueryClient();
 
   const { user } = useCurrentUser();
@@ -124,5 +125,13 @@ export function AccountGeneralForm() {
         </form>
       </Form>
     </div>
+  );
+}
+
+export function AccountGeneralForm() {
+  return (
+    <FeatureGate feature="profiles">
+      <AccountGeneralFormContent />
+    </FeatureGate>
   );
 }

@@ -7,6 +7,8 @@ import { WorkspaceProvider } from "@/features/workspace/state/workspace-provider
 import { LayoutContextProvider } from "@livekit/components-react";
 import { createStore, Provider } from "jotai";
 
+import { FeatureFlagsProvider } from "./feature-flags-provider";
+
 export const jotaiStore = createStore();
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -20,7 +22,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
         }}
       >
         <LayoutContextProvider>
-          <WorkspaceProvider>{children}</WorkspaceProvider>
+          <FeatureFlagsProvider>
+            <WorkspaceProvider>{children}</WorkspaceProvider>
+          </FeatureFlagsProvider>
         </LayoutContextProvider>
         <ReactQueryDevtools
           initialIsOpen={false}

@@ -1,3 +1,4 @@
+import { FeatureHandlers } from "../handlers/features";
 import { validateServerEnvironment } from "@wodge/env/server";
 import { createRuntimeContainer } from "../container";
 import { BackendApplication } from "../application";
@@ -51,7 +52,7 @@ export async function initializeRoom(object: RoomServer) {
   object.messages = restored.messages;
   object.versions = restored.versions;
   const routes = container.resolve(RoomRoutes);
-  return routes;
+  return { routes, features: container.resolve(FeatureHandlers) };
 }
 
 /** Initialize once during ThreadServer.onStart, before requests can run. */
@@ -66,7 +67,7 @@ export async function initializeThread(object: ThreadServer) {
   object.threadPosts = restored.threadPosts;
   object.versions = restored.versions;
   const routes = container.resolve(DiscussionRoutes);
-  return routes;
+  return { routes, features: container.resolve(FeatureHandlers) };
 }
 
 /** Initialize once during UserServer.onStart, before requests can run. */
@@ -81,7 +82,11 @@ export async function initializeUser(object: UserServer) {
   object.workspacesStore = restored.workspacesStore;
   object.versions = restored.versions;
   const routes = container.resolve(UserRoutes);
-  return { routes, workspaceGateway: container.resolve(WorkspaceGateway) };
+  return {
+    routes,
+    features: container.resolve(FeatureHandlers),
+    workspaceGateway: container.resolve(WorkspaceGateway),
+  };
 }
 
 /** Initialize once during WorkspaceServer.onStart, before requests can run. */
@@ -101,7 +106,11 @@ export async function initializeWorkspace(object: WorkspaceServer) {
   const invalidations = container.resolve(AuthorizationInvalidations);
   await container.resolve(WorkspaceHandlers).bindRooms();
   await invalidations.flush();
-  return { routes, invalidations };
+  return {
+    routes,
+    invalidations,
+    features: container.resolve(FeatureHandlers),
+  };
 }
 
 /** Initialize once during PageServer.onStart, before requests can run. */
@@ -116,5 +125,5 @@ export async function initializePage(object: PageServer) {
   object.state = restored.state;
   object.versions = restored.versions;
   const routes = container.resolve(PageRoutes);
-  return { routes, records };
+  return { routes, records, features: container.resolve(FeatureHandlers) };
 }

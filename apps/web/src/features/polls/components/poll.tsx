@@ -1,5 +1,9 @@
 "use client";
 
+import type { ComponentProps } from "react";
+
+import { FeatureGate } from "@/components/feature-flags-provider";
+
 export type Poll = {
   title: string;
   options: string[];
@@ -16,7 +20,7 @@ import { useCurrentRoomRep } from "@/features/rooms/hooks/use-room-rep";
 import { useCurrentThreadRep } from "@/features/discussions/hooks/use-thread-rep";
 import { toast } from "sonner";
 
-export default function PollUI({
+function PollUIContent({
   id,
   options,
   votes,
@@ -78,5 +82,13 @@ export default function PollUI({
       removeVote={removeVote}
       isRoom={isRoom}
     />
+  );
+}
+
+export default function PollUI(props: ComponentProps<typeof PollUIContent>) {
+  return (
+    <FeatureGate feature="polls">
+      <PollUIContent {...props} />
+    </FeatureGate>
   );
 }

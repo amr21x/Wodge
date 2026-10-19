@@ -1,4 +1,5 @@
 import type { RoomMutators } from "@/client/sync/rooms/mutators";
+import { FeatureGate } from "@/components/feature-flags-provider";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useCurrentUser } from "@/features/account/hooks/use-current-user";
 import OfflineEditor from "@/features/editor/block-editor/offline-editor";
@@ -74,18 +75,20 @@ export function MessageEditor({ rep }: { rep?: Replicache<RoomMutators> }) {
             teamId={teamId}
             rep={rep}
           />
-          <Dialog>
-            <DialogTrigger asChild>
-              <SidebarItemBtn
-                className="ml-0.5 mr-2"
-                Icon={Vote}
-                iconClassName="w-4 h-4"
-              />
-            </DialogTrigger>
-            <DialogContent>
-              <PollMaker isRoom />
-            </DialogContent>
-          </Dialog>
+          <FeatureGate feature="polls">
+            <Dialog>
+              <DialogTrigger asChild>
+                <SidebarItemBtn
+                  className="ml-0.5 mr-2"
+                  Icon={Vote}
+                  iconClassName="w-4 h-4"
+                />
+              </DialogTrigger>
+              <DialogContent>
+                <PollMaker isRoom />
+              </DialogContent>
+            </Dialog>
+          </FeatureGate>
           <div
             className="flex  w-full items-center overflow-hidden"
             onKeyDown={(e) => {

@@ -1,3 +1,4 @@
+import { FeatureGate } from "@/components/feature-flags-provider";
 import { Editor, NodeViewWrapper } from "@tiptap/react";
 import { memo, useCallback } from "react";
 
@@ -27,7 +28,9 @@ export const ImageUploadComp = ({
   return (
     <NodeViewWrapper>
       <div className="m-0 p-0" data-drag-handle>
-        <ImageUploader onUpload={onUpload} />
+        <FeatureGate feature="attachments">
+          <ImageUploader onUpload={onUpload} />
+        </FeatureGate>
       </div>
     </NodeViewWrapper>
   );

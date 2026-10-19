@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import { backendApplication } from "./di/runtime";
 import type { WorkerEnvironment } from "./types/worker-environment";
 

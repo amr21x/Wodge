@@ -1,3 +1,5 @@
+import type { ComponentProps } from "react";
+import { FeatureGate } from "@/components/feature-flags-provider";
 import { useState } from "react";
 
 import { Editor, NodeViewWrapper, NodeViewWrapperProps } from "@tiptap/react";
@@ -37,7 +39,7 @@ import { DbProvider } from "./db-provider";
 import { useParams } from "next/navigation";
 import { TableView } from "./table-view";
 
-export function Tasks({ editor, node, getPos }: NodeViewWrapperProps) {
+function TasksContent({ editor, node, getPos }: NodeViewWrapperProps) {
   return (
     <NodeViewWrapper className="select-none">
       <DbProvider>
@@ -335,4 +337,12 @@ function TableWrapper({ editor }: { editor: Editor }) {
           due={due}
         />
       )} */
+}
+
+export function Tasks(props: ComponentProps<typeof TasksContent>) {
+  return (
+    <FeatureGate feature="tasks">
+      <TasksContent {...props} />
+    </FeatureGate>
+  );
 }

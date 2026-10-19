@@ -1,3 +1,5 @@
+import { mutationRecordId } from "@wodge/core/features/policy";
+import type { FeatureHandlers } from "../handlers/features";
 import type {
   ServerThreadMessages,
   ThreadPartyInterface,
@@ -13,6 +15,7 @@ export default class ThreadServer
   extends Server<WorkerEnvironment>
   implements ThreadPartyInterface
 {
+  private features!: FeatureHandlers;
   private router!: DiscussionRoutes["router"];
 
   static options = {
@@ -28,13 +31,21 @@ export default class ThreadServer
 
   async onStart() {
     await handleStartup(async () => {
-      this.router = (await initializeThread(this)).router;
+      const dependencies = await initializeThread(this);
+      this.router = dependencies.routes.router;
+      this.features = dependencies.features;
     });
   }
 
   async onRequest(req: Request): Promise<Response> {
     if (req.headers.get("authorization") !== this.env.SECRET_KEY)
       return new Response(null, { status: 401 });
-    return handleIngress(() => this.router.fetch(req, this.env));
+    return handleIngress(async () => {
+      const denied = await this.features.party(req, "thread", (mutation) => {
+        const id = mutationRecordId(mutation.args);
+        return this.threadPosts.data.find((record) => record.id === id)?.type;
+      });
+      return denied ?? this.router.fetch(req, this.env);
+    });
   }
 }

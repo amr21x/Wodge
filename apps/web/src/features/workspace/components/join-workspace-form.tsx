@@ -1,3 +1,4 @@
+import { FeatureGate } from "@/components/feature-flags-provider";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { JoinWorkspaceSchema } from "@wodge/domain/workspace/validation";
 
@@ -17,7 +18,7 @@ import { DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useQueryClient } from "@tanstack/react-query";
 
-export function JoinWorkspaceForm() {
+function JoinWorkspaceFormContent() {
   const form = useForm<z.infer<typeof JoinWorkspaceSchema>>({
     resolver: zodResolver(JoinWorkspaceSchema),
     defaultValues: {
@@ -68,5 +69,13 @@ export function JoinWorkspaceForm() {
         </div>
       </form>
     </Form>
+  );
+}
+
+export function JoinWorkspaceForm() {
+  return (
+    <FeatureGate feature="membership">
+      <JoinWorkspaceFormContent />
+    </FeatureGate>
   );
 }

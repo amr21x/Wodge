@@ -1,6 +1,8 @@
 "use client";
 
 import { cn } from "@/lib/utils/index";
+import { useFeatureFlags } from "@/components/feature-flags-provider";
+import { CHANNEL_FEATURES } from "@wodge/core/features/policy";
 import { useParams, usePathname } from "next/navigation";
 import {
   Database,
@@ -61,6 +63,7 @@ const tabs: Tab[] = [
 ];
 
 export function Sidebar() {
+  const flags = useFeatureFlags();
   const isSidebarOpen = useAtomValue(isSidebarOpenAtom);
   const { workspaceSlug } = useCurrentWorkspace();
 
@@ -79,6 +82,9 @@ export function Sidebar() {
       <div className="flex flex-col gap-4">
         <ul className="flex flex-col gap-1">
           {tabs.map((tab) => {
+            const feature =
+              CHANNEL_FEATURES[tab.val as keyof typeof CHANNEL_FEATURES];
+            if (feature && !flags[feature]) return null;
             const baseUrl = `/${workspaceSlug}`;
 
             return (

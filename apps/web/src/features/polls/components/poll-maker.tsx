@@ -1,5 +1,9 @@
 "use client";
 
+import type { ComponentProps } from "react";
+
+import { FeatureGate } from "@/components/feature-flags-provider";
+
 import { Button } from "@/components/ui/button";
 import { DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -16,7 +20,7 @@ import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { SidebarItemBtn } from "../../workspace/components/sidebar-item-btn";
 
-export function PollMaker({ isRoom }: { isRoom: boolean }) {
+function PollMakerContent({ isRoom }: { isRoom: boolean }) {
   const [newOption, setNewOption] = useState<string>("");
   const [question, setQuestion] = useState("");
 
@@ -174,5 +178,13 @@ export function PollMaker({ isRoom }: { isRoom: boolean }) {
 
       <DialogClose ref={closeRef} className="hidden" />
     </div>
+  );
+}
+
+export function PollMaker(props: ComponentProps<typeof PollMakerContent>) {
+  return (
+    <FeatureGate feature="polls">
+      <PollMakerContent {...props} />
+    </FeatureGate>
   );
 }

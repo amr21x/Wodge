@@ -1,5 +1,7 @@
 "use client";
 
+import { FeatureGate } from "@/components/feature-flags-provider";
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { WorkspaceSchema } from "@wodge/domain/workspace/validation";
@@ -55,24 +57,25 @@ export function AccountSettings() {
         label="Account"
         description="Manage your account settings"
       />
-      <SettingsContentSection header="Avatar">
-        <div className="space-y-3">
-          <AvatarBtn
-            fallback={user?.displayName}
-            onUpload={onUpload}
-            onRemove={deleteAvatar}
-            avatar={user?.avatar}
-            isUploading={isUploading}
-            isDeleting={isDeleting}
-            className="h-20 w-20 rounded-full ring-2"
-          />
+      <FeatureGate feature="profiles">
+        <SettingsContentSection header="Avatar">
+          <div className="space-y-3">
+            <AvatarBtn
+              fallback={user?.displayName}
+              onUpload={onUpload}
+              onRemove={deleteAvatar}
+              avatar={user?.avatar}
+              isUploading={isUploading}
+              isDeleting={isDeleting}
+              className="h-20 w-20 rounded-full ring-2"
+            />
 
-          <SettingsContentDescription>
-            Update your user avatar. Recommended is 256x256px
-          </SettingsContentDescription>
-        </div>
-      </SettingsContentSection>
-
+            <SettingsContentDescription>
+              Update your user avatar. Recommended is 256x256px
+            </SettingsContentDescription>
+          </div>
+        </SettingsContentSection>
+      </FeatureGate>
       <SettingsContentSection header="General">
         <AccountGeneralForm />
       </SettingsContentSection>

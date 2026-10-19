@@ -1,3 +1,4 @@
+import { FeatureHandlers } from "../handlers/features";
 import type { WithPathParameter } from "../types/proxy";
 import type { ExtractSchema } from "hono/types";
 import type { AuthorizationRoutes } from "./authorization";
@@ -17,6 +18,7 @@ import { WorkspaceApiRoutes } from "./api/workspaces";
 export class ApiRoutes {
   readonly router: ReturnType<typeof ApiRoutes.define>;
   constructor(
+    @inject(FeatureHandlers) features: FeatureHandlers,
     @inject("auth") auth: AuthInstance,
     @inject(ScopedHandlers) scopedHandlers: ScopedHandlers,
     @inject(AccountRoutes) accounts: AccountRoutes,
@@ -25,6 +27,7 @@ export class ApiRoutes {
     @inject(WorkspaceApiRoutes) workspaces: WorkspaceApiRoutes,
   ) {
     this.router = ApiRoutes.define(
+      features,
       auth,
       scopedHandlers,
       accounts,
@@ -34,6 +37,7 @@ export class ApiRoutes {
     );
   }
   private static define(
+    features: FeatureHandlers,
     auth: AuthInstance,
     scopedHandlers: ScopedHandlers,
     accounts: AccountRoutes,
@@ -45,6 +49,14 @@ export class ApiRoutes {
 
     // Establish user/session variables before any child router resolves its handlers.
     router.use("*", authenticated(auth));
+    router.use("*", async (c, next) => {
+      const denied =
+        c.req.path === "/api/users/update" && c.get("user").username
+          ? await features.check(["profiles"])
+          : await features.http(c.req.raw);
+      if (denied) return denied;
+      await next();
+    });
 
     // Workspace policy lives in its DO; the Worker authenticates and forwards these operations.
     const authorizationProxy = new Hono<ApiContext>();

@@ -1,3 +1,5 @@
+import { useFeatureFlags } from "@/components/feature-flags-provider";
+import { CHANNEL_FEATURES } from "@wodge/core/features/policy";
 import * as React from "react";
 
 import { SidebarItem } from "./sidebar-item";
@@ -46,12 +48,15 @@ interface TeamspaceProps extends TeamspacesProps {
 }
 
 export function Teamspaces({ isPages = false, type }: TeamspacesProps) {
+  const flags = useFeatureFlags();
   const { structure } = useCurrentWorkspace();
 
   const teamsId = useMemo(
     () => structure.teams?.map((t) => t.id) || [],
     [structure.teams],
   );
+
+  if (!flags[CHANNEL_FEATURES[type]]) return null;
 
   return (
     <div className="h-full min-h-full shrink-0">

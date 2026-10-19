@@ -2,6 +2,8 @@ import { DrObj } from "@wodge/domain/types";
 import { Room } from "@wodge/domain/rooms/models";
 import { Thread } from "@wodge/domain/discussions/models";
 import { Page } from "@wodge/domain/pages/models";
+import { useFeatureFlags } from "@/components/feature-flags-provider";
+import { CHANNEL_FEATURES } from "@wodge/core/features/policy";
 import { format } from "date-fns";
 import { useSetAtom } from "jotai";
 import {
@@ -18,6 +20,7 @@ import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provid
 import { RecentlyVisitedItem } from "@/client/state/global-atoms";
 
 export function RecentItem({ item }: { item: RecentlyVisitedItem }) {
+  const flags = useFeatureFlags();
   let Icon;
   let channel;
   let folder;
@@ -58,6 +61,8 @@ export function RecentItem({ item }: { item: RecentlyVisitedItem }) {
     default:
       Icon = NotebookText;
   }
+
+  if (!flags[CHANNEL_FEATURES[item.type]]) return null;
 
   return (
     <Link

@@ -1,4 +1,6 @@
 "use client";
+
+import { FeatureGate } from "@/components/feature-flags-provider";
 import { SidebarItemBtn } from "./sidebar-item-btn";
 import { ArrowLeft, ArrowRight, PanelLeft, Video } from "lucide-react";
 import { cn } from "@/lib/utils/index";
@@ -97,23 +99,25 @@ export function AppHeader() {
           </div>
         )}
 
-        <SidebarItemBtn
-          iconClassName={cn(
-            "h-5 w-5",
-            lk_room && "text-green-600 dark:text-green-500",
-          )}
-          Icon={Video}
-          title="Calls are disabled; room messaging remains available"
-          className={cn(
-            "hidden ",
-            !path?.page && "ml-auto",
-            path?.room && "block",
-            lk_room && "animate-pulse duration-1000 hover:animate-none",
-          )}
-          onClick={() => {
-            setCallWindow((c) => !c);
-          }}
-        />
+        <FeatureGate feature="calls">
+          <SidebarItemBtn
+            iconClassName={cn(
+              "h-5 w-5",
+              lk_room && "text-green-600 dark:text-green-500",
+            )}
+            Icon={Video}
+            title="Calls are disabled; room messaging remains available"
+            className={cn(
+              "hidden ",
+              !path?.page && "ml-auto",
+              path?.room && "block",
+              lk_room && "animate-pulse duration-1000 hover:animate-none",
+            )}
+            onClick={() => {
+              setCallWindow((c) => !c);
+            }}
+          />
+        </FeatureGate>
       </div>
     </div>
   );

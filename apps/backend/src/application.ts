@@ -1,3 +1,4 @@
+import { FeatureHandlers } from "./handlers/features";
 import type { AuthInstance } from "@wodge/auth/server";
 import { SessionTickets } from "@wodge/auth/tickets";
 import { AccountService } from "@wodge/core/user/services/account";
@@ -17,6 +18,7 @@ import type { WorkerEnvironment } from "./types/worker-environment";
 export class BackendApplication {
   readonly router: ReturnType<typeof BackendApplication.define>;
   constructor(
+    @inject(FeatureHandlers) features: FeatureHandlers,
     @inject("auth") auth: AuthInstance,
     @inject(BillingHandlers) billing: BillingHandlers,
     @inject(ApiRoutes) api: ApiRoutes,
@@ -25,6 +27,7 @@ export class BackendApplication {
     @inject(AccountService) accounts: AccountService,
   ) {
     this.router = BackendApplication.define(
+      features,
       auth,
       billing,
       api,
@@ -34,6 +37,7 @@ export class BackendApplication {
     );
   }
   private static define(
+    features: FeatureHandlers,
     auth: AuthInstance,
     billing: BillingHandlers,
     api: ApiRoutes,
@@ -54,7 +58,10 @@ export class BackendApplication {
       }),
     );
 
-    const withHealth = router.get("/health", (c) => c.json({ ok: true }, 200));
+    const withFlags = router.get("/api/feature-flags", features.snapshot);
+    const withHealth = withFlags.get("/health", (c) =>
+      c.json({ ok: true }, 200),
+    );
 
     // Better Auth and signed webhooks authenticate themselves, before the API session guard.
     const withAuthentication = withHealth.all("/api/auth/*", (c) => {
@@ -81,6 +88,17 @@ export class BackendApplication {
       partyIngress(auth, tickets, workspaceGateway, accounts),
     );
 
+    router.use("/parties/*", async (c, next) => {
+      const domain = c.req.path.split("/")[2];
+      if (
+        domain === "page" &&
+        c.req.header("upgrade")?.toLowerCase() === "websocket"
+      ) {
+        const denied = await features.check(["pages"]);
+        if (denied) return denied;
+      }
+      await next();
+    });
     router.use("/parties/*", partyserverMiddleware<ApiContext>());
 
     router.notFound((c) => c.json({ error: "Not found" }, 404));

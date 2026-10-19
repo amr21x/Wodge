@@ -1,3 +1,4 @@
+import { FeatureFlagService } from "@wodge/core/features/services/flags";
 import { RoomService } from "@wodge/core/rooms/services/messages";
 import { inject, injectable } from "tsyringe";
 import { WorkspaceGateway } from "../../gateways/workspace";
@@ -10,6 +11,7 @@ import type { RunnerParams } from "./replicache";
 @injectable()
 export class RoomSync {
   constructor(
+    @inject(FeatureFlagService) private readonly flags: FeatureFlagService,
     @inject("room") private readonly party: RoomServer,
     @inject(RoomService) private readonly service: RoomService,
     @inject(WorkspaceGateway)
@@ -24,7 +26,8 @@ export class RoomSync {
   async run(params: RunnerParams, actor: RequestActor) {
     await dispatchRoomMutation(this.service, params, actor);
   }
-  patch = (userId: string) => createRoomPatch(this.party, userId);
+  patch = (userId: string) =>
+    createRoomPatch(this.party, userId, this.flags.read);
   notify = (workspaceId: string) =>
     this.workspaceGateway.notifyChannel(workspaceId, this.party.name);
 }

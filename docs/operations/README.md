@@ -22,3 +22,5 @@ Use the existing environment and release guidance to prepare operational work. T
 - [Execution project](https://linear.app/amr21/project/wodge-revival-and-enhancements-ee86a6345a5d) — operational delivery work.
 
 Follow the applicable approval gates before provisioning, deployment, recovery, or other production actions.
+
+- [Database-controlled feature flags](runbooks/feature-flags.md) — capability coverage, propagation, and recovery.

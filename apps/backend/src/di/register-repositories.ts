@@ -1,3 +1,4 @@
+import { FeatureFlagRepository } from "@wodge/core/features/repositories/flags";
 import { SubscriptionRepository } from "@wodge/core/billing/repositories/subscriptions";
 import { AuthorizationRepository } from "@wodge/core/authorization/repositories/policy";
 import { DiscussionRepository } from "@wodge/core/discussions/repositories/posts";
@@ -20,6 +21,11 @@ import { Lifecycle, type DependencyContainer } from "tsyringe";
 
 // Lifetimes are declared here, never as module-import side effects in the classes.
 export function registerRepositories(container: DependencyContainer) {
+  container.register(
+    FeatureFlagRepository,
+    { useClass: FeatureFlagRepository },
+    { lifecycle: Lifecycle.ContainerScoped },
+  );
   container.register(
     SubscriptionRepository,
     { useClass: SubscriptionRepository },

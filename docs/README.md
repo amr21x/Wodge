@@ -39,3 +39,5 @@ Browse the current portfolio scope and retained UI for each capability. Specific
 Detailed implementation, deployment, and maintenance work stays in Linear.
 
 Read these pages directly in GitHub. To propose an edit, use the page’s pencil button and the repository review process; see the [documentation workflow](development/documentation-workflow.md).
+
+- [Database-controlled feature flags](operations/runbooks/feature-flags.md) — capability coverage, propagation, and recovery.

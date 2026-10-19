@@ -1,3 +1,4 @@
+import type { FeatureHandlers } from "../handlers/features";
 import type { PokeMessage } from "@wodge/domain/sync/index";
 import type {
   PresenceMap,
@@ -19,6 +20,7 @@ export default class WorkspaceServer
   extends Server<WorkerEnvironment>
   implements WorkspacePartyInterface
 {
+  private features!: FeatureHandlers;
   private router!: WorkspaceRoutes["router"];
   private invalidations!: AuthorizationInvalidations;
 
@@ -39,6 +41,7 @@ export default class WorkspaceServer
   async onStart() {
     await handleStartup(async () => {
       const dependencies = await initializeWorkspace(this);
+      this.features = dependencies.features;
       this.router = dependencies.routes.router;
       this.invalidations = dependencies.invalidations;
     });
@@ -47,7 +50,10 @@ export default class WorkspaceServer
   async onRequest(req: Request): Promise<Response> {
     if (req.headers.get("authorization") !== this.env.SECRET_KEY)
       return new Response(null, { status: 401 });
-    return handleIngress(() => this.router.fetch(req, this.env));
+    return handleIngress(async () => {
+      const denied = await this.features.party(req, "workspace");
+      return denied ?? this.router.fetch(req, this.env);
+    });
   }
 
   // Retry unacknowledged invalidations independently of the request that created them.

@@ -118,6 +118,25 @@ export async function verifyCollaboration({
   sendUpdate(first, source);
 
   await synchronized;
+  await database
+    .prepare("UPDATE feature_flags SET enabled=0 WHERE key='pages'")
+    .run();
+  const disabledEdit = new Y.Doc();
+  try {
+    const blocked = await request(pathName, {
+      headers: { upgrade: "websocket" },
+    });
+    assert.equal(blocked.status, 403);
+    disabledEdit.getText("blocked-by-flag").insert(0, "must not persist");
+    sendUpdate(first, disabledEdit);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    assert.equal(destination.getText("blocked-by-flag").toString(), "");
+  } finally {
+    await database
+      .prepare("UPDATE feature_flags SET enabled=1 WHERE key='pages'")
+      .run();
+    disabledEdit.destroy();
+  }
   first.close();
   second.close();
 
@@ -255,6 +274,7 @@ export async function verifyCollaboration({
     restored.getText("runtime").toString(),
     "persisted collaboration",
   );
+  assert.equal(restored.getText("blocked-by-flag").toString(), "");
   socket.close();
   source.destroy();
   destination.destroy();

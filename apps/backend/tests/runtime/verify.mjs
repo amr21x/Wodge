@@ -366,6 +366,72 @@ try {
   );
 
   await check(
+    "D1 flag edits gate Worker APIs and direct object operations while preserving recovery",
+    async () => {
+      const snapshot = await request("/api/feature-flags", {}, false);
+      assert.equal(snapshot.status, 200);
+      assert.equal((await snapshot.json()).flags.membership, true);
+      await database
+        .prepare(
+          "UPDATE feature_flags SET enabled=0 WHERE key IN ('membership','workspaceCreation','profiles','teamManagement')",
+        )
+        .run();
+      try {
+        const flags = await request("/api/feature-flags", {}, false);
+        assert.equal((await flags.json()).flags.membership, false);
+        assert.equal(
+          (await request(`/api/workspaces/${workspace.id}/members`)).status,
+          403,
+        );
+        assert.equal(
+          (
+            await request(
+              "/api/workspaces/new",
+              json({ name: "Disabled", slug: "disabled" }),
+            )
+          ).status,
+          403,
+        );
+        assert.equal((await request("/api/users/me")).status, 200);
+        assert.equal((await request("/api/users/workspaces")).status, 200);
+        const profile = await request(
+          "/api/users/update",
+          json({ displayName: "Disabled update" }),
+        );
+        assert.equal(profile.status, 403);
+        const denied = await request(
+          `/parties/workspace/${workspace.id}/replicache-push`,
+          {
+            ...json({
+              clientGroupID: "disabled-flags",
+              mutations: [
+                {
+                  id: 1,
+                  clientID: "disabled-flags",
+                  name: "createTeam",
+                  args: {},
+                },
+              ],
+            }),
+          },
+        );
+        assert.equal(denied.status, 403, await denied.clone().text());
+        assert.equal((await denied.json()).feature, "teamManagement");
+      } finally {
+        await database
+          .prepare(
+            "UPDATE feature_flags SET enabled=1 WHERE key IN ('membership','workspaceCreation','profiles','teamManagement')",
+          )
+          .run();
+      }
+      assert.equal(
+        (await request(`/api/workspaces/${workspace.id}/members`)).status,
+        200,
+      );
+    },
+  );
+
+  await check(
     "sync requests retain acknowledgement and pull behavior through the Worker",
     async () => {
       const response = await request("/api/replicache/pull", {
