@@ -1,3 +1,7 @@
+import { ObjectSyncRepository } from "@wodge/core/sync/repositories/state";
+import { createObjectDatabase } from "@wodge/infra/database/object-database";
+import * as Y from "yjs";
+import { attachSql } from "../helpers/sqlite";
 import { YServer } from "y-partyserver";
 // @vitest-environment node
 import { pageBindings } from "../helpers/bindings";
@@ -42,7 +46,8 @@ function fixture() {
     },
     versions: new Map([["globalVersion", 0]]),
     name: "page",
-    ctx: { storage: { get, put, list } },
+    document: new Y.Doc(),
+    ctx: { storage: attachSql({ get, put, list }) },
     env: {
       SECRET_KEY: "fixture",
       Workspace: {
@@ -98,7 +103,7 @@ function fixture() {
 const clientKey = makeClientKey("client", makeClientGroupKey("group"));
 
 test("pushes retain duplicate/gap handling and the pull acknowledgement contract", async () => {
-  const { push, app, party, records, put, poke } = fixture();
+  const { push, app, party, put, poke } = fixture();
 
   expect((await push(1)).status).toBe(200);
   expect((await push(1)).status).toBe(200);
@@ -106,8 +111,21 @@ test("pushes retain duplicate/gap handling and the pull acknowledgement contract
   expect(party.state.record.data.columns).toEqual([
     { id: "column-1", title: "Column" },
   ]);
-  expect(put.mock.calls.filter(([key]) => key === "db")).toHaveLength(1);
-  expect(records.get(clientKey)).toMatchObject({
+  expect(
+    vi
+      .mocked(party.ctx.storage.sql.exec)
+      .mock.calls.filter(([query]) =>
+        /^insert into "page_columns"/i.test(query),
+      ),
+  ).toHaveLength(1);
+  expect(put.mock.calls.filter(([key]) => key === "db")).toHaveLength(0);
+  expect(
+    await new ObjectSyncRepository(
+      party.ctx.storage,
+      createObjectDatabase(party.ctx.storage),
+      "page",
+    ).client(clientKey),
+  ).toMatchObject({
     lastMutationID: 1,
     lastModifiedVersion: 1,
   });
@@ -142,33 +160,44 @@ test("denied pushes keep page data untouched while retaining sync acknowledgemen
   expect(party.state.record.data.columns).toEqual([]);
   expect(party.state.record.lastModifiedVersion).toBe(0);
   expect(records.has("db")).toBe(false);
-  expect(records.get(clientKey)).toMatchObject({ lastMutationID: 1 });
+  expect(
+    await new ObjectSyncRepository(
+      party.ctx.storage,
+      createObjectDatabase(party.ctx.storage),
+      "page",
+    ).client(clientKey),
+  ).toMatchObject({ lastMutationID: 1 });
   expect(poke).toHaveBeenCalledTimes(1);
 });
 
 test("a page storage failure returns 500 without acknowledging the failed command", async () => {
-  const { push, party, records, put, poke } = fixture();
+  const { push, party, records, poke } = fixture();
 
-  put.mockImplementation(async (key, value) => {
-    if (key === "db") {
-      throw new Error("storage unavailable");
-    }
-
-    if (typeof key === "string") {
-      records.set(key, structuredClone(value));
-    }
-  });
+  const exec = vi.mocked(party.ctx.storage.sql.exec).getMockImplementation()!;
+  vi.mocked(party.ctx.storage.sql.exec).mockImplementation(
+    (query: string, ...bindings: SqlStorageValue[]) => {
+      if (/^insert into "page_columns"/i.test(query))
+        throw new Error("storage unavailable");
+      return exec(query, ...bindings);
+    },
+  );
   expect((await push(1)).status).toBe(500);
-  expect(party.state.record.lastModifiedVersion).toBe(1);
+  expect(party.state.record.lastModifiedVersion).toBe(0);
   expect(records.has("db")).toBe(false);
-  expect(records.get(clientKey)).toMatchObject({ lastMutationID: 0 });
+  expect(
+    await new ObjectSyncRepository(
+      party.ctx.storage,
+      createObjectDatabase(party.ctx.storage),
+      "page",
+    ).client(clientKey),
+  ).toMatchObject({ lastMutationID: 0 });
   expect(party.versions.get("globalVersion")).toBe(0);
   expect(poke).not.toHaveBeenCalled();
 });
 
 test("the retained startup adapter reloads the same page record and sync versions", async () => {
   vi.spyOn(YServer.prototype, "onStart").mockResolvedValue(undefined);
-  const { push, party, records } = fixture();
+  const { push, party } = fixture();
 
   await push(1);
   const saved = structuredClone(party.state.record);
@@ -182,7 +211,13 @@ test("the retained startup adapter reloads the same page record and sync version
 
   await PageServer.prototype.onStart.call(party);
   expect(party.state.record).toEqual(saved);
-  expect(party.versions).toEqual(records.get("versions"));
+  expect(party.versions).toEqual(
+    await new ObjectSyncRepository(
+      party.ctx.storage,
+      createObjectDatabase(party.ctx.storage),
+      "page",
+    ).loadVersions(),
+  );
 });
 
 test("missing workspace context and denied reads retain their response statuses", async () => {

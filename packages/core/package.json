@@ -16,7 +16,6 @@
     "tsyringe": "4.10.0",
     "drizzle-orm": "0.45.2",
     "@wodge/infra": "workspace:*",
-    "array-move": "^4.0.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {

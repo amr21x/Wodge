@@ -1,0 +1,42 @@
+{
+  "journal": {
+    "version": "7",
+    "dialect": "sqlite",
+    "entries": [
+      {
+        "idx": 0,
+        "version": "6",
+        "when": 1792445513299,
+        "tag": "0000_baseline",
+        "breakpoints": true
+      },
+      {
+        "idx": 1,
+        "version": "6",
+        "when": 1792445572550,
+        "tag": "0001_document_updates",
+        "breakpoints": true
+      },
+      {
+        "idx": 2,
+        "version": "6",
+        "when": 1792450371399,
+        "tag": "0002_wet_silk_fever",
+        "breakpoints": true
+      },
+      {
+        "idx": 3,
+        "version": "6",
+        "when": 1792450514993,
+        "tag": "0003_ambiguous_santa_claus",
+        "breakpoints": true
+      }
+    ]
+  },
+  "migrations": {
+    "m0000": "CREATE TABLE IF NOT EXISTS `page_columns` (\n\t`id` text PRIMARY KEY NOT NULL,\n\t`position` integer NOT NULL,\n\t`title` text\n);\n--> statement-breakpoint\nCREATE TABLE IF NOT EXISTS `page_task_assignees` (\n\t`task_id` text NOT NULL,\n\t`position` integer NOT NULL,\n\t`user_id` text NOT NULL,\n\tPRIMARY KEY(`task_id`, `position`),\n\tFOREIGN KEY (`task_id`) REFERENCES `page_tasks`(`id`) ON UPDATE no action ON DELETE cascade\n);\n--> statement-breakpoint\nCREATE TABLE IF NOT EXISTS `page_tasks` (\n\t`id` text PRIMARY KEY NOT NULL,\n\t`column_id` text NOT NULL,\n\t`position` integer NOT NULL,\n\t`overview` text,\n\t`title` text,\n\t`due_from` text,\n\t`due_to` text,\n\t`has_due` integer NOT NULL,\n\t`has_assignees` integer NOT NULL,\n\t`priority` text,\n\t`include_time` integer NOT NULL\n);\n--> statement-breakpoint\nCREATE INDEX IF NOT EXISTS `page_tasks_column_order` ON `page_tasks` (`column_id`,`position`);--> statement-breakpoint\nCREATE TABLE IF NOT EXISTS `record_metadata` (\n\t`name` text PRIMARY KEY NOT NULL,\n\t`revision` integer NOT NULL,\n\t`deleted` integer NOT NULL\n);\n",
+    "m0001": "CREATE TABLE `page_document` (\n\t`id` integer PRIMARY KEY NOT NULL,\n\t`sequence` integer NOT NULL,\n\t`snapshot_sequence` integer NOT NULL,\n\t`snapshot` blob,\n\tCONSTRAINT \"page_document_singleton\" CHECK(\"page_document\".\"id\" = 1)\n);\n--> statement-breakpoint\nCREATE TABLE `page_document_updates` (\n\t`sequence` integer PRIMARY KEY NOT NULL,\n\t`update` blob NOT NULL\n);\n",
+    "m0002": "CREATE TABLE `sync_client_groups` (\n\t`key` text PRIMARY KEY NOT NULL,\n\t`id` text NOT NULL,\n\t`user_id` text NOT NULL,\n\t`client_version` integer\n);\n--> statement-breakpoint\nCREATE TABLE `sync_clients` (\n\t`key` text PRIMARY KEY NOT NULL,\n\t`id` text NOT NULL,\n\t`group_id` text NOT NULL,\n\t`last_mutation_id` integer NOT NULL,\n\t`last_modified_version` integer NOT NULL\n);\n--> statement-breakpoint\nCREATE TABLE `sync_import` (\n\t`id` integer PRIMARY KEY NOT NULL\n);\n--> statement-breakpoint\nCREATE TABLE `sync_versions` (\n\t`name` text PRIMARY KEY NOT NULL,\n\t`revision` integer NOT NULL\n);\n",
+    "m0003": "ALTER TABLE `sync_import` ADD `legacy_versions` integer DEFAULT 0 NOT NULL;"
+  }
+}

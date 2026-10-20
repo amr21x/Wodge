@@ -1,3 +1,11 @@
+import { roomServiceFixture } from "../helpers/services";
+import { createObjectDatabase } from "@wodge/infra/database/object-database";
+import { attachSql } from "../helpers/sqlite";
+import {
+  initialPolicy,
+  migrateResourcePolicy,
+  effectivePermissions,
+} from "@wodge/auth/authorization/policy";
 import { AuthorizationPolicies } from "@wodge/auth/authorization/policies";
 import { AuthorizationRevocations } from "@wodge/auth/authorization/revocations";
 import { WorkspaceAuthorization } from "@wodge/auth/authorization/service";
@@ -44,10 +52,14 @@ function fixture() {
         },
       ],
     },
-    structure: { teams: [team], groups: [] },
+    structure: { teams: [team] },
   } as WorkspaceState;
   const repository = new AuthorizationPolicies(
-    new AuthorizationRepository(storage, "workspace"),
+    new AuthorizationRepository(
+      storage,
+      "workspace",
+      createObjectDatabase(attachSql(storage)),
+    ),
   );
   const members = new Set(["owner", "alice"]);
   const memberships = {
@@ -61,6 +73,10 @@ function fixture() {
     memberships,
     state,
     "workspace",
+    {
+      loadPermissionImports: async () => null,
+      finishPermissionImport: async () => {},
+    },
   );
   const access = (userId = "owner") => {
     const principal = { userId, sessionId: "session-" + userId };
@@ -124,9 +140,38 @@ describe("workspace authorization", () => {
     expect((await repository.pendingInvalidations())[0]).toMatchObject({
       revision: 1,
     });
+    vi.spyOn(storage, "get").mockRejectedValue(new Error("Unexpected KV read"));
+    vi.spyOn(storage, "put").mockRejectedValue(
+      new Error("Unexpected KV write"),
+    );
     expect(
-      await new AuthorizationRepository(storage, "workspace").read(),
+      await new AuthorizationRepository(
+        storage,
+        "workspace",
+        createObjectDatabase(attachSql(storage)),
+      ).read(),
     ).toEqual(saved);
+  });
+
+  test("policy changes and invalidations roll back together when the SQL outbox write fails", async () => {
+    const { access, repository, storage } = fixture();
+    await access().listRoles();
+    const previous = await repository.read();
+    const pending = await repository.pendingInvalidations();
+    const exec = vi.mocked(storage.sql.exec).getMockImplementation()!;
+    vi.mocked(storage.sql.exec).mockImplementation((query, ...bindings) => {
+      if (/^insert into "authorization_outbox"/i.test(query))
+        throw new Error("outbox unavailable");
+      return exec(query, ...bindings);
+    });
+    await expect(
+      access().createRole({
+        name: "Uncommitted",
+        permissions: { message: ["send"] },
+      }),
+    ).rejects.toThrow();
+    expect(await repository.read()).toEqual(previous);
+    expect(await repository.pendingInvalidations()).toEqual(pending);
   });
 
   test("creates custom roles, combines applicable assignments and protects unrelated scopes", async () => {
@@ -312,7 +357,6 @@ test("combines separate role grants and blocks a delegated manager from granting
 });
 
 test("editOwn and deleteOwn use the stored author even when request metadata is forged", async () => {
-  const { RoomService } = await import("@wodge/core/rooms/services/messages");
   const { MessageSchema } = await import("@wodge/domain/rooms/validation");
   const message = MessageSchema.parse({
     id: "private",
@@ -320,8 +364,8 @@ test("editOwn and deleteOwn use the stored author even when request metadata is 
     content: "Original",
     date: new Date().toISOString(),
   });
-  const save = vi.fn(async () => {});
-  const service = new RoomService({ get: () => [message], save });
+  const { service, repository } = roomServiceFixture([message]);
+  const save = vi.spyOn(repository, "delete");
   const attacker = {
     userId: "bob",
     isOwner: true,
@@ -347,7 +391,7 @@ test("editOwn and deleteOwn use the stored author even when request metadata is 
     ...attacker,
     permissions: { message: ["moderate"] },
   });
-  expect(save).toHaveBeenCalledWith([], undefined);
+  expect(save).toHaveBeenCalledWith(message.id);
 });
 
 test("membership removal discards explicit user assignments before a later rejoin", async () => {
@@ -401,4 +445,55 @@ test("assignment revocation retries a policy revision conflict using fresh state
     ...policy,
     revision: policy.revision + 2,
   });
+});
+
+test("upgrading an existing policy preserves custom roles and revoked room grants", () => {
+  const { state, team } = fixture();
+  const policy = initialPolicy("workspace", state);
+  delete policy.resourcesMigrated;
+  policy.assignments = policy.assignments.filter(
+    (a) => a.scope.type !== "room" && a.scope.type !== "page",
+  );
+  policy.roles.push({
+    id: "custom",
+    name: "Custom",
+    permissions: { thread: ["read"] },
+  });
+  const upgraded = migrateResourcePolicy(policy, state, [
+    {
+      scope_type: "page",
+      scope_id: team.folders[0]!.channels[0]!.id,
+      subject_type: "user",
+      subject_id: "alice",
+      access: "read",
+    },
+    {
+      scope_type: "room",
+      scope_id: team.rooms[0]!.id,
+      subject_type: "user",
+      subject_id: "alice",
+      access: "update",
+    },
+  ]);
+  expect(upgraded.roles).toContainEqual(policy.roles.at(-1));
+  expect(
+    effectivePermissions(upgraded, state, "alice", {
+      type: "room",
+      id: team.rooms[0]!.id,
+    }),
+  ).toEqual({});
+  expect(
+    effectivePermissions(upgraded, state, "alice", {
+      type: "page",
+      id: team.folders[0]!.channels[0]!.id,
+    }),
+  ).toEqual({ page: ["read"] });
+  team.moderators.push("alice");
+  const moderatorUpgrade = migrateResourcePolicy(policy, state, []);
+  const permissions = effectivePermissions(moderatorUpgrade, state, "alice", {
+    type: "room",
+    id: team.rooms[0]!.id,
+  });
+  expect(permissions).not.toHaveProperty("room");
+  expect(permissions).not.toHaveProperty("message");
 });

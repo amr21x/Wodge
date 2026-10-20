@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils/index";
 import { useFeatureFlags } from "@/components/feature-flags-provider";
-import { CHANNEL_FEATURES } from "@wodge/core/features/policy";
+import { CHANNEL_FEATURES } from "@wodge/domain/features/models";
 import { useParams } from "next/navigation";
 import {
   Database,

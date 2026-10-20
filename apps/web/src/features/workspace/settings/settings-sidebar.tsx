@@ -10,7 +10,6 @@ import {
   SettingsSidebarItem,
   SettingsSidebarList,
 } from "./settings";
-import { GroupsSidebar } from "./groups/groups-sidebar";
 import { TeamsSidebar } from "./teams/teams-sidebar";
 import { useIsDesktop } from "@/hooks/use-is-desktop";
 import { SheetContent } from "@/components/ui/sheet";
@@ -45,9 +44,6 @@ export function SettingsSidebar() {
                 <>
                   <SettingsSidebarItem label="members" />
 
-                  <SettingsSidebarCollapsibleItem label="groups">
-                    <GroupsSidebar />
-                  </SettingsSidebarCollapsibleItem>
                   <SettingsSidebarCollapsibleItem label="teams">
                     <TeamsSidebar />
                   </SettingsSidebarCollapsibleItem>

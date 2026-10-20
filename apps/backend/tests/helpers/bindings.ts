@@ -1,3 +1,4 @@
+import { OrganizationMembership } from "@wodge/auth/authorization/membership";
 import { ResourceGrantCache } from "@wodge/auth/authorization/grants";
 import { createRuntimeContainer } from "../../src/container";
 import { WorkspaceNotifications } from "../../src/gateways/workspace-notifications";
@@ -53,6 +54,14 @@ export function workspaceBindings(party: WorkspaceServer) {
   const scope = createRuntimeContainer(party.env, {
     type: "workspace",
     instance: party,
+  });
+  scope.registerInstance(OrganizationMembership, {
+    hasMember: async (userId: string) =>
+      party.workspaceMembers.data.createdBy === userId ||
+      party.workspaceMembers.data.members.some(
+        (member) => member.id === userId,
+      ),
+    validate: async () => null,
   });
   return {
     container: scope,

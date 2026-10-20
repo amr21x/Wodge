@@ -252,7 +252,7 @@ export async function verifyBilling({
   // Invalid URL encodings and malformed multipart input are client errors, not leaked runtime exceptions.
   assert.equal((await request("/parties/user/%E0%A4%A")).status, 400);
   const badUpload = await request(
-    `/parties/workspace/${workspace.id}/file/${team.id}/channel/file`,
+    `/parties/workspace/${workspace.id}/file/${team.id}/${team.rooms[0].id}/file`,
     {
       method: "POST",
       headers: { "content-type": "multipart/form-data; boundary=broken" },

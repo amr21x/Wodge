@@ -485,8 +485,22 @@ try {
     },
   );
 
+  let restartCount = 0;
+  async function restart() {
+    await runtime.setOptions(
+      convertV4MiniflareOptions({
+        ...runtimeOptions,
+        bindings: {
+          ...runtimeOptions.bindings,
+          RESTART_MARKER: String(++restartCount),
+        },
+      }),
+    );
+    database = await runtime.getD1Database("DB");
+  }
+
   await check(
-    "page collaboration synchronizes two clients and persists its snapshot",
+    "page collaboration synchronizes two clients and restores its SQLite snapshot/update journal",
     async () => {
       const { verifyCollaboration } = await import("./collaboration.mjs");
 
@@ -498,20 +512,25 @@ try {
         workspace,
         structure,
         emails,
-        restart: async () => {
-          await runtime.setOptions(
-            convertV4MiniflareOptions({
-              ...runtimeOptions,
-              bindings: {
-                ...runtimeOptions.bindings,
-                RESTART_MARKER: "restart",
-              },
-            }),
-          );
-          database = await runtime.getD1Database("DB");
-        },
+        restart,
       });
       authorizationMemberCookie = collaboration.viewerCookie;
+    },
+  );
+
+  await check(
+    "relational structural state and sync acknowledgements survive restart and retries",
+    async () => {
+      const { verifyStructuralPersistence } =
+        await import("./structural-persistence.mjs");
+      await verifyStructuralPersistence({
+        root,
+        request,
+        json,
+        workspace,
+        structure,
+        restart,
+      });
     },
   );
 

@@ -103,42 +103,6 @@ export function AddFolderForm({
             )}
           />
 
-          {/* <FormField
-            control={form.control}
-            name="viewGroups"
-            render={({ field }) => {
-              return (
-                <FormItem>
-                  <FormLabel>View groups</FormLabel>
-                  <FormControl>
-                    <GroupMultiSelect
-                      onChange={field.onChange}
-                      baseGroups={structure.groups}
-                    />
-                  </FormControl>
-                </FormItem>
-              );
-            }}
-          />
-
-          <FormField
-            control={form.control}
-            name="editGroups"
-            render={({ field }) => {
-              return (
-                <FormItem>
-                  <FormLabel>Edit groups</FormLabel>
-                  <FormControl>
-                    <GroupMultiSelect
-                      onChange={field.onChange}
-                      baseGroups={structure.groups}
-                    />
-                  </FormControl>
-                </FormItem>
-              );
-            }}
-          /> */}
-
           <FormField
             control={form.control}
             name="parentFolder"

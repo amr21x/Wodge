@@ -66,7 +66,7 @@ export function useWorkspaceSubscription() {
       return tx.get<WorkspaceStructure>(makeWorkspaceStructureKey());
     },
     {
-      default: { teams: [], groups: [] },
+      default: { teams: [] },
     },
   );
 

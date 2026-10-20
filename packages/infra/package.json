@@ -8,7 +8,9 @@
   "scripts": {
     "typecheck": "tsc --incremental false --pretty false",
     "db:generate": "drizzle-kit generate --config database/drizzle.config.ts",
-    "db:drop": "drizzle-kit drop --config database/drizzle.config.ts"
+    "db:drop": "drizzle-kit drop --config database/drizzle.config.ts",
+    "db:generate:objects": "node database/generate-object-migrations.mjs",
+    "db:check:objects": "node database/bundle-object-migrations.mjs --check"
   },
   "dependencies": {
     "@wodge/domain": "workspace:*",

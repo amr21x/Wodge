@@ -8,8 +8,6 @@ export type Workspace = z.infer<typeof Validation.WorkspaceSchema> & {
 
 export type Member = z.infer<typeof Validation.MemberSchema>;
 
-export type Group = z.infer<typeof Validation.GroupSchema>;
-
 export type WorkspaceStructure = z.infer<
   typeof Validation.WorkspaceStructureSchema
 >;

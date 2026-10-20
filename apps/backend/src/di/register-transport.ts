@@ -1,4 +1,6 @@
-import { FeatureHandlers } from "../handlers/features";
+import { UserSync } from "../lib/sync/user";
+import { PageCollaborationHandlers } from "../handlers/pages/collaboration";
+import { FeatureFlagHandlers } from "../handlers/feature-flags";
 import { BackendApplication } from "../application";
 import { RoomGateway } from "../gateways/room";
 import { UserNotifications } from "../gateways/user-notifications";
@@ -43,8 +45,18 @@ import { Lifecycle, type DependencyContainer } from "tsyringe";
 // Lifetimes are declared here, never as module-import side effects in the classes.
 export function registerTransport(container: DependencyContainer) {
   container.register(
-    FeatureHandlers,
-    { useClass: FeatureHandlers },
+    UserSync,
+    { useClass: UserSync },
+    { lifecycle: Lifecycle.ContainerScoped },
+  );
+  container.register(
+    PageCollaborationHandlers,
+    { useClass: PageCollaborationHandlers },
+    { lifecycle: Lifecycle.ContainerScoped },
+  );
+  container.register(
+    FeatureFlagHandlers,
+    { useClass: FeatureFlagHandlers },
     { lifecycle: Lifecycle.ContainerScoped },
   );
   container.register(

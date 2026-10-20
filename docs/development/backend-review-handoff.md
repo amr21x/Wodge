@@ -27,10 +27,10 @@ call the DI initialization boundary once to receive ready routes and lifecycle
 dependencies. Startup restoration uses record repositories inside that boundary, before
 services can observe object state; request handlers use services only.
 
-Core features contain `services/`, `repositories/` and pure `mutations/` as needed.
+Core features contain business `services/` and relational `repositories/`.
 Infrastructure owns technical clients and primitives, with database configuration
 under `packages/infra/database/`. Domain owns DTOs, schemas and declarative types.
-The web reuses pure optimistic transformations, not backend services or repositories.
+Web owns its optimistic transformations and has no imports or dependency on core.
 Better Auth configuration, tokens, membership APIs and custom authorization are in
 auth. Generic email delivery is an infrastructure integration.
 
@@ -59,7 +59,7 @@ Browser bundle verification includes the actual typed frontend client.
 - Backend unit/integration tests cover DI reuse and isolation, concurrent identities,
   constructor-injected handlers, SDK disposal, authorization, sync dispatch, validation,
   object persistence, membership synchronization, application errors and provider boundaries.
-- Core tests cover pure mutations, identifiers, profiles and input contracts. Auth tests
+- Core tests cover identifiers, profiles and input contracts; web tests cover optimistic mutations. Auth tests
   cover access rules. The package test configurations discover these suites directly.
 - Typechecks cover backend, core, auth, infrastructure, domain, environment and web.
 - `node scripts/check-boundaries.mjs` checks package exports, dependency declarations,
@@ -86,10 +86,14 @@ Browser bundle verification includes the actual typed frontend client.
 
 ## Known limits for behavior review
 
-- The role/permission rollout is complete for the documented room slice. Page,
-  thread and legacy file/group paths still have compatibility authorization.
-- Durable Object storage uses KV records on SQLite-backed objects. Relational SQL
-  tables and deployed namespace/data migration remain separate work.
+- Access groups are removed. Room, page and thread access uses scoped custom roles;
+  Yjs connections recheck page access. Browser role-management screens and legacy
+  standalone file authorization remain separate follow-up work.
+- Structural object data and binary Yjs snapshots/update journals use Drizzle SQLite
+  tables with per-object migrations and one-time KV imports. D1 has its own Drizzle
+  connection and migrations. Sync metadata, authorization, presence and room bindings
+  also use relational tables. Deployed namespace transfer remains separate work; see
+  [persistence boundaries](../architecture/data-model.md).
 - D1 organization writes and object synchronization cannot share one transaction.
   Handlers coordinate them and some operations reconcile idempotently; durable
   recovery for every partial failure still needs a reconciliation/queue design.

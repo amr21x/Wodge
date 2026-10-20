@@ -1,4 +1,4 @@
-import { FeatureHandlers } from "./handlers/features";
+import { FeatureFlagHandlers } from "./handlers/feature-flags";
 import type { AuthInstance } from "@wodge/auth/server";
 import { SessionTickets } from "@wodge/auth/tickets";
 import { AccountService } from "@wodge/core/user/services/account";
@@ -17,7 +17,7 @@ import type { ApiContext } from "./types/hono-context";
 export class BackendApplication {
   readonly router: ReturnType<typeof BackendApplication.define>;
   constructor(
-    @inject(FeatureHandlers) features: FeatureHandlers,
+    @inject(FeatureFlagHandlers) features: FeatureFlagHandlers,
     @inject("auth") auth: AuthInstance,
     @inject(BillingHandlers) billing: BillingHandlers,
     @inject(ApiRoutes) api: ApiRoutes,
@@ -36,7 +36,7 @@ export class BackendApplication {
     );
   }
   private static define(
-    features: FeatureHandlers,
+    features: FeatureFlagHandlers,
     auth: AuthInstance,
     billing: BillingHandlers,
     api: ApiRoutes,

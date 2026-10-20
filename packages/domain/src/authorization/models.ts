@@ -30,6 +30,7 @@ export interface RoleAssignment {
 
 export interface AuthorizationPolicy {
   schemaVersion: 1;
+  resourcesMigrated?: boolean;
   workspaceId: string;
   revision: number;
   roles: AuthorizationRole[];
@@ -59,3 +60,6 @@ export interface AuthorizationInvalidation {
   revision: number;
   createdAt: number;
 }
+
+export type PermissionImport =
+  typeof import("../workspace/schema/object").workspace_permission_imports.$inferSelect;

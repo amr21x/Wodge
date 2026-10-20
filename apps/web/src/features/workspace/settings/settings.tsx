@@ -2,17 +2,10 @@
 
 import { SidebarItem } from "../components/sidebar-item";
 import { useFeatureFlags } from "@/components/feature-flags-provider";
-import { pageFeatures } from "@wodge/core/features/policy";
-import { disabledFeature } from "@wodge/core/features/flags";
+import { pageFeatures } from "@/client/features/pages";
+import { disabledFeature } from "@/client/features/flags";
 
-import {
-  LucideIcon,
-  PanelLeft,
-  Plus,
-  ShieldPlusIcon,
-  Users2,
-  X,
-} from "lucide-react";
+import { LucideIcon, PanelLeft, Plus, Users2, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { SidebarItemBtn } from "../components/sidebar-item-btn";
 import { IconType } from "react-icons/lib";
@@ -116,7 +109,7 @@ function SettingsSidebarCollapsibleItem({
     />
   );
 
-  const Icon = label === "groups" ? ShieldPlusIcon : Users2;
+  const Icon = Users2;
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>

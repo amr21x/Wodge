@@ -1,75 +1,64 @@
-import {
-  isAdmin,
-  isOwner,
-  isTeamModerator,
-} from "@wodge/auth/authorization/access";
+import { WorkspaceAuthorization } from "@wodge/auth/authorization/service";
+import { containsPermissions } from "@wodge/auth/authorization/policy";
 import { workspaceError } from "@wodge/core/workspace/errors";
-import { WorkspaceStateRepository } from "@wodge/core/workspace/repositories/state";
 import type { ResourceActor } from "@wodge/domain/channels/index";
 import { inject, injectable } from "tsyringe";
 
-/** Legacy workspace mutation gates, evaluated before calling a business operation. */
 @injectable()
 export class WorkspaceMutationAccess {
   constructor(
-    @inject(WorkspaceStateRepository)
-    private readonly workspace: WorkspaceStateRepository,
+    @inject(WorkspaceAuthorization)
+    private readonly authorization: WorkspaceAuthorization,
+    @inject("objectId") private readonly workspaceId: string,
   ) {}
-
-  authorize(name: string, input: unknown, actor: ResourceActor): ResourceActor {
-    const isOwnerFlag = !!isOwner({
-      members: this.workspace.members,
-      userId: actor.userId,
-    });
-    const isAdminFlag = !!isAdmin({
-      members: this.workspace.members,
-      userId: actor.userId,
-    });
+  async authorize(
+    name: string,
+    input: unknown,
+    actor: ResourceActor,
+  ): Promise<ResourceActor> {
+    const administrative = ["createTeam", "deleteTeam", "updateTeam"].includes(
+      name,
+    );
+    const structural = [
+      "createPage",
+      "updatePage",
+      "createRoom",
+      "updateRoom",
+      "createThread",
+      "updateThread",
+      "deleteFolder",
+      "updateFolder",
+      "deleteChannel",
+    ].includes(name);
+    if (!administrative && !structural) return actor;
     const teamId =
       typeof input === "object" && input !== null && "teamId" in input
         ? String(input.teamId)
         : undefined;
-    const moderator = isTeamModerator({
-      structure: this.workspace.structure,
-      userId: actor.userId,
-      teamId,
+    const scope = teamId
+      ? { type: "team" as const, id: teamId }
+      : { type: "workspace" as const, id: this.workspaceId };
+    const permissions = await this.authorization.permissionsForUser(
+      actor.userId,
+      scope,
+    );
+    const canManage = containsPermissions(permissions, {
+      workspace: ["manage"],
     });
-    const administrative = [
-      "createGroup",
-      "deleteGroup",
-      "updateGroup",
-      "createTeam",
-      "deleteTeam",
-      "updateTeam",
-    ].includes(name);
-    const channelEdit =
-      [
-        "createPage",
-        "updatePage",
-        "createRoom",
-        "updateRoom",
-        "createThread",
-        "deleteFolder",
-      ].includes(name) ||
-      (name === "deleteChannel" &&
-        typeof input === "object" &&
-        input !== null &&
-        "type" in input &&
-        (input.type === "page" || input.type === "room"));
-    if (
-      (administrative && !isOwnerFlag && !isAdminFlag) ||
-      (channelEdit && !isOwnerFlag && !isAdminFlag && !moderator)
-    ) {
+    const canManageTeam =
+      teamId && containsPermissions(permissions, { team: ["manageMembers"] });
+    if (!canManage && !(canManageTeam && (name === "updateTeam" || structural)))
       throw workspaceError(
         "WORKSPACE_FORBIDDEN",
         "Workspace operation is forbidden",
       );
-    }
     return {
       ...actor,
-      isOwner: isOwnerFlag,
-      isAdmin: isAdminFlag,
-      isTeamModerator: moderator,
+      isOwner: false,
+      isAdmin: canManage,
+      isTeamModerator: !!canManageTeam,
+      canEdit: true,
+      permissions,
     };
   }
 }

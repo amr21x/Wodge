@@ -51,8 +51,6 @@ export function TeamMore({ teamId, folderId, folder }: TeamMoreProps) {
         name: "New page",
 
         id: createEntityId(),
-        editGroups: ["team-members"],
-        viewGroups: ["team-members"],
         avatar: "",
       });
     } catch {

@@ -1,3 +1,6 @@
+import { ObjectSyncRepository } from "@wodge/core/sync/repositories/state";
+import { PollRepository } from "@wodge/core/polls/repositories/polls";
+import { PageDocumentRepository } from "@wodge/core/pages/repositories/document";
 import { FeatureFlagRepository } from "@wodge/core/features/repositories/flags";
 import { SubscriptionRepository } from "@wodge/core/billing/repositories/subscriptions";
 import { AuthorizationRepository } from "@wodge/core/authorization/repositories/policy";
@@ -21,6 +24,21 @@ import { Lifecycle, type DependencyContainer } from "tsyringe";
 
 // Lifetimes are declared here, never as module-import side effects in the classes.
 export function registerRepositories(container: DependencyContainer) {
+  container.register(
+    ObjectSyncRepository,
+    { useClass: ObjectSyncRepository },
+    { lifecycle: Lifecycle.ContainerScoped },
+  );
+  container.register(
+    PollRepository,
+    { useClass: PollRepository },
+    { lifecycle: Lifecycle.ContainerScoped },
+  );
+  container.register(
+    PageDocumentRepository,
+    { useClass: PageDocumentRepository },
+    { lifecycle: Lifecycle.ContainerScoped },
+  );
   container.register(
     FeatureFlagRepository,
     { useClass: FeatureFlagRepository },

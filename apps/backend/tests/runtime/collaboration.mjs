@@ -3,6 +3,20 @@ import { realpathSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 
+/** @param {string} root */
+export function loadYjsProtocol(root) {
+  const require = createRequire(
+    realpathSync(
+      path.join(root, "apps/backend/node_modules/y-partyserver/package.json"),
+    ),
+  );
+  const Y = require("yjs");
+  const encoding = require("lib0/encoding");
+  const decoding = require("lib0/decoding");
+  const sync = require("y-protocols/sync");
+  return { Y, encoding, decoding, sync };
+}
+
 /** @param {any} fixture */
 export async function verifyCollaboration({
   root,
@@ -14,15 +28,7 @@ export async function verifyCollaboration({
   emails,
   restart,
 }) {
-  const require = createRequire(
-    realpathSync(
-      path.join(root, "apps/backend/node_modules/y-partyserver/package.json"),
-    ),
-  );
-  const Y = require("yjs");
-  const encoding = require("lib0/encoding");
-  const decoding = require("lib0/decoding");
-  const sync = require("y-protocols/sync");
+  const { Y, encoding, decoding, sync } = loadYjsProtocol(root);
   const team = structure.teams[0];
   const folder = team.folders[0];
   const page = folder.channels[0];
@@ -33,34 +39,40 @@ export async function verifyCollaboration({
   });
   const pathName = `/parties/page/${page.id}?${target}`;
 
-  const changed = await request("/api/replicache/push", {
-    ...json({
-      clientGroupID: "runtime-editor",
-      pushVersion: 1,
-      schemaVersion: "",
-      mutations: [
-        {
-          id: 1,
-          clientID: "runtime-editor",
-          name: "updatePage",
-          args: {
-            ...page,
-            teamId: team.id,
-            folderId: folder.id,
-            editGroups: [],
-            viewGroups: ["team-members"],
-          },
-        },
-      ],
-    }),
-    headers: {
-      "content-type": "application/json",
-      domain: "workspace",
-      id: workspace.id,
-    },
-  });
-
-  assert.equal(changed.status, 200, await changed.text());
+  const authorizationRoot = `/api/workspaces/${workspace.id}/authorization`;
+  const existing = await (await request(authorizationRoot + "/roles")).json();
+  for (const assignment of existing.assignments.filter(
+    (/** @type {{id:string,scope:{type:string,id:string}}} */ a) =>
+      a.scope.type === "page" && a.scope.id === page.id,
+  )) {
+    assert.equal(
+      (
+        await request(authorizationRoot + "/assignments/" + assignment.id, {
+          method: "DELETE",
+        })
+      ).status,
+      204,
+    );
+  }
+  const created = await request(
+    authorizationRoot + "/roles",
+    json({ name: "Live page access", permissions: { page: ["read"] } }),
+  );
+  assert.equal(created.status, 201, await created.clone().text());
+  const pageRole = await created.json();
+  async function assignPageRole() {
+    const response = await request(
+      authorizationRoot + "/assignments",
+      json({
+        roleId: pageRole.id,
+        subject: { type: "team", id: team.id },
+        scope: { type: "page", id: page.id },
+      }),
+    );
+    assert.equal(response.status, 201, await response.clone().text());
+    return response.json();
+  }
+  let pageAssignment = await assignPageRole();
 
   const a = await request(pathName, { headers: { upgrade: "websocket" } });
   const b = await request(pathName, { headers: { upgrade: "websocket" } });
@@ -205,6 +217,105 @@ export async function verifyCollaboration({
     404,
   );
 
+  const candidates = await request(
+    authorizationRoot + "/pages/" + page.id + "/members",
+    { headers: viewerHeaders },
+  );
+  assert.equal(candidates.status, 200, await candidates.clone().text());
+  assert.ok((await candidates.json()).length >= 2);
+
+  // A thread reader can synchronize but cannot write, including through direct object ingress.
+  const thread = team.threads[0];
+  for (const assignment of existing.assignments.filter(
+    (/** @type {{id:string,scope:{type:string,id:string}}} */ item) =>
+      item.scope.type === "thread" && item.scope.id === thread.id,
+  ))
+    assert.equal(
+      (
+        await request(authorizationRoot + "/assignments/" + assignment.id, {
+          method: "DELETE",
+        })
+      ).status,
+      204,
+    );
+  const threadRoleResponse = await request(
+    authorizationRoot + "/roles",
+    json({ name: "Live thread access", permissions: { thread: ["read"] } }),
+  );
+  assert.equal(threadRoleResponse.status, 201);
+  const threadRole = await threadRoleResponse.json();
+  assert.equal(
+    (
+      await request(
+        authorizationRoot + "/assignments",
+        json({
+          roleId: threadRole.id,
+          subject: { type: "team", id: team.id },
+          scope: { type: "thread", id: thread.id },
+        }),
+      )
+    ).status,
+    201,
+  );
+  const viewerIdentity = await database
+    .prepare("SELECT id FROM auth_users WHERE email = ?")
+    .bind("viewer@example.test")
+    .first();
+  const threadHeaders = {
+    ...viewerHeaders,
+    "content-type": "application/json",
+    "x-workspace-id": workspace.id,
+    "x-team-id": team.id,
+  };
+  const threadPath = `/parties/thread/${thread.id}`;
+  /** @param {number} id */
+  async function writeThread(id) {
+    return request(threadPath + "/replicache-push", {
+      ...json({
+        clientGroupID: "role-thread",
+        mutations: [
+          {
+            id,
+            clientID: "role-thread",
+            name: "createPost",
+            args: {
+              id: "role-thread-post",
+              author: viewerIdentity.id,
+              content: "Permission checked",
+              type: "qa",
+              createdAt: new Date().toISOString(),
+            },
+          },
+        ],
+      }),
+      headers: threadHeaders,
+    });
+  }
+  async function readThread() {
+    const response = await request(threadPath + "/replicache-pull", {
+      ...json({ clientGroupID: "role-thread", cookie: null }),
+      headers: threadHeaders,
+    });
+    assert.equal(response.status, 200);
+    return JSON.stringify(await response.json());
+  }
+  assert.equal((await writeThread(1)).status, 200);
+  assert.ok(!(await readThread()).includes("role-thread-post"));
+  assert.equal(
+    (
+      await request(authorizationRoot + "/roles/" + threadRole.id, {
+        ...json({
+          name: "Live thread access",
+          permissions: { thread: ["read", "update"] },
+        }),
+        method: "PATCH",
+      })
+    ).status,
+    200,
+  );
+  assert.equal((await writeThread(2)).status, 200);
+  assert.ok((await readThread()).includes("role-thread-post"));
+
   const viewer = await request(pathName, {
     headers: {
       ...viewerHeaders,
@@ -222,11 +333,116 @@ export async function verifyCollaboration({
 
   malicious.getText("runtime").insert(0, "unauthorized edit");
   sendUpdate(reader, malicious);
-  reader.close();
 
-  // Wait for YServer's configured persistence debounce, then verify a new connection sees the authoritative snapshot.
-
-  await new Promise((resolve) => setTimeout(resolve, 2300));
+  // Keep the same viewer socket open while grants change, then restart before the debounce expires.
+  const live = await request(pathName, { headers: { upgrade: "websocket" } });
+  assert.equal(live.status, 101);
+  const editor = live.webSocket;
+  editor.accept();
+  const observed = new Y.Doc();
+  /** @param {string} field @param {string} expected */
+  function waitForField(field, expected) {
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(
+        () => reject(new Error(`Live Yjs update timed out: ${field}`)),
+        5000,
+      );
+      const listener = (
+        /** @type {{ data: ArrayBuffer | string }} */ event,
+      ) => {
+        if (typeof event.data === "string") return;
+        const decoder = decoding.createDecoder(new Uint8Array(event.data));
+        if (decoding.readVarUint(decoder) !== 0) return;
+        sync.readSyncMessage(decoder, encoding.createEncoder(), observed, null);
+        if (observed.getText(field).toString() === expected) {
+          clearTimeout(timeout);
+          editor.removeEventListener("message", listener);
+          resolve(undefined);
+        }
+      };
+      editor.addEventListener("message", listener);
+    });
+  }
+  /** @param {boolean} canEdit @param {boolean} [canView] */
+  async function changeAccess(canEdit, canView = true) {
+    if (!canView) {
+      const response = await request(
+        authorizationRoot + "/assignments/" + pageAssignment.id,
+        { method: "DELETE" },
+      );
+      assert.equal(response.status, 204);
+      pageAssignment = null;
+      return;
+    }
+    const response = await request(
+      authorizationRoot + "/roles/" + pageRole.id,
+      {
+        ...json({
+          name: "Live page access",
+          permissions: { page: canEdit ? ["read", "update"] : ["read"] },
+        }),
+        method: "PATCH",
+      },
+    );
+    assert.equal(response.status, 200, await response.text());
+    if (!pageAssignment) pageAssignment = await assignPageRole();
+  }
+  // Exercise threshold compaction, then leave a fresh update for journal recovery.
+  const continuous = new Y.Doc();
+  for (let index = 0; index < 66; index++) {
+    const received = waitForField("continuous", String(index));
+    continuous.getMap("counter").set("value", index);
+    const text = continuous.getText("continuous");
+    text.delete(0, text.length);
+    text.insert(0, String(index));
+    sendUpdate(editor, continuous);
+    await received;
+  }
+  continuous.destroy();
+  await changeAccess(true);
+  const granted = new Y.Doc();
+  granted.getText("granted-live").insert(0, "allowed while editor");
+  let received = waitForField("granted-live", "allowed while editor");
+  sendUpdate(reader, granted);
+  await received;
+  await changeAccess(false);
+  const revoked = new Y.Doc();
+  revoked.getText("revoked-live").insert(0, "must not persist");
+  sendUpdate(reader, revoked);
+  // Wait for the rejected update to traverse the local websocket boundary.
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  const closed = new Promise((resolve, reject) => {
+    const timeout = setTimeout(
+      () => reject(new Error("Revoked viewer was not disconnected")),
+      5000,
+    );
+    reader.addEventListener(
+      "close",
+      (/** @type {{ code: number }} */ event) => {
+        clearTimeout(timeout);
+        assert.equal(event.code, 1008);
+        resolve(undefined);
+      },
+    );
+  });
+  await changeAccess(false, false);
+  const pending = new Y.Doc();
+  pending.getText("pending-save").insert(0, "durable before debounce");
+  received = waitForField("pending-save", "durable before debounce");
+  sendUpdate(editor, pending);
+  await received;
+  await closed;
+  assert.equal(observed.getText("revoked-live").toString(), "");
+  const deniedReconnect = await request(pathName, {
+    headers: { ...viewerHeaders, upgrade: "websocket" },
+  });
+  assert.equal(deniedReconnect.status, 403);
+  await changeAccess(false);
+  editor.close();
+  observed.destroy();
+  granted.destroy();
+  revoked.destroy();
+  pending.destroy();
   await restart();
   const reconnect = await request(pathName, {
     headers: { upgrade: "websocket" },
@@ -275,6 +491,16 @@ export async function verifyCollaboration({
     "persisted collaboration",
   );
   assert.equal(restored.getText("blocked-by-flag").toString(), "");
+  assert.equal(
+    restored.getText("pending-save").toString(),
+    "durable before debounce",
+  );
+  assert.equal(
+    restored.getText("granted-live").toString(),
+    "allowed while editor",
+  );
+  assert.equal(restored.getText("revoked-live").toString(), "");
+  assert.equal(restored.getText("continuous").toString(), "65");
   socket.close();
   source.destroy();
   destination.destroy();

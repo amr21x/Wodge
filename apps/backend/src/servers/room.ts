@@ -1,5 +1,5 @@
 import { mutationRecordId } from "@wodge/core/features/policy";
-import type { FeatureHandlers } from "../handlers/features";
+import type { FeatureFlagHandlers } from "../handlers/feature-flags";
 import type {
   RoomPartyInterface,
   ServerRoomMessages,
@@ -15,7 +15,7 @@ export default class RoomServer
   extends Server<WorkerEnvironment>
   implements RoomPartyInterface
 {
-  private features!: FeatureHandlers;
+  private features!: FeatureFlagHandlers;
   private router!: RoomRoutes["router"];
 
   static options = {

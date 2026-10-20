@@ -1,192 +1,204 @@
-import { createCommentMutation } from "@wodge/core/discussions/mutations/create-comment";
-import { createPostMutation } from "@wodge/core/discussions/mutations/create-post";
-import { deleteCommentMutation } from "@wodge/core/discussions/mutations/delete-comment";
-import { deletePostMutation } from "@wodge/core/discussions/mutations/delete-post";
-import { editCommentMutation } from "@wodge/core/discussions/mutations/edit-comment";
-import { editPostMutation } from "@wodge/core/discussions/mutations/edit-post";
-import { removePostVoteMutation } from "@wodge/core/discussions/mutations/remove-vote";
-import { togglePostMutation } from "@wodge/core/discussions/mutations/toggle-post";
-import { postVoteMutation } from "@wodge/core/discussions/mutations/vote";
 import { DiscussionRepository } from "@wodge/core/discussions/repositories/posts";
+import { discussionsError } from "@wodge/core/discussions/errors";
+import {
+  ThreadPostSchema,
+  ThreadMessageSchema,
+} from "@wodge/domain/discussions/validation";
 import type { ResourceActor } from "@wodge/domain/channels/index";
 import type { DiscussionInputs } from "@wodge/domain/discussions/dto";
 import { inject, injectable } from "tsyringe";
 
+const privileged = (actor: ResourceActor) =>
+  actor.isAdmin || actor.isOwner || actor.isTeamModerator;
 @injectable()
 export class DiscussionService {
   constructor(
-    @inject(DiscussionRepository)
-    private readonly discussions: Pick<DiscussionRepository, "get" | "save">,
+    @inject(DiscussionRepository) private readonly discussions: Pick<
+      DiscussionRepository,
+      keyof DiscussionRepository
+    >,
   ) {}
-
-  async deletePost(
-    input: DiscussionInputs["deletePost"],
-    actor: ResourceActor,
-    revision?: number,
-  ) {
-    const data = this.discussions.get();
-    const isPrivileged =
-      actor.isAdmin || actor.isOwner || actor.isTeamModerator;
-    const post = input;
-    const d = deletePostMutation({
-      isPrivileged,
-      post: post,
-      postsArray: data,
-      userId: actor.userId,
-    });
-
-    await this.discussions.save(d, revision);
-  }
-
-  async editPost(
-    input: DiscussionInputs["editPost"],
-    actor: ResourceActor,
-    revision?: number,
-  ) {
-    const data = this.discussions.get();
-    const { newContent, ...post } = input;
-    const d = editPostMutation({
-      postsArray: data,
-      newContent,
-      userId: actor.userId,
-      post,
-    });
-
-    await this.discussions.save(d, revision);
-  }
-
-  async togglePost(
-    input: DiscussionInputs["togglePost"],
-    actor: ResourceActor,
-    revision?: number,
-  ) {
-    const data = this.discussions.get();
-    const isPrivileged =
-      actor.isAdmin || actor.isOwner || actor.isTeamModerator;
-    const d = togglePostMutation({
-      isPrivileged,
-      postsArray: data,
-      curUserId: actor.userId,
-      postId: input,
-    });
-
-    await this.discussions.save(d, revision);
-  }
-
   async createPost(
     input: DiscussionInputs["createPost"],
     actor: ResourceActor,
     revision?: number,
   ) {
-    const data = this.discussions.get();
-    const isPrivileged =
-      actor.isAdmin || actor.isOwner || actor.isTeamModerator;
-    const post = input;
-
-    if (post.type === "post" && !isPrivileged) {
-      return;
-    }
-
-    const d = createPostMutation({
-      post: post,
-      postsArray: data,
-      userId: actor.userId,
+    if (input.type === "post" && !privileged(actor)) return;
+    const post = ThreadPostSchema.parse(input);
+    if (post.author !== actor.userId)
+      throw discussionsError("DISCUSSION_FORBIDDEN", "author error");
+    return this.discussions.change(revision, () => {
+      if (this.discussions.findPost(post.id))
+        throw discussionsError("DISCUSSION_CONFLICT", "post already exists");
+      this.discussions.insertPost({
+        ...post,
+        createdAt: new Date().toISOString(),
+      });
     });
-
-    await this.discussions.save(d, revision);
   }
-
-  async removeVote(
-    input: DiscussionInputs["removeVote"],
+  async editPost(
+    input: DiscussionInputs["editPost"],
     actor: ResourceActor,
     revision?: number,
   ) {
-    const data = this.discussions.get();
-    const vote = input;
-
-    await this.discussions.save(
-      removePostVoteMutation({
-        curUserId: actor.userId,
-        postsArr: data,
-        ...vote,
-      }),
-      revision,
-    );
-  }
-
-  async vote(
-    input: DiscussionInputs["vote"],
-    actor: ResourceActor,
-    revision?: number,
-  ) {
-    const data = this.discussions.get();
-    const vote = input;
-
-    await this.discussions.save(
-      postVoteMutation({
-        curUserId: actor.userId,
-        postsArr: data,
-        ...vote,
-      }),
-      revision,
-    );
-  }
-
-  async deleteComment(
-    input: DiscussionInputs["deleteComment"],
-    actor: ResourceActor,
-    revision?: number,
-  ) {
-    const data = this.discussions.get();
-    const isPrivileged =
-      actor.isAdmin || actor.isOwner || actor.isTeamModerator;
-    const msg = input;
-    const d = deleteCommentMutation({
-      comment: msg,
-      postId: msg.postId,
-      postsArray: data,
-      userId: actor.userId,
-      isPrivileged: msg?.author === actor.userId || isPrivileged,
+    return this.discussions.change(revision, () => {
+      const post = this.discussions.findPost(input.id);
+      if ((post?.author ?? input.author) !== actor.userId)
+        throw discussionsError(
+          "DISCUSSION_FORBIDDEN",
+          "You are not allowed to edit this message",
+        );
+      if (post)
+        this.discussions.editPost(
+          post.id,
+          input.newContent,
+          new Date().toISOString(),
+        );
     });
-
-    await this.discussions.save(d, revision);
   }
-
+  async deletePost(
+    input: DiscussionInputs["deletePost"],
+    actor: ResourceActor,
+    revision?: number,
+  ) {
+    return this.discussions.change(revision, () => {
+      const post = this.discussions.findPost(input.id);
+      if ((post?.author ?? input.author) !== actor.userId && !privileged(actor))
+        throw discussionsError(
+          "DISCUSSION_FORBIDDEN",
+          "You are not allowed to delete this message",
+        );
+      this.discussions.deletePost(input.id);
+    });
+  }
+  async togglePost(
+    input: DiscussionInputs["togglePost"],
+    actor: ResourceActor,
+    revision?: number,
+  ) {
+    return this.discussions.change(revision, () => {
+      const post = this.discussions.findPost(input);
+      if (!post)
+        throw discussionsError("DISCUSSION_NOT_FOUND", "post not found");
+      if (post.author !== actor.userId && !privileged(actor))
+        throw discussionsError(
+          "DISCUSSION_FORBIDDEN",
+          "You are not the creator of this thread",
+        );
+      this.discussions.resolvePost(post.id, !post.isResolved);
+    });
+  }
   async createComment(
     input: DiscussionInputs["createComment"],
     actor: ResourceActor,
     revision?: number,
   ) {
-    const data = this.discussions.get();
-    const isPrivileged =
-      actor.isAdmin || actor.isOwner || actor.isTeamModerator;
-    const { postId, ...comment } = input;
-    const d = createCommentMutation({
-      comment,
-      postId,
-      isPrivileged,
-      postsArray: data,
-      userId: actor.userId,
+    const { postId, ...data } = input,
+      comment = ThreadMessageSchema.parse(data);
+    if (comment.author !== actor.userId)
+      throw discussionsError("DISCUSSION_FORBIDDEN", "author error");
+    return this.discussions.change(revision, () => {
+      const post = this.discussions.findPost(postId);
+      if (!post)
+        throw discussionsError("DISCUSSION_NOT_FOUND", "post not found");
+      if (
+        comment.type !== "message" &&
+        post.author !== actor.userId &&
+        !privileged(actor)
+      )
+        throw discussionsError("DISCUSSION_FORBIDDEN", "not privileged");
+      if (post.isResolved && comment.type === "message")
+        throw discussionsError("DISCUSSION_CONFLICT", "post is resolved");
+      if (this.discussions.findComment(postId, comment.id))
+        throw discussionsError("DISCUSSION_CONFLICT", "message already exists");
+      this.discussions.insertComment(postId, {
+        ...comment,
+        createdAt: new Date().toISOString(),
+      });
     });
-
-    await this.discussions.save(d, revision);
   }
-
   async editComment(
     input: DiscussionInputs["editComment"],
     actor: ResourceActor,
     revision?: number,
   ) {
-    const data = this.discussions.get();
-    const { comment, postId, newContent } = input;
-    const d = editCommentMutation({
-      comment,
-      postId,
-      postsArray: data,
-      newContent,
-      userId: actor.userId,
+    return this.discussions.change(revision, () => {
+      const comment = this.discussions.findComment(
+        input.postId,
+        input.comment.id,
+      );
+      if ((comment?.author ?? input.comment.author) !== actor.userId)
+        throw discussionsError(
+          "DISCUSSION_FORBIDDEN",
+          "You are not allowed to edit this message",
+        );
+      if (comment)
+        this.discussions.editComment(
+          input.postId,
+          comment.id,
+          input.newContent,
+          new Date().toISOString(),
+        );
     });
-
-    await this.discussions.save(d, revision);
+  }
+  async deleteComment(
+    input: DiscussionInputs["deleteComment"],
+    actor: ResourceActor,
+    revision?: number,
+  ) {
+    return this.discussions.change(revision, () => {
+      const comment = this.discussions.findComment(input.postId, input.id);
+      if (
+        (comment?.author ?? input.author) !== actor.userId &&
+        !privileged(actor)
+      )
+        throw discussionsError(
+          "DISCUSSION_FORBIDDEN",
+          "You are not allowed to delete this message",
+        );
+      this.discussions.deleteComment(input.postId, input.id);
+    });
+  }
+  async vote(
+    input: DiscussionInputs["vote"],
+    actor: ResourceActor,
+    revision?: number,
+  ) {
+    return this.discussions.change(revision, () => {
+      const post = this.discussions.findPost(input.postId);
+      if (!post)
+        throw discussionsError("DISCUSSION_NOT_FOUND", "Messages not found");
+      if (post.type !== "poll")
+        throw discussionsError(
+          "DISCUSSION_INVALID_INPUT",
+          "Post is not a poll",
+        );
+      if (post.pollVoters.some((v) => v.voter === actor.userId))
+        throw discussionsError("DISCUSSION_CONFLICT", "User already voted");
+      if (input.option < 0 || input.option >= post.pollOptions.length)
+        throw discussionsError("DISCUSSION_INVALID_INPUT", "Invalid option");
+      this.discussions.castVote(post.id, actor.userId, input.option);
+    });
+  }
+  async removeVote(
+    input: DiscussionInputs["removeVote"],
+    actor: ResourceActor,
+    revision?: number,
+  ) {
+    return this.discussions.change(revision, () => {
+      const post = this.discussions.findPost(input.postId);
+      if (!post)
+        throw discussionsError("DISCUSSION_NOT_FOUND", "Post not found");
+      if (post.type !== "poll")
+        throw discussionsError(
+          "DISCUSSION_INVALID_INPUT",
+          "Post is not a poll",
+        );
+      const vote = post.pollVoters.find((v) => v.voter === actor.userId);
+      if (!vote) return;
+      if (input.option < 0 || input.option >= post.pollOptions.length)
+        throw discussionsError("DISCUSSION_INVALID_INPUT", "Invalid option");
+      this.discussions.removeVote(post.id, actor.userId, vote.option);
+    });
   }
 }

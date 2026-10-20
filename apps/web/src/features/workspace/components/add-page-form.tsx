@@ -8,7 +8,6 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { GroupMultiSelect } from "@/features/workspace/components/group-multi-select";
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createEntityId } from "@wodge/domain/identifiers";
@@ -27,14 +26,12 @@ export function AddPageForm({
   teamId: string;
   page?: Page;
 }) {
-  const { workspaceRep, structure } = useCurrentWorkspace();
+  const { workspaceRep } = useCurrentWorkspace();
   const form = useForm<Page>({
     resolver: zodResolver(PageSchema),
     defaultValues: {
       name: page?.avatar || "",
       avatar: page?.avatar || "",
-      editGroups: page?.editGroups || ["team-members"],
-      viewGroups: page?.viewGroups || ["team-members"],
       id: page?.id || createEntityId(),
     },
   });
@@ -94,44 +91,9 @@ export function AddPageForm({
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="viewGroups"
-            render={({ field }) => {
-              return (
-                <FormItem>
-                  <FormLabel>View groups</FormLabel>
-                  <FormControl>
-                    <GroupMultiSelect
-                      onChange={field.onChange}
-                      baseGroups={structure.groups}
-                      preset={page?.viewGroups}
-                    />
-                  </FormControl>
-                </FormItem>
-              );
-            }}
-          />
-
-          <FormField
-            control={form.control}
-            name="editGroups"
-            render={({ field }) => {
-              return (
-                <FormItem>
-                  <FormLabel>Edit groups</FormLabel>
-                  <FormControl>
-                    <GroupMultiSelect
-                      onChange={field.onChange}
-                      baseGroups={structure.groups}
-                      preset={page?.editGroups}
-                    />
-                  </FormControl>
-                </FormItem>
-              );
-            }}
-          />
-
+          <p role="note" className="text-sm text-muted-foreground">
+            Page access is managed through team roles and permissions.
+          </p>
           <Button type="submit" className="w-full">
             {page ? "Update" : "Create"} page
           </Button>

@@ -1,4 +1,4 @@
-import type { FeatureHandlers } from "../handlers/features";
+import type { FeatureFlagHandlers } from "../handlers/feature-flags";
 import type { PokeMessage } from "@wodge/domain/sync/index";
 import type {
   PresenceMap,
@@ -20,7 +20,7 @@ export default class WorkspaceServer
   extends Server<WorkerEnvironment>
   implements WorkspacePartyInterface
 {
-  private features!: FeatureHandlers;
+  private features!: FeatureFlagHandlers;
   private router!: WorkspaceRoutes["router"];
   private invalidations!: AuthorizationInvalidations;
 

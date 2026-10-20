@@ -1,7 +1,7 @@
 import type { Permissions } from "../authorization/permissions";
 import { entityIdSchema } from "@wodge/domain/identifiers";
 import { z } from "zod";
-import { LEGACY_ENTITY_ID_LENGTH, LEGACY_GROUP_ID_LENGTH } from "../constants";
+import { LEGACY_ENTITY_ID_LENGTH } from "../constants";
 
 export const ChannelTypeSchema = z.enum([
   "page",
@@ -15,12 +15,6 @@ export const ChannelSchema = z.object({
   id: entityIdSchema(LEGACY_ENTITY_ID_LENGTH),
   name: z.string().max(70).min(1),
   avatar: z.string().optional(),
-  viewGroups: z.array(
-    entityIdSchema(LEGACY_GROUP_ID_LENGTH).or(z.literal("team-members")),
-  ),
-  editGroups: z.array(
-    entityIdSchema(LEGACY_GROUP_ID_LENGTH).or(z.literal("team-members")),
-  ),
 });
 
 export type Channel = z.infer<typeof ChannelSchema>;

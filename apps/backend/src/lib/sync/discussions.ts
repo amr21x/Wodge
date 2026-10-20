@@ -1,3 +1,4 @@
+import { ObjectSyncRepository } from "@wodge/core/sync/repositories/state";
 import { FeatureFlagService } from "@wodge/core/features/services/flags";
 import { DiscussionService } from "@wodge/core/discussions/services/posts";
 import { inject, injectable } from "tsyringe";
@@ -11,6 +12,8 @@ import type { RunnerParams } from "./replicache";
 @injectable()
 export class ThreadSync {
   constructor(
+    @inject(ObjectSyncRepository)
+    private readonly syncRecords: ObjectSyncRepository,
     @inject(FeatureFlagService) private readonly flags: FeatureFlagService,
     @inject("thread") private readonly party: ThreadServer,
     @inject(DiscussionService) private readonly service: DiscussionService,
@@ -18,12 +21,19 @@ export class ThreadSync {
     private readonly workspaceGateway: WorkspaceGateway,
   ) {}
   get storage() {
-    return this.party.ctx.storage;
+    return this.syncRecords;
   }
   get versions() {
     return this.party.versions;
   }
   async run(params: RunnerParams, actor: RequestActor) {
+    if (
+      !actor.canEdit &&
+      !actor.isOwner &&
+      !actor.isAdmin &&
+      !actor.isTeamModerator
+    )
+      return;
     await dispatchDiscussionMutation(this.service, params, actor);
   }
   patch = (userId: string) =>

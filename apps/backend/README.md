@@ -14,14 +14,19 @@ There is no default Party or separate PartyKit deployment.
 - `types/` defines Worker environment bindings, Hono context variables, actors and the explicit object-kind union. Identity, headers and mutation revisions are operation arguments, not DI registrations.
 - `gateways/` handles communication between objects through the infrastructure HTTP client. `/parties/:namespace/:id/*` is the PartyServer routing prefix. Internal stub requests use a synthetic `https://internal` URL; the selected Durable Object stub determines the destination.
 - Core feature `services/` owns business operations; `repositories/` owns data access. Infrastructure configures SDKs, database clients and storage primitives. Repository instances receive their database/storage dependency once.
-- Domain owns declarative models, schemas and DTOs. Core `mutations/` contains pure transformations also used by web optimistic updates; browser checks exclude services, repositories and provider SDKs.
+- Domain owns declarative models, schemas and DTOs. Backend services execute relational operations through repositories. Web owns its optimistic transformations and cannot import or depend on core.
 - Auth owns Better Auth configuration, identity/session helpers and workspace authorization. Generic email delivery belongs to infrastructure. Better Auth owns the canonical D1 user, organization and membership records; workspace collaboration state and resource policies remain in its Durable Object.
 - Organization lifecycle synchronization is coordinated by backend handlers. Direct Better Auth mutations that would bypass coordination are blocked; ordinary authentication and organization reads remain available.
 
 [Authorization rollout](../../docs/features/team-roles-access/authorization/design.md#implemented-first-slice)
-records remaining page/thread permission work. D1 and Durable Object updates are
+records the authorization rollout. Access groups are removed; room/page/thread access
+uses scoped custom roles. D1 and Durable Object updates are
 separate transactions; durable reconciliation and queues remain follow-up work.
-The current SQLite-backed objects still use the storage KV API, rather than relational tables.
+Structural records and binary Yjs snapshots/update journals use Drizzle in each SQLite-backed
+object, with a connection and migrations separate from D1. Replicache metadata, presence,
+authorization policies/outbox records and room bindings also use relational tables.
+KV reads only import legacy records once; normal operations never write them.
+[Persistence boundaries](../../docs/architecture/data-model.md) describes table migrations and the one-time structural import.
 
 ## Typed frontend API
 
@@ -103,9 +108,13 @@ keys are rejected because this is a test-billing showcase. Configuration errors 
 names without printing values. The generated billing migration must be applied before webhook use.
 
 The checked-in Worker configuration bootstraps new SQLite-backed Durable Object
-classes. It does not migrate deployed PartyKit namespaces or old Yjs snapshots.
-Before a production cutover, inspect the deployed namespace/class mappings, preserve
-or transfer their records, and verify the Yjs document export/import. Existing SQL
+classes. It does not transfer deployed PartyKit namespaces.
+Within these SQLite-backed namespaces, awaited startup applies versioned table migrations
+and imports existing structural, synchronization, authorization, presence and room-binding
+KV records and Yjs snapshots once. This does not transfer data from another
+namespace or from a legacy KV-backed Durable Object. Before a production cutover, inspect
+the deployed namespace/class mappings, preserve or transfer their records, and verify the
+Yjs document export/import. Existing SQL
 migration statements are preserved; Drizzle metadata is upgraded and a new auth
 migration is added.
 

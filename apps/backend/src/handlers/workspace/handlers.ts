@@ -54,13 +54,13 @@ export class WorkspaceHandlers {
     return c.body(null, 204);
   };
 
-  authChannel = (c: Context<WorkspaceContext>) => {
+  authChannel = async (c: Context<WorkspaceContext>) => {
     if (c.req.header("x-workspace-id") !== this.workspaceId) {
       return c.json({ ok: false, error: "Unauthorized" }, 401);
     }
 
     return c.json(
-      this.workspaceAccess.authorize(
+      await this.workspaceAccess.authorize(
         ChannelAccessHeaders.parse({
           userId: c.req.header("x-user-id"),
           teamId: c.req.header("x-team-id"),
