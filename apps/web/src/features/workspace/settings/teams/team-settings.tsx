@@ -1,5 +1,6 @@
 "use client";
 
+import { refreshPermissions } from "@/client/permissions";
 import { useMemo } from "react";
 import { SettingsContentHeader, SettingsContentSection } from "../settings";
 import { DrObj } from "@wodge/domain/types";
@@ -56,6 +57,7 @@ export function TeamSettings({
           },
         },
       });
+      refreshPermissions({ revoke: true });
     } catch {
       toast.error("Add member failed");
     }
@@ -76,6 +78,7 @@ export function TeamSettings({
           },
         },
       });
+      refreshPermissions({ revoke: true });
     } catch {
       toast.error("Remove member failed");
     }
@@ -100,6 +103,7 @@ export function TeamSettings({
           },
         },
       });
+      refreshPermissions({ revoke: true });
     } catch {
       toast.error("Change member role failed");
     }

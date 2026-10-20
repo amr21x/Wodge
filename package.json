@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
-    "dev": "turbo dev dev:api",
+    "dev": "turbo dev dev:api --env-mode=loose",
+    "secrets": "bash scripts/secrets.sh",
     "studio": "turbo db:studio",
     "generate": "turbo db:generate",
     "migrate": "pnpm --filter backend db:migration:cloud",

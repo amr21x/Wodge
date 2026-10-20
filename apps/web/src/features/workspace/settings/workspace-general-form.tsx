@@ -1,3 +1,4 @@
+import { failureMessage, requireOk } from "@/client/errors";
 import { api } from "@/client/api";
 import {
   Form,
@@ -40,7 +41,7 @@ export function WorkspaceGeneralForm() {
   const router = useRouter();
 
   useEffect(() => {
-    if (workspace) {
+    if (workspace && !form.formState.isDirty) {
       form.reset(workspace);
     }
   }, [workspace, form]);
@@ -52,7 +53,7 @@ export function WorkspaceGeneralForm() {
         param: { workspaceId },
         json: data,
       });
-      if (!response.ok) throw new Error("Workspace update failed");
+      await requireOk(response);
 
       return data;
     },
@@ -61,17 +62,16 @@ export function WorkspaceGeneralForm() {
       queryClient.invalidateQueries({
         queryKey: ["user-workspaces"],
       });
-      // }
+      form.reset(_data);
+      router.push(`/${_data.slug}/settings`);
     },
-    onError() {
-      toast.error("Workspace update failed");
+    onError(error) {
+      toast.error(failureMessage(error));
     },
   });
 
   async function onSubmit(data: Pick<Workspace, "name" | "slug">) {
     mutate(data);
-    router.push(`/${data.slug}/settings`);
-    form.reset(data);
   }
 
   return (

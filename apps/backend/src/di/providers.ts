@@ -2,7 +2,6 @@ import { createObjectDatabase } from "@wodge/infra/database/object-database";
 import { createAuth } from "@wodge/auth/server";
 import { createDatabase } from "@wodge/infra/database/database";
 import type { Database } from "@wodge/infra/database/types";
-import { ResendEmail } from "@wodge/infra/email/resend";
 import {
   instancePerContainerCachingFactory,
   type DependencyContainer,
@@ -26,7 +25,6 @@ export function registerProviders(container: DependencyContainer) {
       createAuth(
         c.resolve<WorkerEnvironment>("environment"),
         c.resolve<Database>("database"),
-        c.resolve(ResendEmail),
       ),
     ),
   });

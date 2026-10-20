@@ -23,6 +23,7 @@ export interface AppStore {
   socket?: PartySocket;
 
   actions: {
+    reset: () => Promise<void>;
     addWorkspace: (
       workspace: string,
       userId: string,
@@ -44,6 +45,26 @@ export const useAppStore = create<AppStore>()(
     micStatus: true,
 
     actions: {
+      reset: async () => {
+        const { socket, userStore, workspaces, activeChanRep } = get();
+        set({
+          socket: undefined,
+          userStore: undefined,
+          workspaces: {},
+          activeChanRep: undefined,
+        });
+        socket?.close();
+        // Close instances without deleting IndexedDB: offline drafts remain recoverable.
+        await Promise.allSettled(
+          [
+            ...new Set([
+              userStore,
+              activeChanRep,
+              ...Object.values(workspaces),
+            ]),
+          ].map((rep) => rep?.close()),
+        );
+      },
       addWorkspace: (workspaceId, userId) => {
         // Closing the current workspace so to account for the case of switching from local to cloud
         if (get().workspaces?.[workspaceId] !== undefined) {
@@ -74,22 +95,10 @@ export const useAppStore = create<AppStore>()(
 
         return workspace;
       },
-      // Softly delete workspace from the store
       removeWorkspace: async (workspaceId: string) => {
-        const workspaces = get().workspaces;
-
-        if (workspaces[workspaceId]) {
-          // workaround as close throws an error
-          //@ts-ignore
-          workspaces[workspaceId]!.puller = undefined;
-          //@ts-ignore
-          workspaces[workspaceId]!.pusher = undefined;
-          // await workspaces[workspaceId]!.close();
-        }
-
-        const { workspaceId: _, ...rest } = workspaces;
-
-        set({ ...rest });
+        const { [workspaceId]: removed, ...workspaces } = get().workspaces;
+        set({ workspaces });
+        await removed?.close();
       },
       connectSocket: (userId: string) => {
         if (get().socket) {

@@ -80,8 +80,8 @@ importers:
         specifier: 0.2.2
         version: 0.2.2
       replicache:
-        specifier: ^14.1.0
-        version: 14.2.2
+        specifier: ^15.3.0
+        version: 15.3.0
       tsyringe:
         specifier: 4.10.0
         version: 4.10.0
@@ -492,8 +492,8 @@ importers:
         specifier: ^0.13.8
         version: 0.13.8(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       replicache:
-        specifier: ^14.2.2
-        version: 14.2.2
+        specifier: ^15.3.0
+        version: 15.3.0
       replicache-react:
         specifier: ^5.0.1
         version: 5.0.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
@@ -5851,23 +5851,23 @@ packages:
         integrity: sha512-42aWfPrimMfDKDi4YegyS7x+/0tlzaqwPQCULLanv3DMIlu96KTJR0fM5isWX2UViOqlGnX6YFgqWepcX+XMNg==,
       }
 
-  "@rocicorp/lock@1.0.3":
+  "@rocicorp/lock@1.0.4":
     resolution:
       {
-        integrity: sha512-aXRTG0Ul89KrV30J/p209RhMCRLIFFIT6RepvCPBicKTHaUtTlmJipgLl6QmSt5HJYYJ5P8Czp+4T4G1+6fcgQ==,
+        integrity: sha512-FavTiO8ETXFXDVfA87IThGduTTTR8iqzBnr/c60gUUmbk7knGEXPmf2B+yiNuluJD0ku0fL2V2r62UXnsLXl6w==,
       }
     engines: { node: ^12.20.0 || ^14.13.1 || >=16.0.0 }
 
-  "@rocicorp/logger@5.2.1":
+  "@rocicorp/logger@5.5.0":
     resolution:
       {
-        integrity: sha512-/co4DJq3opjULOHe7hMAho/E2WJuv6rMOJ1QDlCKsPHZ09XkkKHDM8dPu+odmDHWBb5aMnnzC92WQLd05CTxnA==,
+        integrity: sha512-lBn0Y4FPKB/IOhcz+r3f9/Ig//LLjWiaQ66Z9tJ54uFib8juzBSXeuxZd/oRnvBt+Lu4epDmLsO1Pnl4mdkSFQ==,
       }
 
-  "@rocicorp/resolver@1.0.1":
+  "@rocicorp/resolver@1.0.2":
     resolution:
       {
-        integrity: sha512-9+IK9C/du8Nrqn3LaKBxJwV4H2HyIpa7HlTuc4eQ938lL4faxN6TuQV+IpvX6PxQeR14X7yMtz1f9dfiS5fvlw==,
+        integrity: sha512-TfjMTQp9cNNqNtHFfa+XHEGdA7NnmDRu+ZJH4YF3dso0Xk/b9DMhg/sl+b6CR4ThFZArXXDsG1j8Mwl34wcOZQ==,
       }
     engines: { node: ^12.20.0 || ^14.13.1 || >=16.0.0 }
     deprecated: Use Promise.withResolvers instead
@@ -12723,10 +12723,10 @@ packages:
       react: ">=16.0 <19.0"
       react-dom: ">=16.0 <19.0"
 
-  replicache@14.2.2:
+  replicache@15.3.0:
     resolution:
       {
-        integrity: sha512-PBlt6C2X7wSPVUUVBKumHPTXXmPZYO/rqoTQXYLgvzPabYkKBdJbCEHjh9hXNUU5vpkzDeEmOPQqlVus9zCiBg==,
+        integrity: sha512-XE9NbpG5bVuJNcj61vzbZBwesNx9q51l6/o0J8wT4v1YZhKoqj9GExwc3pLUYSi/AyrQtkX44wOyrSMLHzFIaA==,
       }
     engines: { node: ">=14.8.0" }
     hasBin: true
@@ -18208,13 +18208,13 @@ snapshots:
 
   "@remirror/core-constants@3.0.0": {}
 
-  "@rocicorp/lock@1.0.3":
+  "@rocicorp/lock@1.0.4":
     dependencies:
-      "@rocicorp/resolver": 1.0.1
+      "@rocicorp/resolver": 1.0.2
 
-  "@rocicorp/logger@5.2.1": {}
+  "@rocicorp/logger@5.5.0": {}
 
-  "@rocicorp/resolver@1.0.1": {}
+  "@rocicorp/resolver@1.0.2": {}
 
   "@rollup/plugin-babel@5.3.1(@babel/core@7.24.4)(@types/babel__core@7.20.5)(rollup@2.79.1)":
     dependencies:
@@ -22588,12 +22588,12 @@ snapshots:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
 
-  replicache@14.2.2:
+  replicache@15.3.0:
     dependencies:
       "@badrap/valita": 0.3.8
-      "@rocicorp/lock": 1.0.3
-      "@rocicorp/logger": 5.2.1
-      "@rocicorp/resolver": 1.0.1
+      "@rocicorp/lock": 1.0.4
+      "@rocicorp/logger": 5.5.0
+      "@rocicorp/resolver": 1.0.2
 
   require-from-string@2.0.2: {}
 

@@ -58,17 +58,24 @@ RPC. Better Auth's own client remains the authentication client.
 
 ## Development
 
-Copy `.dev.vars.example` to `.dev.vars` and provide local secrets. Set the public web
-environment from the root `.env.example`. Start backend with `pnpm --filter backend dev`
-and web with `pnpm --filter web dev`. Next forwards `/api/*` to the local Worker.
+Store the keys listed in `.dev.vars.example` in the application's Bitwarden
+Secrets Manager project and run `pnpm secrets setup` once per machine (`pnpm secrets refresh` after changes); see
+[local secrets](../../README.md#local-secrets). Set the public web environment from
+the root `.env.example`. Start backend with
+`pnpm secrets run -- pnpm --filter backend dev` and web with `pnpm --filter web dev`. Next forwards `/api/*` to the local Worker.
 
-For partial local development, only `BETTER_AUTH_SECRET` and `SECRET_KEY` are mandatory
-secrets. Each must contain at least 32 characters and differ from the other; origins and
-D1/DO bindings still come from Wrangler. `INTEGRATION_MODE=partial` is the local default.
-Provider credentials are temporarily optional. Missing storage, billing or call configuration
+Google and GitHub are the supported sign-in methods. `GOOGLE_CLIENT_ID`,
+`GOOGLE_CLIENT_SECRET`, `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` are mandatory
+in both integration modes. Configure provider callbacks as
+`<APP_DOMAIN>/api/auth/callback/google` and `<APP_DOMAIN>/api/auth/callback/github`.
+Email/OTP sign-in is disabled and does not require Resend.
+
+`BETTER_AUTH_SECRET` and `SECRET_KEY` must each contain at least 32 characters and
+differ from one another; origins and D1/DO bindings come from Wrangler.
+`INTEGRATION_MODE=partial` is the local default. Storage and billing credentials
+remain optional in partial mode. Missing storage, billing or call configuration
 returns HTTP 503 when those operations are attempted; calls always return HTTP 403 with
-`CALLS_DISABLED`, regardless of credentials or plan. Email OTP returns unavailable when
-Resend is missing. Authentication is never bypassed: sign-in needs Resend or configured OAuth.
+`CALLS_DISABLED`, regardless of credentials or plan. Authentication is never bypassed: sign-in requires a configured Google or GitHub OAuth provider.
 Workspace synchronization skips bucket creation without storage credentials, so collaboration
 can run after authentication. Workspaces created this way need their buckets provisioned before
 enabling uploads later. Provider verification and required deployment configuration remain
@@ -79,7 +86,7 @@ no Supabase accounts, passwords or sessions are imported. Existing application d
 is not deleted or linked to newly authenticated accounts automatically.
 
 - `pnpm --filter backend test`: domain/application/transport regression tests.
-- `pnpm --filter backend test:runtime`: production Worker, real D1/DOs and Better Auth checks in Miniflare. Email and object storage are mocked at the network boundary.
+- `pnpm --filter backend test:runtime`: production Worker, real D1/DOs and Better Auth checks in Miniflare. OAuth providers and object storage are mocked at the network boundary.
 - `pnpm --filter backend test:foundation`: retained package and database compatibility checks.
 - `pnpm --filter backend build`: Wrangler dry-run bundle.
 
@@ -100,10 +107,11 @@ unverified/incomplete.
 ## Deployment
 
 The deployment workflow offers `partial` (the temporary default) and `ready` integration modes.
-Partial deployments need only the two signing secrets plus origins and D1/DO bindings;
-sign-in remains unavailable without email or OAuth. Ready mode requires complete Resend,
-storage and Stripe test settings before serving requests; LiveKit and OAuth remain optional.
-Both modes validate signing secrets, HTTP origins and paired OAuth configuration. Live Stripe
+Both modes require the two signing secrets, Google and GitHub OAuth credentials,
+origins and D1/DO bindings. Ready mode additionally requires complete storage and
+Stripe test settings before serving requests. Email sign-in is disabled; Resend
+and LiveKit are not prerequisites. Both modes validate signing secrets, HTTP
+origins and all four OAuth settings. Live Stripe
 keys are rejected because this is a test-billing showcase. Configuration errors list field
 names without printing values. The generated billing migration must be applied before webhook use.
 
@@ -121,7 +129,7 @@ migration is added.
 Production `/api/*` paths on the web hostname must route to this Worker. Keep the
 backend hostname available for existing PartySocket clients. Better Auth's public
 base URL is `APP_DOMAIN`; register Google/GitHub callbacks under
-`<APP_DOMAIN>/api/auth/callback/<provider>`. Configure Resend delivery and the Worker
+`<APP_DOMAIN>/api/auth/callback/<provider>`. Configure the Worker
 secrets listed in `.dev.vars.example`.
 
 The deployment workflow is manually triggered while namespace cutover remains

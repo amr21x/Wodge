@@ -1,5 +1,4 @@
 import { AuthorizationRetry } from "@wodge/infra/durable-objects/authorization-retry";
-import { ResendEmail } from "@wodge/infra/email/resend";
 import { HttpClient } from "@wodge/infra/http/client";
 import { StripePayments } from "@wodge/infra/payments/payments";
 import { S3ObjectStorage } from "@wodge/infra/storage/object-storage";
@@ -10,11 +9,6 @@ export function registerIntegrationClasses(container: DependencyContainer) {
   container.register(
     AuthorizationRetry,
     { useClass: AuthorizationRetry },
-    { lifecycle: Lifecycle.ContainerScoped },
-  );
-  container.register(
-    ResendEmail,
-    { useClass: ResendEmail },
     { lifecycle: Lifecycle.ContainerScoped },
   );
   container.register(

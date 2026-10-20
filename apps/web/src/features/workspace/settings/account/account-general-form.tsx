@@ -1,3 +1,4 @@
+import { failureMessage, requireOk } from "@/client/errors";
 import { api } from "@/client/api";
 import { FeatureGate } from "@/components/feature-flags-provider";
 import {
@@ -42,7 +43,7 @@ function AccountGeneralFormContent() {
   });
 
   useEffect(() => {
-    if (user) {
+    if (user && !form.formState.isDirty) {
       form.reset({
         username: user.username as string,
         displayName: user.displayName as string,
@@ -55,18 +56,19 @@ function AccountGeneralFormContent() {
       data: Pick<PublicUserType, "username" | "displayName">,
     ) => {
       const response = await api.api.users.update.$post({ json: data });
-      if (!response.ok) throw new Error("Account update failed");
+      await requireOk(response);
 
       return data;
     },
     onSuccess: (_data) => {
+      form.reset(_data);
       toast.success("Account updated");
       queryClient.invalidateQueries({
         queryKey: ["user"],
       });
     },
-    onError() {
-      toast.error("Account update failed");
+    onError(error) {
+      toast.error(failureMessage(error));
     },
   });
 
@@ -74,7 +76,6 @@ function AccountGeneralFormContent() {
     data: Pick<PublicUserType, "username" | "displayName">,
   ) {
     mutate(data);
-    form.reset(data);
   }
 
   return (

@@ -1,3 +1,5 @@
+import { requireOk } from "@/client/errors";
+import { refreshPermissions } from "@/client/permissions";
 import { api } from "@/client/api";
 import PartySocket from "partysocket";
 import { PokeMessage } from "@wodge/domain/sync/index";
@@ -14,10 +16,16 @@ export function createSocket(userId: string) {
     // Refresh the session ticket whenever the client reconnects.
     query: async () => {
       const response = await api.api.users.token.$get();
-      const token = response.ok ? (await response.json()).token : "";
+      await requireOk(response);
+      const token = (await response.json()).token;
       return { token };
     },
   });
+
+  socket.addEventListener("open", () => refreshPermissions());
+  socket.addEventListener("close", () =>
+    refreshPermissions({ refetch: false }),
+  );
 
   const userStore = useAppStore.getState().userStore;
   const { addWorkspace, removeWorkspace } = useAppStore.getState().actions;
@@ -30,6 +38,7 @@ export function createSocket(userId: string) {
     if (data.sub === "poke") {
       switch (data.type) {
         case "workspace":
+          refreshPermissions();
           if (!data.id) {
             return;
           }
@@ -68,6 +77,7 @@ export function createSocket(userId: string) {
           });
 
         case "workspaceMembers":
+          refreshPermissions();
           const workspaces2 = useAppStore.getState().workspaces;
           if (data.id && workspaces2[data.id]) {
             workspaces2[data.id]?.pull();

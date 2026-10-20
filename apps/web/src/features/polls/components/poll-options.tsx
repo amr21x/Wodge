@@ -11,6 +11,7 @@ export function PollOptions({
   setVote,
   removeVote,
   isRoom = false,
+  disabled = false,
 }: {
   options?: string[];
   votes?: number[];
@@ -18,6 +19,7 @@ export function PollOptions({
   setVote: (option: number) => void;
   removeVote: () => void;
   isRoom?: boolean;
+  disabled?: boolean;
 }) {
   const totalVotes = votes?.reduce((a, b) => a + b, 0) || 0;
 
@@ -33,6 +35,7 @@ export function PollOptions({
         {options?.map((option, i) => (
           <li key={i}>
             <button
+              disabled={disabled}
               type="button"
               className={cn(
                 buttonVariants({
@@ -80,7 +83,7 @@ export function PollOptions({
           {totalVotes} vote{totalVotes === 1 ? "" : "s"}
         </span>
         {vote !== undefined && (
-          <Button size="sm" onClick={removeVote}>
+          <Button disabled={disabled} size="sm" onClick={removeVote}>
             Remove vote
           </Button>
         )}

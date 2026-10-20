@@ -32,19 +32,27 @@ export function useCurrentRoomRep() {
     return team?.rooms.find((r) => r.id === channelId);
   }, [team, channelId]);
 
+  const userId = user?.id;
+  const exists = !!team && !!channel;
   useEffect(() => {
-    if (workspaceId && team && channel && user && !rep) {
-      const repTemp = createRoomRep({
-        channelId: channel.id,
-        workspaceId,
-        teamId: team.id,
-        userId: user.id,
-      });
+    setRep(undefined);
+    if (!workspaceId || !exists || !userId) return;
+    const instance = createRoomRep({
+      channelId,
+      workspaceId,
+      teamId,
+      userId,
+    });
+    setRep(instance);
+    setChannelRep(instance);
+    return () => {
+      if (useAppStore.getState().activeChanRep === instance)
+        useAppStore.setState({ activeChanRep: undefined });
+      void instance.close();
+    };
+  }, [workspaceId, teamId, channelId, userId, exists, setChannelRep]);
 
-      setRep(repTemp);
-      setChannelRep(repTemp);
-    }
-  }, [workspaceId, team, channel, structure.teams, user, rep, setChannelRep]);
-
-  return rep;
+  return userId && exists && rep?.name === `${userId}-${channelId}`
+    ? rep
+    : undefined;
 }

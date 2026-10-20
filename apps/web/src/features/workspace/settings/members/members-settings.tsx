@@ -1,5 +1,8 @@
 "use client";
 
+import { failureMessage, requireOk } from "@/client/errors";
+import { refreshPermissions } from "@/client/permissions";
+
 import { SettingsContentHeader, SettingsContentSection } from "../settings";
 
 import { InviteLink } from "./invite-sections";
@@ -23,10 +26,12 @@ export function MembersSettings() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (_c: boolean) => {
-      await fetch(`/api/workspaces/${workspaceId}/invite`, {
+      const response = await fetch(`/api/workspaces/${workspaceId}/invite`, {
         method: "PATCH",
       });
+      await requireOk(response);
     },
+    onError: (error) => toast.error(failureMessage(error)),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["user-workspaces"],
@@ -47,9 +52,13 @@ export function MembersSettings() {
         `/api/workspaces/${workspaceId}/members/${memberId}`,
         { method: "DELETE" },
       );
-      if (!response.ok) throw new Error("Remove member failed");
-    } catch {
-      toast.error("Remove member failed");
+      await requireOk(response);
+      refreshPermissions({ revoke: true });
+      void queryClient.invalidateQueries({
+        queryKey: [workspaceId, "members"],
+      });
+    } catch (error) {
+      toast.error(failureMessage(error));
     }
   }
 
@@ -63,9 +72,10 @@ export function MembersSettings() {
           body: JSON.stringify({ role }),
         },
       );
-      if (!response.ok) throw new Error("Change member role failed");
-    } catch {
-      toast.error("Change member role failed");
+      await requireOk(response);
+      refreshPermissions({ revoke: true });
+    } catch (error) {
+      toast.error(failureMessage(error));
     }
   }
 

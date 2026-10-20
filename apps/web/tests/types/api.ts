@@ -78,3 +78,25 @@ void [
   invalidUserId,
   invalidRoleId,
 ];
+
+const assignment: InferRequestType<
+  typeof workspace.authorization.assignments.$post
+> = {
+  param: { workspaceId: "workspace" },
+  json: {
+    roleId: "writer",
+    subject: { type: "user", id: "member" },
+    scope: { type: "room", id: "room" },
+  },
+};
+type RoleList = InferResponseType<
+  typeof workspace.authorization.roles.$get,
+  200
+>;
+const assignmentId: RoleList["assignments"][number]["id"] = "assignment";
+const removal: InferRequestType<
+  (typeof workspace.authorization.assignments)[":assignmentId"]["$delete"]
+> = {
+  param: { workspaceId: "workspace", assignmentId },
+};
+void [assignment, removal];

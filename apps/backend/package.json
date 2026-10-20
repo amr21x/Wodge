@@ -25,7 +25,7 @@
     "object-sizeof": "^2.6.4",
     "partysocket": "^0.0.25",
     "query-string": "^9.0.0",
-    "replicache": "^14.1.0",
+    "replicache": "^15.3.0",
     "zod": "^3.22.4",
     "partyserver": "0.5.10",
     "y-partyserver": "2.2.0",

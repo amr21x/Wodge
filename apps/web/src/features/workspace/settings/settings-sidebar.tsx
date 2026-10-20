@@ -17,14 +17,19 @@ import { useIsOwnerOrAdmin } from "@/features/workspace/hooks/use-is-owner-or-ad
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
+import { usePermission } from "../hooks/use-permission";
 import { useQueryClient } from "@tanstack/react-query";
 
 export function SettingsSidebar() {
   const isDesktop = useIsDesktop();
   const isManger = useIsOwnerOrAdmin();
   const { workspaceSlug } = useParams<{ workspaceSlug?: string }>();
-  const { workspaceRep } = useCurrentWorkspace();
+  const { workspaceRep, workspaceId } = useCurrentWorkspace();
   const queryClient = useQueryClient();
+  const canReadRoles = usePermission(
+    workspaceId ? { type: "workspace", id: workspaceId } : undefined,
+    { role: ["read"] },
+  );
 
   const jsx = (
     <div className="flex h-full flex-col">
@@ -40,6 +45,7 @@ export function SettingsSidebar() {
             </SettingsSidebarHeader>
             <SettingsSidebarList>
               <SettingsSidebarItem label="general" href="/" isDefault />
+              {canReadRoles && <SettingsSidebarItem label="roles" />}
               {isManger && (
                 <>
                   <SettingsSidebarItem label="members" />

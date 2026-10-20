@@ -2,26 +2,25 @@ import { validateServerEnvironment } from "@wodge/env/server";
 import { expect, test } from "vitest";
 import { createTestEnvironment } from "../helpers/environment";
 
-test("ready mode requires retained providers but never LiveKit or OAuth", () => {
+test("ready mode requires storage and billing while email login and LiveKit are unnecessary", () => {
   const environment = createTestEnvironment({
     INTEGRATION_MODE: "ready",
     LIVEKIT_API_KEY: undefined,
     LIVEKIT_API_SECRET: undefined,
+    RESEND_API_KEY: undefined,
+    RESEND_EMAIL_FROM: undefined,
   });
   expect(() => validateServerEnvironment(environment)).not.toThrow();
   expect(() =>
     validateServerEnvironment({ ...environment, R2_SECRET_KEY: undefined }),
   ).toThrow("R2_SECRET_KEY");
-  expect(() =>
-    validateServerEnvironment({ ...environment, RESEND_API_KEY: "" }),
-  ).toThrow("RESEND_API_KEY");
 });
 
 test("configuration rejects weak/shared signing secrets, incomplete OAuth, unsafe origins and live billing keys", () => {
   for (const changes of [
     { SECRET_KEY: "short" },
     { SECRET_KEY: createTestEnvironment().BETTER_AUTH_SECRET },
-    { GOOGLE_CLIENT_ID: "client" },
+    { GOOGLE_CLIENT_SECRET: "" },
     { APP_DOMAIN: "https://example.test/path" },
     { R2_ENDPOINT: "ftp://example.test" },
     { STRIPE_SECRET_KEY: "sk_live_do_not_use" },
@@ -37,5 +36,22 @@ test("configuration rejects weak/shared signing secrets, incomplete OAuth, unsaf
     );
   } catch (error) {
     expect(String(error)).not.toContain(sensitive);
+  }
+});
+
+test.each([
+  "GOOGLE_CLIENT_ID",
+  "GOOGLE_CLIENT_SECRET",
+  "GITHUB_CLIENT_ID",
+  "GITHUB_CLIENT_SECRET",
+] as const)("%s is mandatory in partial and ready modes", (key) => {
+  for (const mode of ["partial", "ready"] as const) {
+    for (const value of [undefined, "", "   "]) {
+      expect(() =>
+        validateServerEnvironment(
+          createTestEnvironment({ INTEGRATION_MODE: mode, [key]: value }),
+        ),
+      ).toThrow(key);
+    }
   }
 });

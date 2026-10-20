@@ -8,7 +8,7 @@ import type { PageActor, PageInputs } from "@wodge/domain/pages/dto";
 import type { Db } from "@wodge/domain/pages/models";
 import { TaskSchema } from "@wodge/domain/pages/validation";
 import { IDBKeyRange, indexedDB } from "fake-indexeddb";
-import { Replicache, TEST_LICENSE_KEY } from "replicache";
+import { Replicache } from "replicache";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { pageMutators } from "../../../web/src/client/sync/pages/mutators";
 import type PageParty from "../../src/servers/page";
@@ -26,7 +26,6 @@ function createClient() {
   vi.stubGlobal("IDBKeyRange", IDBKeyRange);
   const client = new Replicache({
     name: `page-integration-${crypto.randomUUID()}`,
-    licenseKey: TEST_LICENSE_KEY,
     mutators: pageMutators,
     pullInterval: null,
     logLevel: "error",

@@ -20,6 +20,8 @@ vi.mock("y-partyserver/provider", () => ({
     doc,
     options,
     connect: vi.fn(),
+    on: vi.fn(),
+    off: vi.fn(),
     destroy: vi.fn(),
   })),
 }));
@@ -63,10 +65,12 @@ test("rerenders reuse a session; page changes dispose providers and documents", 
   expect(first.destroy).toHaveBeenCalledOnce();
   expect(mocks.indexedDB.mock.results[0]!.value.destroy).toHaveBeenCalledOnce();
   expect(destroyed).toHaveBeenCalledOnce();
-  mocks.token.mockResolvedValue({ ok: false });
-  await expect(
-    mocks.provider.mock.results[1]!.value.options.params(),
-  ).rejects.toThrow("authentication failed");
+  mocks.token.mockResolvedValue(new Response(null, { status: 401 }));
+  await act(async () => {
+    await expect(
+      mocks.provider.mock.results[1]!.value.options.params(),
+    ).rejects.toThrow();
+  });
 });
 
 test("Strict Mode setup replay disposes the first session and leaves the replacement connected", async () => {

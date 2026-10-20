@@ -25,7 +25,7 @@ export async function verifyCollaboration({
   database,
   workspace,
   structure,
-  emails,
+  signIn,
   restart,
 }) {
   const { Y, encoding, decoding, sync } = loadYjsProtocol(root);
@@ -152,25 +152,7 @@ export async function verifyCollaboration({
   first.close();
   second.close();
 
-  const sent = await request(
-    "/api/auth/email-otp/send-verification-otp",
-    json({ email: "viewer@example.test", type: "sign-in" }),
-  );
-
-  assert.equal(sent.status, 200, await sent.text());
-  const signedIn = await request(
-    "/api/auth/sign-in/email-otp",
-    json({
-      email: "viewer@example.test",
-      otp: emails.get("viewer@example.test"),
-    }),
-  );
-
-  assert.equal(signedIn.status, 200, await signedIn.clone().text());
-  const viewerCookie = signedIn.headers
-    .getSetCookie()
-    .map((/** @type {string} */ value) => value.split(";")[0])
-    .join("; ");
+  const { cookie: viewerCookie } = await signIn("viewer@example.test");
   const viewerHeaders = { cookie: viewerCookie };
 
   assert.equal(
