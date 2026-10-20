@@ -357,7 +357,6 @@ test("combines separate role grants and blocks a delegated manager from granting
 });
 
 test("editOwn and deleteOwn use the stored author even when request metadata is forged", async () => {
-  const { RoomService } = await import("@wodge/core/rooms/services/messages");
   const { MessageSchema } = await import("@wodge/domain/rooms/validation");
   const message = MessageSchema.parse({
     id: "private",

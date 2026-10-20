@@ -45,7 +45,7 @@ export function MemberMultiSelect({
   // const [value, setValue] = useState<string[]>(preset || []);
   const [open, setOpen] = useState(false);
 
-  const { channelId, teamId, folderId } = useParams<{
+  const { channelId } = useParams<{
     channelId: string;
     teamId: string;
     folderId: string;

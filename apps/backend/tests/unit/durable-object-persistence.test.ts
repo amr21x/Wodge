@@ -20,7 +20,6 @@ import { ThreadPostSchema } from "@wodge/domain/discussions/validation";
 import { TaskSchema } from "@wodge/domain/pages/validation";
 import {
   REPLICACHE_VERSIONS_KEY,
-  WORKSPACE_PRESENCE_KEY,
   makeWorkspaceStructureKey,
   makeWorkspacesStoreKey,
 } from "@wodge/domain/sync/index";

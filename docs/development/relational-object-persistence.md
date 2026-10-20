@@ -4,7 +4,7 @@
 
 Checked locally on 2026-10-20 against base commit
 `66ddd1daae69a1bd5a030393ada1443ca026d242` plus the working-tree changes described here.
-Code/test/migration fingerprint: `6b01c85706ee8aebbe0a49423a63838bf99ed24f5bd06c53616f384f04ed17db`.
+Code/test/migration fingerprint: `1531b65a7e1f8f4ab861a50c07463c679726609f1a6cc6577b757d3681441108`.
 
 The fingerprint is SHA-256 over sorted changed/new `.ts`, `.tsx`, `.mjs`, `.json` and `.sql` files
 under `apps/` and `packages/`, concatenating relative path, NUL, file bytes, NUL; deleted paths use `<deleted>` as their content.
@@ -13,7 +13,7 @@ self-reference. No commit, push, remote migration or deployment was performed.
 
 ## Results
 
-- **Pass:** backend unit/integration suite (192 tests). Covers schema creation,
+- **Pass:** backend unit/integration suite (195 tests). Covers schema creation,
   append-only schema upgrades, repeated startup, rejection of newer schema versions,
   legacy SQL table adoption, retry after a failed import, row diffs, empty collections,
   legacy orphan task references,
@@ -43,8 +43,8 @@ self-reference. No commit, push, remote migration or deployment was performed.
   Wrangler's dry-run bundle with all five Durable Object bindings.
 - **Pass:** object migration generation reports no schema drift; bundled SQL matches
   the generated journals. Object migrations remain separate from D1.
-- **Pass:** ownership/import boundary check, formatting, changed documentation links
-  and whitespace checks.
+- **Pass:** `pnpm lint` (warnings denied), `pnpm format:check`, ownership/import
+  boundary check, changed documentation links and whitespace checks.
 
 The environment uses Node 24.19.0. Existing installed dependencies were reused;
 this was not a fresh installation check. The default pnpm launcher could not open
@@ -93,6 +93,11 @@ restore without KV reads or writes. Policy and invalidation writes roll back tog
 - **Pass:** runtime page role changes affect open Yjs connections. A thread reader can
   synchronize but cannot write; granting update access enables the same direct object
   mutation. Page assignee candidates come from backend authorization.
+
+- **Pass:** demoting a bootstrapped or migrated team moderator removes system moderator
+  assignments and publishes policy invalidations. Stale assignments cannot grant page
+  updates or team management after structural demotion, including when policy persistence
+  fails. Retrying completes cleanup; custom grants and other teams remain intact.
 
 Historical SQL and migration-only readers retain legacy field/table names solely to
 upgrade existing data. Replicache client groups and UI command grouping are unrelated.

@@ -1,11 +1,5 @@
 import { sql } from "drizzle-orm";
-import {
-  sqliteTable,
-  text,
-  integer,
-  primaryKey,
-  check,
-} from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, check } from "drizzle-orm/sqlite-core";
 
 export const user_workspaces = sqliteTable("user_workspaces", {
   workspace_id: text("workspace_id").primaryKey(),

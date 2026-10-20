@@ -103,7 +103,7 @@ function fixture() {
 const clientKey = makeClientKey("client", makeClientGroupKey("group"));
 
 test("pushes retain duplicate/gap handling and the pull acknowledgement contract", async () => {
-  const { push, app, party, records, put, poke } = fixture();
+  const { push, app, party, put, poke } = fixture();
 
   expect((await push(1)).status).toBe(200);
   expect((await push(1)).status).toBe(200);
@@ -197,7 +197,7 @@ test("a page storage failure returns 500 without acknowledging the failed comman
 
 test("the retained startup adapter reloads the same page record and sync versions", async () => {
   vi.spyOn(YServer.prototype, "onStart").mockResolvedValue(undefined);
-  const { push, party, records } = fixture();
+  const { push, party } = fixture();
 
   await push(1);
   const saved = structuredClone(party.state.record);

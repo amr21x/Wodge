@@ -44,6 +44,7 @@ Backend flow: **route → handler → core service → repository → persistenc
 - Use direct `@wodge` imports. No barrels, forwarding-only re-exports, browser stubs or dependency bags. Required Worker object exports and the generated API entry are exceptions.
 - Keep routes explicit and readable; avoid long fluent chains without losing Hono types. Format changed files and comment non-obvious intent/constraints.
 - Never expose secrets. Document environment settings and their purpose in `.dev.vars.example`. Missing optional providers must fail clearly, never fake success or bypass authentication.
+- Code quality checks and formatting are required validation. Run `pnpm lint` and `pnpm format:check` from the repository root; use `pnpm format` to apply formatting and resolve lint findings before finishing.
 - Run affected type checks and meaningful tests. Use `backend test:runtime`/`test:foundation` for runtime changes, `backend test:api` for API contracts, and `node scripts/check-boundaries.mjs` for ownership/import changes. Commands are run through `pnpm --filter <package>` as appropriate.
 - Report what changed, checks actually run and remaining limitations. Documentation-only edits need formatting/link/whitespace checks, not application tests.
 

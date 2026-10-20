@@ -57,6 +57,7 @@ export class WorkspaceSync {
     }
     const previous = this.party.workspaceStructure.data;
     await dispatchWorkspaceMutation(this.service, params, authorized);
+    await this.authorization.synchronizeTeamModerators();
     await this.authorization.provisionResources(previous);
     await this.policies.markChanged();
   }

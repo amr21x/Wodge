@@ -4,6 +4,7 @@ import type {
   AuthorizationPolicy,
   AuthorizationScope,
   PermissionImport,
+  RoleAssignment,
 } from "@wodge/domain/authorization/models";
 import type { Permissions } from "@wodge/domain/authorization/permissions";
 import { createEntityId } from "@wodge/domain/identifiers";
@@ -43,6 +44,39 @@ export function scopeAncestry(
   return [];
 }
 
+/** Team-scoped system moderator grants are backed by the current moderator list. */
+function isCurrentTeamModeratorAssignment(
+  policy: AuthorizationPolicy,
+  state: WorkspaceState,
+  assignment: RoleAssignment,
+) {
+  if (
+    assignment.scope.type !== "team" ||
+    assignment.subject.type !== "user" ||
+    !policy.roles.some(
+      (role) => role.id === assignment.roleId && role.system === "moderator",
+    )
+  )
+    return true;
+  return state.structure.teams.some(
+    (team) =>
+      team.id === assignment.scope.id &&
+      team.moderators.includes(assignment.subject.id),
+  );
+}
+
+export function reconcileTeamModeratorRoles(
+  policy: AuthorizationPolicy,
+  state: WorkspaceState,
+): AuthorizationPolicy {
+  const assignments = policy.assignments.filter((assignment) =>
+    isCurrentTeamModeratorAssignment(policy, state, assignment),
+  );
+  return assignments.length === policy.assignments.length
+    ? policy
+    : { ...policy, revision: policy.revision + 1, assignments };
+}
+
 export function effectivePermissions(
   policy: AuthorizationPolicy,
   state: WorkspaceState,
@@ -67,6 +101,7 @@ export function effectivePermissions(
         : teams.has(assignment.subject.id);
     if (
       !subjectMatches ||
+      !isCurrentTeamModeratorAssignment(policy, state, assignment) ||
       !ancestors.some(
         (ancestor) =>
           ancestor.type === assignment.scope.type &&

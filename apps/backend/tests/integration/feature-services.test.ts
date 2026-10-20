@@ -20,9 +20,6 @@ import { createTestEnvironment } from "../helpers/environment";
 // @vitest-environment node
 // @vitest-environment node
 import { BillingService } from "@wodge/core/billing/services/billing";
-import { DiscussionService } from "@wodge/core/discussions/services/posts";
-import { RoomService } from "@wodge/core/rooms/services/messages";
-import { UserService } from "@wodge/core/user/services/memberships";
 import {
   defaultWorkspaceMembers,
   defaultWorkspaceStructure,
@@ -32,7 +29,6 @@ import { WorkspaceFiles } from "@wodge/core/workspace/services/files";
 import { WorkspaceLifecycle } from "@wodge/core/workspace/services/lifecycle";
 import { ThreadPostSchema } from "@wodge/domain/discussions/validation";
 import { MessageSchema } from "@wodge/domain/rooms/validation";
-import { REPLICACHE_VERSIONS_KEY } from "@wodge/domain/sync/index";
 import type { PaymentEvent } from "@wodge/infra/payments/types";
 import type { ObjectStorage } from "@wodge/infra/storage/types";
 import { afterEach, expect, test, vi } from "vitest";
@@ -350,7 +346,6 @@ test("room service gates send/vote capabilities while preserving author checks",
 test("discussion service gates announcements and preserves author/privilege checks", async () => {
   const {
     state,
-    storage: store,
     service,
     records: recordRepository,
   } = discussionServiceFixture();

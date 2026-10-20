@@ -1,10 +1,4 @@
-import {
-  sqliteTable,
-  text,
-  integer,
-  primaryKey,
-  index,
-} from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
 
 export const room_messages = sqliteTable(
   "room_messages",

@@ -1,10 +1,7 @@
 import { pageServiceFixture, roomServiceFixture } from "../helpers/services";
-import type { Db } from "@wodge/domain/pages/models";
 // @vitest-environment node
 import { billingError } from "@wodge/core/billing/errors";
 import { ApplicationError } from "@wodge/core/errors";
-import { PageService } from "@wodge/core/pages/services/page";
-import { RoomService } from "@wodge/core/rooms/services/messages";
 import { MessageSchema } from "@wodge/domain/rooms/validation";
 import { expect, test, vi } from "vitest";
 import { handleError } from "../../src/errors/handler";

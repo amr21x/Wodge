@@ -8,6 +8,7 @@ import {
   migrateResourcePolicy,
   extendResourceAssignments,
   reconcileOrganizationRoles,
+  reconcileTeamModeratorRoles,
   scopeAncestry,
 } from "@wodge/auth/authorization/policy";
 import { authorizationError } from "@wodge/core/authorization/errors";
@@ -71,6 +72,27 @@ export class WorkspaceAuthorization {
         ) {
           throw error;
         }
+      }
+    }
+  }
+
+  /** Persist demotions, including moderator assignments imported by older policies. */
+  async synchronizeTeamModerators() {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const policy = await this.policy();
+      const updated = reconcileTeamModeratorRoles(policy, this.state);
+      if (updated === policy) return;
+      try {
+        await this.repository.commit(policy.revision, updated);
+        return;
+      } catch (error) {
+        if (
+          !(error instanceof Error) ||
+          !("code" in error) ||
+          error.code !== "AUTHORIZATION_CONFLICT" ||
+          attempt === 2
+        )
+          throw error;
       }
     }
   }

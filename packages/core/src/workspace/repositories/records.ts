@@ -56,7 +56,6 @@ export class WorkspaceRecordRepository {
   }
   async loadWorkspace(): Promise<WorkspacePartyInterface> {
     await this.prepare();
-    const db = this.db;
     if (!loadRecordMetadata(this.db, "members")) {
       await this.saveMembers(
         (await this.legacyStorage.get<
@@ -302,6 +301,7 @@ export class WorkspaceRecordRepository {
     this.writeStructure(record);
   }
   writeStructure(record: WorkspacePartyInterface["workspaceStructure"]) {
+    const db = this.db;
     const { teams } = record.data;
     const channels: (typeof workspace_channels.$inferSelect)[] = [];
     for (const team of teams) {
@@ -328,7 +328,6 @@ export class WorkspaceRecordRepository {
         });
     }
     this.db.transaction(() => {
-      const db = this.db;
       reconcileRows(
         db,
         workspace_teams,

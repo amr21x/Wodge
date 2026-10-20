@@ -65,8 +65,7 @@ test("default teams and welcome channels use UUIDv7 while structural root keys r
 });
 
 test("new UUID teams, folders and channels pass the shared write schemas", () => {
-  const teamId = createEntityId(),
-    groupId = createEntityId();
+  const teamId = createEntityId();
 
   expect(
     workspaceInputSchemas.createTeam.safeParse({ id: teamId, name: "Team" })
