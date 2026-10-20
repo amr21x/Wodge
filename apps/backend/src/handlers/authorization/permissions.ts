@@ -1,3 +1,4 @@
+import { z } from "zod";
 import type { JsonContext } from "../../validators/json";
 import { WorkspaceAuthorization } from "@wodge/auth/authorization/service";
 
@@ -11,6 +12,8 @@ import { AuthorizationInvalidations } from "../../lib/authorization/invalidation
 import { requestIdentity } from "../../lib/helpers/identity";
 import { readJson } from "../../lib/helpers/json";
 import type { WorkspaceContext } from "../../types/hono-context";
+
+const pageParams = z.object({ pageId: z.string().min(1) });
 
 @injectable()
 export class PermissionHandlers {
@@ -29,6 +32,14 @@ export class PermissionHandlers {
         c.req.valid("json"),
         requestIdentity(c),
       ),
+      200,
+    );
+  };
+
+  pageMembers = async (c: Context<WorkspaceContext>) => {
+    const { pageId } = pageParams.parse(c.req.param());
+    return c.json(
+      await this.authorization.pageMembers(pageId, requestIdentity(c)),
       200,
     );
   };

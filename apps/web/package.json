@@ -157,7 +157,6 @@
     "@wodge/domain": "workspace:*",
     "@wodge/auth": "workspace:*",
     "y-partyserver": "2.2.0",
-    "@wodge/core": "workspace:*",
     "hono": "4.13.13"
   },
   "devDependencies": {

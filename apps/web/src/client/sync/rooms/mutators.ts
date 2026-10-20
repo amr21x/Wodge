@@ -1,11 +1,11 @@
 import type { EditMessageProps, VoteArgs } from "@wodge/domain/rooms/dto";
 import { WriteTransaction } from "replicache";
-import { sendMessageMutation } from "@wodge/core/rooms/mutations/send-msg";
+import { sendMessageMutation } from "./mutations/send-msg";
 import { Message } from "@wodge/domain/rooms/models";
-import { deleteMessageMutation } from "@wodge/core/rooms/mutations/delete-msg";
-import { editMessageMutation } from "@wodge/core/rooms/mutations/edit-msg";
-import { voteMutation } from "@wodge/core/rooms/mutations/vote";
-import { removeRoomVoteMutation } from "@wodge/core/rooms/mutations/remove-vote";
+import { deleteMessageMutation } from "./mutations/delete-msg";
+import { editMessageMutation } from "./mutations/edit-msg";
+import { voteMutation } from "./mutations/vote";
+import { removeRoomVoteMutation } from "./mutations/remove-vote";
 
 export type RoomMutators = ReturnType<typeof createRoomMutators>;
 

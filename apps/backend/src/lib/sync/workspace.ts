@@ -1,3 +1,5 @@
+import { ObjectSyncRepository } from "@wodge/core/sync/repositories/state";
+import { WorkspaceAuthorization } from "@wodge/auth/authorization/service";
 import { AuthorizationPolicies } from "@wodge/auth/authorization/policies";
 import { WorkspaceMutationAccess } from "@wodge/auth/authorization/workspace-mutations";
 import { WorkspaceService } from "@wodge/core/workspace/services/structure";
@@ -13,6 +15,10 @@ import { WorkspaceNotifications } from "../../gateways/workspace-notifications";
 @injectable()
 export class WorkspaceSync {
   constructor(
+    @inject(ObjectSyncRepository)
+    private readonly syncRecords: ObjectSyncRepository,
+    @inject(WorkspaceAuthorization)
+    private readonly authorization: WorkspaceAuthorization,
     @inject(WorkspaceMutationAccess)
     private readonly access: WorkspaceMutationAccess,
     @inject("workspace") private readonly party: WorkspaceServer,
@@ -24,7 +30,7 @@ export class WorkspaceSync {
     @inject(UserGateway) private readonly userGateway: UserGateway,
   ) {}
   get storage() {
-    return this.party.ctx.storage;
+    return this.syncRecords;
   }
   get versions() {
     return this.party.versions;
@@ -34,11 +40,11 @@ export class WorkspaceSync {
     try {
       authorized = {
         ...actor,
-        ...this.access.authorize(
+        ...(await this.access.authorize(
           params.mutation.name,
           params.mutation.args,
           actor,
-        ),
+        )),
       };
     } catch (error) {
       if (
@@ -49,7 +55,9 @@ export class WorkspaceSync {
         return;
       throw error;
     }
+    const previous = this.party.workspaceStructure.data;
     await dispatchWorkspaceMutation(this.service, params, authorized);
+    await this.authorization.provisionResources(previous);
     await this.policies.markChanged();
   }
   patch = (userId: string) =>

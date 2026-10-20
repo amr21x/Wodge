@@ -136,9 +136,6 @@ export class WorkspaceLifecycle {
           team.members = [...new Set([...team.members, ...addedIds])];
         }
       }
-      for (const group of draft.groups) {
-        group.members = group.members.filter((id) => ids.has(id));
-      }
     });
     await this.workspace.saveMembershipProjection();
   }

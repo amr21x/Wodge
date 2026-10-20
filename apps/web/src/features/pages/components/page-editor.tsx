@@ -15,12 +15,19 @@ export function PageEditor({
   teamId: string;
   user: UserType;
 }) {
-  const { provider } = useYDoc({
+  const collaboration = useYDoc({
     channelId,
     folderId,
     teamId,
     workspaceId,
   });
 
-  return <BlockEditor ydoc={provider.doc} provider={provider} user={user} />;
+  if (!collaboration) return null;
+  return (
+    <BlockEditor
+      ydoc={collaboration.provider.doc}
+      provider={collaboration.provider}
+      user={user}
+    />
+  );
 }

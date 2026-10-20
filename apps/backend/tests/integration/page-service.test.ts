@@ -1,3 +1,7 @@
+import { ObjectSyncRepository } from "@wodge/core/sync/repositories/state";
+import { createObjectDatabase } from "@wodge/infra/database/object-database";
+import { PageRecordRepository } from "@wodge/core/pages/repositories/records";
+import { attachSql } from "../helpers/sqlite";
 // @vitest-environment node
 
 import type { PageActor, PageInputs } from "@wodge/domain/pages/dto";
@@ -43,12 +47,15 @@ function fixture() {
       deleted: false,
     },
   };
-  const persisted = new Map<string, unknown>();
-  const storage = {
+  const persisted = new Map<string, unknown>([
+    ["db", structuredClone(state.record)],
+  ]);
+  const storage = attachSql({
+    get: vi.fn(async (key: string) => persisted.get(key)),
     put: vi.fn(async (...args: unknown[]) => {
       persisted.set(args[0] as string, structuredClone(args[1]));
     }),
-  };
+  });
 
   return {
     state,
@@ -135,7 +142,7 @@ describe("page transport service caller", () => {
   test.each(commands)(
     "$command.name preserves state, version and persisted record",
     async ({ command, expected }) => {
-      const { state, persisted, service } = fixture();
+      const { state, storage, service } = fixture();
 
       await service.execute(command, owner, 7);
       expect(state.record).toEqual({
@@ -143,7 +150,19 @@ describe("page transport service caller", () => {
         lastModifiedVersion: 7,
         deleted: false,
       });
-      expect(persisted.get("db")).toEqual(state.record);
+      expect(
+        (
+          await new PageRecordRepository(
+            storage as unknown as DurableObjectStorage,
+            createObjectDatabase(storage as unknown as DurableObjectStorage),
+            new ObjectSyncRepository(
+              storage as unknown as DurableObjectStorage,
+              createObjectDatabase(storage as unknown as DurableObjectStorage),
+              "page",
+            ),
+          ).loadPage()
+        ).state.record,
+      ).toEqual(state.record);
     },
   );
 
@@ -187,16 +206,56 @@ describe("page transport service caller", () => {
     expect(storage.put).not.toHaveBeenCalled();
   });
 
-  test("failed persistence rejects after the existing in-memory state update", async () => {
+  test("commands read committed SQL rather than a stale sync projection and preserve unrelated rows", async () => {
+    const { state, service, storage } = fixture();
+    await service.execute(
+      { name: "updateColumn", args: { id: "a", title: "Ready" } },
+      owner,
+      4,
+    );
+    storage.sql.exec(
+      "UPDATE page_tasks SET title = 'Committed' WHERE id = 'first'",
+    );
+    state.record.data.columns = [];
+    const exec = vi.mocked(storage.sql.exec);
+    exec.mockClear();
+    await service.execute(
+      { name: "createTask", args: { col: "a", task: createdTask } },
+      owner,
+      5,
+    );
+    expect(
+      state.record.data.tasks.find((task) => task.id === "first")?.title,
+    ).toBe("Committed");
+    expect(state.record.data.tasks.map((task) => task.id)).toEqual([
+      "first",
+      "second",
+      "third",
+    ]);
+    expect(
+      exec.mock.calls.some(([query]) =>
+        /^delete from "page_tasks"|^update "page_tasks"/i.test(query),
+      ),
+    ).toBe(false);
+    expect(storage.put).not.toHaveBeenCalled();
+  });
+
+  test("failed persistence preserves the last committed projection", async () => {
     const { state, service, storage, persisted } = fixture();
 
-    storage.put.mockRejectedValueOnce(new Error("storage unavailable"));
+    vi.mocked(storage.sql.exec).mockImplementationOnce(() => {
+      throw new Error("storage unavailable");
+    });
 
     await expect(
       service.execute({ name: "deleteTask", args: { task: first } }, owner, 7),
     ).rejects.toThrow("storage unavailable");
-    expect(state.record.data.tasks).toEqual([second]);
-    expect(state.record.lastModifiedVersion).toBe(7);
-    expect(persisted.has("db")).toBe(false);
+    expect(state.record.data.tasks).toEqual([first, second]);
+    expect(state.record.lastModifiedVersion).toBe(3);
+    expect(persisted.get("db")).toEqual({
+      data: { columns: state.record.data.columns, tasks: [first, second] },
+      lastModifiedVersion: 3,
+      deleted: false,
+    });
   });
 });

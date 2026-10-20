@@ -62,6 +62,9 @@ export class AuthorizationRoutes {
       permissionHandlers.hasPermission,
     );
 
-    return withHasPermission;
+    return withHasPermission.get(
+      "/pages/:pageId/members",
+      permissionHandlers.pageMembers,
+    );
   }
 }

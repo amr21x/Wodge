@@ -1,3 +1,4 @@
+import { channelCapabilities } from "@wodge/auth/authorization/channel-capabilities";
 import type { ChannelsTypes } from "@wodge/domain/channels/index";
 import { AuthChannelResponseSchema } from "@wodge/domain/channels/index";
 import type { WorkspaceGateway } from "../gateways/workspace";
@@ -43,25 +44,9 @@ export async function authorizeChannel(
 
   request.headers.set("channel-auth", JSON.stringify(permissions));
   request.headers.set("x-admin", String(permissions.isAdmin));
-  request.headers.set(
-    "x-can-edit",
-    String(
-      permissions.canEdit ||
-        permissions.isOwner ||
-        permissions.isAdmin ||
-        permissions.isTeamModerator,
-    ),
-  );
-  request.headers.set(
-    "x-can-view",
-    String(
-      permissions.canView ||
-        permissions.canEdit ||
-        permissions.isOwner ||
-        permissions.isAdmin ||
-        permissions.isTeamModerator,
-    ),
-  );
+  const capabilities = channelCapabilities(permissions);
+  request.headers.set("x-can-edit", String(capabilities.canEdit));
+  request.headers.set("x-can-view", String(capabilities.canView));
   request.headers.set("x-owner", String(permissions.isOwner));
   request.headers.set("x-team-moderator", String(permissions.isTeamModerator));
 

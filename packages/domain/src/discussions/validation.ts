@@ -1,19 +1,8 @@
-import { entityIdSchema } from "@wodge/domain/identifiers";
 import { z } from "zod";
 
 import { ChannelSchema } from "@wodge/domain/channels/index";
-import { LEGACY_GROUP_ID_LENGTH } from "@wodge/domain/constants";
 
-export const ThreadSchema = ChannelSchema.extend({
-  viewGroups: z
-    .array(entityIdSchema(LEGACY_GROUP_ID_LENGTH).or(z.literal("team-members")))
-    .optional()
-    .default(["team-members"]),
-  editGroups: z
-    .array(entityIdSchema(LEGACY_GROUP_ID_LENGTH).or(z.literal("team-members")))
-    .optional()
-    .default(["team-members"]),
-});
+export const ThreadSchema = z.object(ChannelSchema.shape);
 
 export const ThreadMessageSchema = z.object({
   id: z.string(),

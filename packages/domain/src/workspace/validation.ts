@@ -1,16 +1,12 @@
 import { entityIdSchema } from "@wodge/domain/identifiers";
 import { z } from "zod";
-import {
-  BRAND_COLOR,
-  LEGACY_GROUP_ID_LENGTH,
-  LEGACY_TEAM_ID_LENGTH,
-} from "../constants";
+import { LEGACY_FOLDER_ID_LENGTH, LEGACY_TEAM_ID_LENGTH } from "../constants";
 import { ThreadSchema } from "../discussions/validation";
 import { PageSchema } from "../pages/validation";
 import { RoomSchema } from "../rooms/validation";
 
 export const FolderSchema = z.object({
-  id: entityIdSchema(LEGACY_GROUP_ID_LENGTH).or(
+  id: entityIdSchema(LEGACY_FOLDER_ID_LENGTH).or(
     z
       .string()
       .refine(
@@ -71,17 +67,8 @@ export const MemberSchema = z.object({
   }),
 });
 
-export const GroupSchema = z.object({
-  id: entityIdSchema(LEGACY_GROUP_ID_LENGTH),
-  name: z.string().max(70).min(1),
-  members: z.array(z.string()),
-  color: z.string().default(BRAND_COLOR),
-  createdBy: z.string(),
-});
-
 export const WorkspaceStructureSchema = z.object({
   teams: z.array(TeamSchema),
-  groups: z.array(GroupSchema),
 });
 
 export const WorkspaceMembersSchema = z.object({
@@ -132,17 +119,6 @@ const teamUpdate = z.union([
   }),
 ]);
 
-const groupUpdate = z.union([
-  z.object({
-    action: z.literal("updateInfo"),
-    update: z.object({ name: z.string(), color: z.string() }),
-  }),
-  z.object({
-    action: z.enum(["addMembers", "removeMembers"]),
-    update: members,
-  }),
-]);
-
 const page = PageSchema.extend({ teamId: z.string(), folderId: z.string() });
 
 const room = RoomSchema.extend({ teamId: z.string() });
@@ -153,9 +129,6 @@ export const workspaceInputSchemas = {
   createTeam: TeamSchema.pick({ id: true, name: true, avatar: true }),
   updateTeam: z.object({ teamId: z.string(), teamUpdate }),
   deleteTeam: z.string(),
-  createGroup: GroupSchema.pick({ id: true, name: true, color: true }),
-  updateGroup: z.object({ groupId: z.string(), groupUpdate }),
-  deleteGroup: z.string(),
   createPage: page,
   updatePage: page,
   createRoom: room,

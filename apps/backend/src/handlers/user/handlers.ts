@@ -1,3 +1,4 @@
+import { UserSync } from "../../lib/sync/user";
 import { UserAvatars } from "@wodge/core/user/services/avatars";
 import { UserService } from "@wodge/core/user/services/memberships";
 import { PokeMessage } from "@wodge/domain/sync/index";
@@ -8,7 +9,6 @@ import { inject, injectable } from "tsyringe";
 import { UserNotifications } from "../../gateways/user-notifications";
 import { readJson } from "../../lib/helpers/json";
 import { readUpload } from "../../lib/helpers/upload";
-import { repPull, repPush } from "../../lib/sync/replicache";
 import UserServer from "../../servers/user";
 import type { UserContext } from "../../types/hono-context";
 import { AvatarKey } from "../../validators/files";
@@ -17,6 +17,7 @@ import { RemoveWorkspaceBody } from "../../validators/user";
 @injectable()
 export class UserHandlers {
   constructor(
+    @inject(UserSync) private readonly sync: UserSync,
     @inject(S3ObjectStorage) private readonly storage: S3ObjectStorage,
     @inject(HttpClient) private readonly http: HttpClient,
     @inject(UserNotifications)
@@ -70,29 +71,8 @@ export class UserHandlers {
     return c.json({ ok: true }, 200);
   };
 
-  userPull = async (c: Context<UserContext>) => {
-    return await repPull({
-      req: c.req,
-      storage: this.party.ctx.storage,
-      versions: this.party.versions,
-      patcher: async () => [],
-    });
-  };
-
-  userPush = async (c: Context<UserContext>) => {
-    const res = await repPush({
-      req: c.req,
-      storage: this.party.ctx.storage,
-      versions: this.party.versions,
-      runner: async () => {},
-    });
-
-    if (res.status === 200) {
-      this.party.poke();
-    }
-
-    return res;
-  };
+  userPull = (c: Context<UserContext>) => this.sync.pull(c.req);
+  userPush = (c: Context<UserContext>) => this.sync.push(c.req);
 
   removeWorkspace = async (c: Context<UserContext>) => {
     const parsed = RemoveWorkspaceBody.safeParse(await readJson(c.req));
@@ -132,9 +112,9 @@ export class UserHandlers {
   };
   private async updateMemberships() {
     await Promise.all(
-      this.userService
-        .listWorkspaceIds()
-        .map((id) => this.notifications.updateMember(id)),
+      (await this.userService.listWorkspaceIds()).map((id) =>
+        this.notifications.updateMember(id),
+      ),
     );
   }
 }

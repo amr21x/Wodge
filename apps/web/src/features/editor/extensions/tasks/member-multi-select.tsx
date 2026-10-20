@@ -18,7 +18,8 @@ import { Check, Users2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { forwardRef, useMemo, useState } from "react";
 
-import { canView } from "@wodge/auth/authorization/access";
+import { api } from "@/client/api";
+import { useQuery } from "@tanstack/react-query";
 import { Member } from "@wodge/domain/workspace/models";
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
 
@@ -49,22 +50,25 @@ export function MemberMultiSelect({
     teamId: string;
     folderId: string;
   }>();
-  const { structure, members: membersArr } = useCurrentWorkspace();
-
+  const { workspaceId, members: membersArr } = useCurrentWorkspace();
+  const { data: eligible = [] } = useQuery({
+    queryKey: ["page-members", workspaceId, channelId],
+    enabled: !!workspaceId && !!channelId,
+    refetchInterval: 10_000,
+    queryFn: async () => {
+      if (!workspaceId || !channelId) return [];
+      const response = await api.api.workspaces[
+        ":workspaceId"
+      ].authorization.pages[":pageId"].members.$get({
+        param: { workspaceId, pageId: channelId },
+      });
+      if (!response.ok) return [];
+      return response.json();
+    },
+  });
   const members = useMemo(
-    () =>
-      membersArr.members.filter((m) =>
-        canView({
-          channelId,
-          teamId,
-          structure,
-          members: membersArr,
-          channelType: "page",
-          folderId,
-          userId: m.id,
-        }),
-      ),
-    [teamId, channelId, structure, membersArr, folderId],
+    () => membersArr.members.filter((member) => eligible.includes(member.id)),
+    [membersArr, eligible],
   );
 
   function onSelect(m: Member) {

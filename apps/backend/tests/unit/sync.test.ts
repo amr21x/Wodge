@@ -1,3 +1,6 @@
+import { ObjectSyncRepository } from "@wodge/core/sync/repositories/state";
+import { createObjectDatabase } from "@wodge/infra/database/object-database";
+import { attachSql } from "../helpers/sqlite";
 // @vitest-environment node
 import {
   REPLICACHE_VERSIONS_KEY,
@@ -11,7 +14,7 @@ type Storage = DurableObjectStorage;
 
 function fixture() {
   const records = new Map<string, unknown>();
-  const storage = {
+  const storage = attachSql({
     async get(key: string) {
       return structuredClone(records.get(key));
     },
@@ -29,7 +32,12 @@ function fixture() {
           .map(([k, v]) => [k, structuredClone(v)]),
       );
     },
-  } as unknown as Storage;
+  }) as unknown as Storage;
+  const repository = new ObjectSyncRepository(
+    storage,
+    createObjectDatabase(storage),
+    "page",
+  );
   const versions = new Map([["globalVersion", 3]]);
   const runner = vi.fn(async () => {});
   const patcher = vi.fn(async () => [
@@ -46,7 +54,7 @@ function fixture() {
     user: string | null = "owner",
   ) =>
     repPush({
-      storage,
+      storage: repository,
       versions,
       runner,
       req: req({ clientGroupID: group, mutations }, user),
@@ -57,13 +65,23 @@ function fixture() {
     user: string | null = "owner",
   ) =>
     repPull({
-      storage,
+      storage: repository,
       versions,
       patcher,
       req: req({ clientGroupID: group, cookie }, user),
     });
 
-  return { records, storage, versions, runner, patcher, req, push, pull };
+  return {
+    records,
+    legacy: storage,
+    storage: repository,
+    versions,
+    runner,
+    patcher,
+    req,
+    push,
+    pull,
+  };
 }
 
 const mutation = (id = 1, clientID = "client") => ({
@@ -113,10 +131,14 @@ test("push runs consecutive mutations once, supports multiple clients and acknow
   expect(f.runner.mock.calls).toHaveLength(3);
   expect(f.versions.get("globalVersion")).toBe(4);
   expect(
-    f.records.get(makeClientKey("client", makeClientGroupKey("group"))),
+    await f.storage.client(
+      makeClientKey("client", makeClientGroupKey("group")),
+    ),
   ).toMatchObject({ lastMutationID: 2, lastModifiedVersion: 4 });
   expect(
-    f.records.get(makeClientKey("second", makeClientGroupKey("group"))),
+    await f.storage.client(
+      makeClientKey("second", makeClientGroupKey("group")),
+    ),
   ).toMatchObject({ lastMutationID: 1 });
   expect((await f.push([mutation(), mutation(2)])).status).toBe(200);
   expect(f.runner).toHaveBeenCalledTimes(3);
@@ -137,7 +159,9 @@ test("push rejects a future mutation without advancing its stored acknowledgemen
   await f.push([mutation()]);
   expect((await f.push([mutation(3)])).status).toBe(500);
   expect(
-    f.records.get(makeClientKey("client", makeClientGroupKey("group"))),
+    await f.storage.client(
+      makeClientKey("client", makeClientGroupKey("group")),
+    ),
   ).toMatchObject({ lastMutationID: 1 });
   expect(f.runner).toHaveBeenCalledOnce();
 });
@@ -152,7 +176,9 @@ test("runner failure leaves acknowledgements unchanged; retry replays prior effe
   expect(f.versions.get("globalVersion")).toBe(3);
   expect(f.records.has(REPLICACHE_VERSIONS_KEY)).toBe(false);
   expect(
-    f.records.get(makeClientKey("client", makeClientGroupKey("group"))),
+    await f.storage.client(
+      makeClientKey("client", makeClientGroupKey("group")),
+    ),
   ).toMatchObject({ lastMutationID: 0 });
   expect((await f.push([mutation(), mutation(2)])).status).toBe(200);
   expect(f.runner).toHaveBeenCalledTimes(4);

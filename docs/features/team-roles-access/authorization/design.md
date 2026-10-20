@@ -9,11 +9,11 @@ migration, deployment or production cutover has been performed.
 ## Implemented first slice
 
 - Typed domain permission catalogue, role/assignment schemas, scopes and errors.
-- WorkspaceAuthorization in core exposes role creation/update/deletion,
+- WorkspaceAuthorization in auth exposes role creation/update/deletion,
   assignment/removal, hasPermission, requirePermission and an internal grant
-  resolver. Each request supplies the verified caller through backend DI.
-- KVAuthorizationRepository persists versioned policy, compare-and-save revision
-  checks and pending invalidation events in one native atomic KV write.
+  resolver. Each operation receives the verified caller as an argument.
+- AuthorizationRepository persists normalized roles, permissions, assignments and
+  pending invalidation events with revision checks in one local Drizzle SQL transaction.
 - The Better Auth organization is the canonical workspace identity in D1. Its ID
   is also the workspace DO name. There is no separate workspace table, membership
   table or organization-to-workspace mapping. Profile fields and metadata are
@@ -93,8 +93,9 @@ unadopted workspace. Run migrations through the normal D1 migration runner so
 failed batches roll back. Populated legacy room objects still need a trusted
 room-scope backfill; this work does not infer their owner from incoming requests.
 Fresh databases use organization IDs directly from creation.
-The full Durable Object KV-to-SQL migration is postponed; authorization uses a
-storage contract and the existing KV API.
+All application Durable Object persistence uses Drizzle SQLite, including authorization.
+One-time imports retain legacy records without dual writes; deployed namespace transfer
+remains separate work.
 
 Outstanding work includes other resource enforcement, existing-state adoption,
 team/group UI/data conversion, immediate session/membership invalidation across
@@ -144,6 +145,23 @@ The first slice has automated coverage in:
 The retained regression, runtime and compatibility suites are also run. Browser
 UI role management and page/thread authorization are not claimed by this evidence.
 
+## Group removal amendment
+
+The current implementation removes workspace access groups, their management commands,
+settings routes, channel selectors and active table definitions. Teams and scoped custom
+roles authorize rooms, pages and threads; Yjs refreshes page permissions while connections
+remain open. Browser visibility/editability checks use the permission API, and page task
+assignee candidates are resolved by backend policy. Thread mutations require update access.
+
+Legacy SQL and KV access lists are translated once into scoped user/team assignments.
+The SQL upgrade drops the group tables after preserving these projections. Existing room
+custom roles and revocations are authoritative and are not overwritten by legacy room
+lists. Newly created resources receive explicit default team assignments. Historical
+migration files and migration-only readers retain obsolete names solely for upgrades.
+Earlier first-slice limitations below describe the previous baseline; group replacement,
+page/thread access and live Yjs permission refresh are now implemented. UI role management
+and deployed namespace transfers remain outside this change.
+
 ## Requested direction
 
 Better Auth provides authentication and organization membership. A dedicated
@@ -156,10 +174,9 @@ store; projections and caches cannot be independently edited.
 The complete Durable Object migration covers user, workspace, room, thread and
 page objects, including records, sync versions, client groups, acknowledgements,
 deletions, presence and Yjs snapshots. Existing configuration declares SQLite
-classes, but production application persistence still uses their KV API. Moving
-that application data to SQL tables and transferring any deployed KV-backed
-namespaces are distinct migration concerns. This migration is desired work; it
-is not a prerequisite for a bounded authorization prototype.
+classes. Application records now use relational tables through a separate Drizzle
+connection and migration stream from D1. Transferring any deployed KV-backed
+namespaces remains a distinct migration concern.
 
 Queues may be introduced later. They are an option, not a selected dependency or
 an immediate-revocation guarantee.

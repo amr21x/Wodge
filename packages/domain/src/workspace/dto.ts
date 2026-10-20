@@ -9,8 +9,6 @@ export type WorkspaceInputs = {
 
 export type TeamUpdateArgs = WorkspaceInputs["updateTeam"];
 
-export type GroupUpdateArgs = WorkspaceInputs["updateGroup"];
-
 export type NewPageArgs = WorkspaceInputs["createPage"];
 
 export type NewRoomArgs = WorkspaceInputs["createRoom"];

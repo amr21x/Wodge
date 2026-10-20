@@ -31,8 +31,6 @@ export function AddRoomForm({
     defaultValues: {
       name: room?.name || "",
       avatar: room?.avatar || "",
-      editGroups: room?.editGroups || ["team-members"],
-      viewGroups: room?.viewGroups || ["team-members"],
       id: room?.id || createEntityId(),
     },
   });
@@ -88,8 +86,7 @@ export function AddRoomForm({
 
           <p role="note" className="text-sm text-muted-foreground">
             Room access is managed through workspace roles and permissions.
-            Legacy view/edit groups are read-only here and do not change room
-            access.
+            Access is managed with team roles and permissions.
           </p>
 
           <Button type="submit" className="w-full">

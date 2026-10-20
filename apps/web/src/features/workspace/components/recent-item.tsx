@@ -3,7 +3,7 @@ import { Room } from "@wodge/domain/rooms/models";
 import { Thread } from "@wodge/domain/discussions/models";
 import { Page } from "@wodge/domain/pages/models";
 import { useFeatureFlags } from "@/components/feature-flags-provider";
-import { CHANNEL_FEATURES } from "@wodge/core/features/policy";
+import { CHANNEL_FEATURES } from "@wodge/domain/features/models";
 import { format } from "date-fns";
 import { useSetAtom } from "jotai";
 import {

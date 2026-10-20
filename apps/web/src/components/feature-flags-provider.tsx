@@ -14,8 +14,8 @@ import {
   closedFlags,
   createFlagReader,
   disabledFeature,
-} from "@wodge/core/features/flags";
-import { pageFeatures } from "@wodge/core/features/policy";
+} from "@/client/features/flags";
+import { pageFeatures } from "@/client/features/pages";
 
 const FeatureFlagsContext = createContext<FeatureFlags>(closedFlags());
 

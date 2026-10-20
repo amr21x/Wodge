@@ -1,9 +1,12 @@
+import { WorkspaceRecordRepository } from "@wodge/core/workspace/repositories/records";
 import { OrganizationMembership } from "@wodge/auth/authorization/membership";
 import {
   assertApplicablePermissions,
   containsPermissions,
   effectivePermissions,
   initialPolicy,
+  migrateResourcePolicy,
+  extendResourceAssignments,
   reconcileOrganizationRoles,
   scopeAncestry,
 } from "@wodge/auth/authorization/policy";
@@ -23,7 +26,10 @@ import type {
   RoomAuthorizationScope,
 } from "@wodge/domain/authorization/models";
 import { createEntityId } from "@wodge/domain/identifiers";
-import type { WorkspaceState } from "@wodge/domain/workspace/models";
+import type {
+  WorkspaceState,
+  WorkspaceStructure,
+} from "@wodge/domain/workspace/models";
 import { inject, injectable } from "tsyringe";
 import { AuthorizationPolicies } from "./policies";
 
@@ -37,6 +43,10 @@ export class WorkspaceAuthorization {
     @inject(WorkspaceLifecycleRepository)
     private readonly state: WorkspaceState,
     @inject("objectId") private readonly workspaceId: string,
+    @inject(WorkspaceRecordRepository) private readonly records: Pick<
+      WorkspaceRecordRepository,
+      "loadPermissionImports" | "finishPermissionImport"
+    >,
   ) {}
 
   /** Trusted lifecycle operation; callers supply the refreshed organization projection. */
@@ -82,6 +92,18 @@ export class WorkspaceAuthorization {
   private async policy() {
     const stored = await this.repository.read();
     if (stored) {
+      const imports = await this.records.loadPermissionImports();
+      if (!stored.resourcesMigrated) {
+        const upgraded = migrateResourcePolicy(
+          stored,
+          this.state,
+          imports ?? [],
+        );
+        await this.repository.commit(stored.revision, upgraded);
+        await this.records.finishPermissionImport();
+        return upgraded;
+      }
+      if (imports !== null) await this.records.finishPermissionImport();
       return stored;
     }
     if (!this.state.members.createdBy) {
@@ -90,9 +112,14 @@ export class WorkspaceAuthorization {
         "Workspace has not been initialized",
       );
     }
-    const policy = initialPolicy(this.workspaceId, this.state);
+    const policy = initialPolicy(
+      this.workspaceId,
+      this.state,
+      await this.records.loadPermissionImports(),
+    );
     try {
       await this.repository.commit(0, policy);
+      await this.records.finishPermissionImport();
       return policy;
     } catch (error) {
       const winner = await this.repository.read();
@@ -130,6 +157,78 @@ export class WorkspaceAuthorization {
     permissions: PermissionRequest["permissions"],
   ): PermissionRequest {
     return { scope: { type: "workspace", id: this.workspaceId }, permissions };
+  }
+
+  /** Internal object calls carry verified user identity; organization membership remains authoritative. */
+  async permissionsForUser(userId: string, scope: PermissionRequest["scope"]) {
+    if (!(await this.memberships.hasMember(userId, this.workspaceId)))
+      return {};
+    return effectivePermissions(await this.policy(), this.state, userId, scope);
+  }
+
+  async pageMembers(pageId: string, principal: AuthorizationPrincipal) {
+    await this.requireMember(principal);
+    const policy = await this.policy();
+    const scope = { type: "page" as const, id: pageId };
+    this.requireAllowed(
+      policy,
+      { scope, permissions: { page: ["read"] } },
+      principal,
+    );
+    const eligible = this.state.members.members.filter((member) =>
+      containsPermissions(
+        effectivePermissions(policy, this.state, member.id, scope),
+        { page: ["read"] },
+      ),
+    );
+    const active = await Promise.all(
+      eligible.map(async (member) =>
+        (await this.memberships.hasMember(member.id, this.workspaceId))
+          ? member.id
+          : null,
+      ),
+    );
+    return active.filter((id): id is string => id !== null);
+  }
+
+  async provisionResources(previous: WorkspaceStructure) {
+    const before = new Set(
+      previous.teams.flatMap((team) =>
+        [
+          ...team.rooms,
+          ...team.threads,
+          ...team.folders.flatMap((f) => f.channels),
+        ].map((resource) => resource.id),
+      ),
+    );
+    const added = new Set(
+      this.state.structure.teams
+        .flatMap((team) =>
+          [
+            ...team.rooms,
+            ...team.threads,
+            ...team.folders.flatMap((f) => f.channels),
+          ].map((resource) => resource.id),
+        )
+        .filter((id) => !before.has(id)),
+    );
+    if (!added.size) return;
+    const policy = await this.policy();
+    const seed = initialPolicy(this.workspaceId, this.state);
+    const assignments = seed.assignments.filter(
+      (a) =>
+        added.has(a.scope.id) &&
+        !policy.assignments.some(
+          (existing) =>
+            existing.scope.type === a.scope.type &&
+            existing.scope.id === a.scope.id,
+        ),
+    );
+    if (!assignments.length) return;
+    await this.repository.commit(
+      policy.revision,
+      extendResourceAssignments(policy, seed, assignments),
+    );
   }
 
   async hasPermission(

@@ -1,22 +1,14 @@
+import { ObjectSyncRepository } from "@wodge/core/sync/repositories/state";
+import { createObjectDatabase } from "@wodge/infra/database/object-database";
+import { WorkspaceRecordRepository } from "@wodge/core/workspace/repositories/records";
+import { RoomRecordRepository } from "@wodge/core/rooms/repositories/records";
+import { DiscussionRecordRepository } from "@wodge/core/discussions/repositories/records";
+import { UserRecordRepository } from "@wodge/core/user/repositories/records";
 import type { DurableObjectStorage } from "@cloudflare/workers-types";
 import { UserService } from "@wodge/core/user/services/memberships";
-import {
-  defaultWorkspaceMembers,
-  defaultWorkspaceStructure,
-} from "@wodge/core/workspace/defaults";
 import { WorkspaceLifecycleRepository } from "@wodge/core/workspace/repositories/lifecycle";
 import { WorkspaceLifecycle } from "@wodge/core/workspace/services/lifecycle";
-import type { ThreadPost } from "@wodge/domain/discussions/models";
 import type { PageActor } from "@wodge/domain/pages/dto";
-import type { Message } from "@wodge/domain/rooms/models";
-import {
-  REPLICACHE_VERSIONS_KEY,
-  WORKSPACE_PRESENCE_KEY,
-  makeWorkspaceMembersKey,
-  makeWorkspaceStructureKey,
-  makeWorkspacesStoreKey,
-} from "@wodge/domain/sync/index";
-import type { VersionedRecord } from "@wodge/domain/sync/records";
 import { createRuntimeContainer } from "../../src/container";
 import type RoomParty from "../../src/servers/room";
 import type ThreadParty from "../../src/servers/thread";
@@ -27,12 +19,6 @@ import {
   executeRoomMutation,
   executeWorkspaceMutation,
 } from "../helpers/mutations";
-
-const record = <T>(data: T): VersionedRecord<T> => ({
-  data,
-  lastModifiedVersion: 0,
-  deleted: false,
-});
 
 export async function featureObject(
   request: Request,
@@ -54,22 +40,15 @@ export async function featureObject(
   };
 
   if (feature === "workspace") {
-    const state = {
-      workspaceMembers:
-        (await storage.get<
-          VersionedRecord<ReturnType<typeof defaultWorkspaceMembers>>
-        >(makeWorkspaceMembersKey())) ?? record(defaultWorkspaceMembers()),
-      workspaceStructure:
-        (await storage.get<
-          VersionedRecord<ReturnType<typeof defaultWorkspaceStructure>>
-        >(makeWorkspaceStructureKey())) ?? record(defaultWorkspaceStructure()),
-      versions:
-        (await storage.get<Map<string, number>>(REPLICACHE_VERSIONS_KEY)) ??
-        new Map([["globalVersion", 0]]),
-      presenceMap:
-        (await storage.get<Map<string, boolean>>(WORKSPACE_PRESENCE_KEY)) ??
-        new Map<string, boolean>(),
-    };
+    const state = await new WorkspaceRecordRepository(
+      storage,
+      createObjectDatabase(storage),
+      new ObjectSyncRepository(
+        storage,
+        createObjectDatabase(storage),
+        "workspace",
+      ),
+    ).loadWorkspace();
     const party = {
       ...state,
       poke: async () => {},
@@ -89,7 +68,24 @@ export async function featureObject(
     if (body && execution) {
       if (body.command.name === "createWorkspace") {
         await new WorkspaceLifecycle(
-          new WorkspaceLifecycleRepository(party.ctx.storage, party),
+          new WorkspaceLifecycleRepository(
+            new WorkspaceRecordRepository(
+              party.ctx.storage,
+              createObjectDatabase(party.ctx.storage),
+              new ObjectSyncRepository(
+                party.ctx.storage,
+                createObjectDatabase(party.ctx.storage),
+                "workspace",
+              ),
+            ),
+            new ObjectSyncRepository(
+              party.ctx.storage,
+              createObjectDatabase(party.ctx.storage),
+              "workspace",
+            ),
+            party,
+            createObjectDatabase(party.ctx.storage),
+          ),
         ).createWorkspace(body.actor.userId);
       } else {
         await executeWorkspaceMutation(party, execution, body.actor);
@@ -105,11 +101,11 @@ export async function featureObject(
   }
 
   if (feature === "rooms") {
-    const state = {
-      messages:
-        (await storage.get<VersionedRecord<Message[]>>("messages")) ??
-        record<Message[]>([]),
-    };
+    const state = await new RoomRecordRepository(
+      storage,
+      createObjectDatabase(storage),
+      new ObjectSyncRepository(storage, createObjectDatabase(storage), "room"),
+    ).loadRoom();
 
     if (body && execution) {
       await executeRoomMutation(
@@ -133,11 +129,15 @@ export async function featureObject(
   }
 
   if (feature === "discussions") {
-    const state = {
-      threadPosts:
-        (await storage.get<VersionedRecord<ThreadPost[]>>("posts")) ??
-        record<ThreadPost[]>([]),
-    };
+    const state = await new DiscussionRecordRepository(
+      storage,
+      createObjectDatabase(storage),
+      new ObjectSyncRepository(
+        storage,
+        createObjectDatabase(storage),
+        "thread",
+      ),
+    ).loadThread();
 
     if (body && execution) {
       await executeDiscussionMutation(
@@ -161,9 +161,11 @@ export async function featureObject(
   }
 
   if (feature === "user") {
-    const workspaces =
-      (await storage.get<Set<string>>(makeWorkspacesStoreKey())) ??
-      new Set<string>();
+    const { workspacesStore: workspaces } = await new UserRecordRepository(
+      storage,
+      createObjectDatabase(storage),
+      new ObjectSyncRepository(storage, createObjectDatabase(storage), "user"),
+    ).loadUser();
     const party = {
       workspacesStore: workspaces,
       name: "user",

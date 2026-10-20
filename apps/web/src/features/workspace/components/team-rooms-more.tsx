@@ -32,8 +32,6 @@ export function TeamRoomsMore({ teamId }: TeamMoreProps) {
         name: "New room",
 
         id: createEntityId(),
-        editGroups: ["team-members"],
-        viewGroups: ["team-members"],
         avatar: "",
       });
     } catch {

@@ -85,22 +85,16 @@ import React from "react";
 //       {
 //         id: "root-t1",
 //         name: "root",
-//         editGroups: [],
-//         viewGroups: [],
 //         channels: [
 //           {
 //             id: "1c1",
 //             name: "Amr 1",
-//             editGroups: [],
-//             viewGroups: [],
 //             avatar: "https://i.imgur.com/7V9b0e3.jpg",
 //             type: "text",
 //           },
 //           {
 //             id: "1c11",
 //             name: "Maro 2",
-//             editGroups: [],
-//             viewGroups: [],
 //             avatar: "https://i.imgur.com/7V9b0e3.jpg",
 //             type: "text",
 //           },
@@ -109,14 +103,10 @@ import React from "react";
 //       {
 //         id: "1d1",
 //         name: "Dir 1",
-//         editGroups: [],
-//         viewGroups: [],
 //         channels: [
 //           {
 //             id: "1c2",
 //             name: "Ali 1",
-//             editGroups: [],
-//             viewGroups: [],
 //             avatar: "https://i.imgur.com/7V9b0e3.jpg",
 //             type: "text",
 //           },
@@ -125,14 +115,10 @@ import React from "react";
 //       {
 //         id: "1d2",
 //         name: "Dir 2",
-//         editGroups: [],
-//         viewGroups: [],
 //         channels: [
 //           {
 //             id: "1c3",
 //             name: "Begz 2",
-//             editGroups: [],
-//             viewGroups: [],
 //             avatar: "https://i.imgur.com/7V9b0e3.jpg",
 //             type: "text",
 //           },
@@ -151,14 +137,10 @@ import React from "react";
 //       {
 //         id: "2d1",
 //         name: "Dir 1",
-//         editGroups: [],
-//         viewGroups: [],
 //         channels: [
 //           {
 //             id: "2c1",
 //             name: "Omar 1",
-//             editGroups: [],
-//             viewGroups: [],
 //             avatar: "https://i.imgur.com/7V9b0e3.jpg",
 //             type: "text",
 //           },
@@ -167,14 +149,10 @@ import React from "react";
 //       {
 //         id: "2d2",
 //         name: "Dir 2",
-//         editGroups: [],
-//         viewGroups: [],
 //         channels: [
 //           {
 //             id: "2c2",
 //             name: "Masry 2",
-//             editGroups: [],
-//             viewGroups: [],
 //             type: "text",
 //             avatar: "https://i.imgur.com/7V9b0e3.jpg",
 //           },
@@ -193,14 +171,10 @@ import React from "react";
 //       {
 //         id: "3d1",
 //         name: "Dir 1",
-//         editGroups: [],
-//         viewGroups: [],
 //         channels: [
 //           {
 //             id: "3c1",
 //             name: "Channel 1",
-//             editGroups: [],
-//             viewGroups: [],
 //             avatar: "https://i.imgur.com/7V9b0e3.jpg",
 //             type: "text",
 //           },
@@ -209,14 +183,10 @@ import React from "react";
 //       {
 //         id: "3d2",
 //         name: "Dir 2",
-//         editGroups: [],
-//         viewGroups: [],
 //         channels: [
 //           {
 //             id: "3c2",
 //             name: "Channel 2",
-//             editGroups: [],
-//             viewGroups: [],
 //             type: "text",
 //             avatar: "https://i.imgur.com/7V9b0e3.jpg",
 //           },

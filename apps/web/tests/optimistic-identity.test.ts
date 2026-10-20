@@ -9,7 +9,7 @@ import {
   ThreadMessageSchema,
   ThreadPostSchema,
 } from "@wodge/domain/discussions/validation";
-import { createDefaultTeam } from "@wodge/core/workspace/defaults";
+import { TeamSchema } from "@wodge/domain/workspace/validation";
 import { createEntityId } from "@wodge/domain/identifiers";
 import { makeWorkspaceStructureKey } from "@wodge/domain/sync/index";
 import type { WorkspaceStructure } from "@wodge/domain/workspace/models";
@@ -113,19 +113,23 @@ test("discussion mutations use their replica identity across profile cache chang
 });
 
 test("workspace mutations use the replica owner without a cached user", async () => {
-  const team = createDefaultTeam("alice");
+  const team = TeamSchema.parse({
+    id: createEntityId(),
+    name: "Team",
+    createdBy: "alice",
+    members: ["alice"],
+    moderators: [],
+    folders: [],
+    rooms: [],
+    threads: [{ id: createEntityId(), name: "Thread" }],
+  });
   const key = makeWorkspaceStructureKey();
-  const { tx, records } = transaction({ [key]: { teams: [team], groups: [] } });
+  const { tx, records } = transaction({ [key]: { teams: [team] } });
   const mutations = createWorkspaceMutators("alice");
   await mutations.createTeam(tx, {
     id: createEntityId(),
     name: "New team",
     avatar: "",
-  });
-  await mutations.createGroup(tx, {
-    id: createEntityId(),
-    name: "New group",
-    color: "#112233",
   });
   const thread = { ...team.threads[0]!, id: createEntityId() };
   await mutations.createThread(tx, { ...thread, teamId: team.id });
@@ -139,7 +143,6 @@ test("workspace mutations use the replica owner without a cached user", async ()
     createdBy: "alice",
     members: ["alice"],
   });
-  expect(structure.groups[0]).toMatchObject({ createdBy: "alice" });
   expect(structure.teams[0]!.threads).toContainEqual({
     ...thread,
     name: "Renamed",

@@ -1,3 +1,9 @@
+import { ObjectSyncRepository } from "@wodge/core/sync/repositories/state";
+import { createObjectDatabase } from "@wodge/infra/database/object-database";
+import { WorkspaceRecordRepository } from "@wodge/core/workspace/repositories/records";
+import { RoomRecordRepository } from "@wodge/core/rooms/repositories/records";
+import { DiscussionRecordRepository } from "@wodge/core/discussions/repositories/records";
+import { attachSql } from "../helpers/sqlite";
 // @vitest-environment jsdom
 
 import { ThreadPostSchema } from "@wodge/domain/discussions/validation";
@@ -75,17 +81,17 @@ function params(name: string, args: unknown): RunnerParams {
 function storage() {
   const records = new Map<string, unknown>();
 
-  return {
+  return attachSql({
     records,
     get: vi.fn(async (key: string) => structuredClone(records.get(key))),
     put: vi.fn(async (key: string, value: unknown) => {
       records.set(key, structuredClone(value));
     }),
-  };
+  });
 }
 
 test("workspace optimism uses its bound actor identity and backend authorization still gates writes", async () => {
-  const state = { teams: [], groups: [] };
+  const state = { teams: [] };
   const instance = client({
     ...createWorkspaceMutators("owner"),
     async seed(tx: WriteTransaction) {
@@ -113,9 +119,20 @@ test("workspace optimism uses its bound actor identity and backend authorization
   expect(
     await instance.query((tx) => tx.get(makeWorkspaceStructureKey())),
   ).toEqual(party.workspaceStructure.data);
-  expect(persisted.records.get(makeWorkspaceStructureKey())).toEqual(
-    party.workspaceStructure,
-  );
+  expect(
+    (
+      await new WorkspaceRecordRepository(
+        party.ctx.storage,
+        createObjectDatabase(party.ctx.storage),
+        new ObjectSyncRepository(
+          party.ctx.storage,
+          createObjectDatabase(party.ctx.storage),
+          "workspace",
+        ),
+      ).loadWorkspace()
+    ).workspaceStructure,
+  ).toEqual(party.workspaceStructure);
+  persisted.put.mockClear();
   party.workspaceMembers.data.createdBy = "someone-else";
   party.workspaceMembers.data.members = [];
 
@@ -125,7 +142,7 @@ test("workspace optimism uses its bound actor identity and backend authorization
     actor,
   );
   expect(party.workspaceStructure.data.teams).toHaveLength(1);
-  expect(persisted.put).toHaveBeenCalledTimes(1);
+  expect(persisted.put).not.toHaveBeenCalled();
 });
 
 test("room messages and discussion posts agree across client transactions and backend handlers", async () => {
@@ -170,8 +187,32 @@ test("room messages and discussion posts agree across client transactions and ba
   expect(await posts.query((tx) => tx.get("posts"))).toEqual(
     thread.threadPosts.data,
   );
-  expect(roomStorage.records.get("messages")).toEqual(room.messages);
-  expect(postStorage.records.get("posts")).toEqual(thread.threadPosts);
+  expect(
+    (
+      await new RoomRecordRepository(
+        room.ctx.storage,
+        createObjectDatabase(room.ctx.storage),
+        new ObjectSyncRepository(
+          room.ctx.storage,
+          createObjectDatabase(room.ctx.storage),
+          "room",
+        ),
+      ).loadRoom()
+    ).messages,
+  ).toEqual(room.messages);
+  expect(
+    (
+      await new DiscussionRecordRepository(
+        thread.ctx.storage,
+        createObjectDatabase(thread.ctx.storage),
+        new ObjectSyncRepository(
+          thread.ctx.storage,
+          createObjectDatabase(thread.ctx.storage),
+          "thread",
+        ),
+      ).loadThread()
+    ).threadPosts,
+  ).toEqual(thread.threadPosts);
 });
 
 test("sender impersonation is rejected without persisted client or backend messages", async () => {

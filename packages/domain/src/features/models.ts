@@ -4,7 +4,6 @@ export const FEATURE_REGISTRY = {
   workspaceSettings: { default: true, available: true },
   membership: { default: true, available: true },
   teamManagement: { default: true, available: true },
-  groups: { default: true, available: true },
   discussions: { default: true, available: true },
   messaging: { default: true, available: true },
   polls: { default: true, available: true },
@@ -34,3 +33,10 @@ export interface FlagSnapshot {
   validUntil: number;
   source: "database" | "last-known-good" | "closed";
 }
+
+export const CHANNEL_FEATURES = {
+  page: "pages",
+  room: "messaging",
+  thread: "discussions",
+  resources: "resources",
+} as const;

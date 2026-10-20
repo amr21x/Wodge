@@ -1,11 +1,13 @@
+import "reflect-metadata";
+import { ObjectSyncRepository } from "@wodge/core/sync/repositories/state";
+import { createObjectDatabase } from "@wodge/infra/database/object-database";
+import { PageRecordRepository } from "@wodge/core/pages/repositories/records";
 import { toUserProfile } from "@wodge/core/user/profile";
 import { authOrganizations, authUsers } from "@wodge/domain/auth/schema/d1";
-import "reflect-metadata";
 import { createTestEnvironment } from "../helpers/environment";
 // Local compatibility fixture, separate from the production router.
 import type { DurableObjectNamespace } from "@cloudflare/workers-types";
 import type { PageActor } from "@wodge/domain/pages/dto";
-import type { PageRecord } from "@wodge/domain/pages/models";
 import {
   NewWorkspaceSchema,
   WorkspaceSchema,
@@ -30,13 +32,15 @@ export class FoundationRoom extends Server {
       return featureObject(request, this.ctx.storage);
     }
 
-    const state = {
-      record: (await this.ctx.storage.get<PageRecord>("db")) ?? {
-        data: { columns: [], tasks: [] },
-        lastModifiedVersion: 0,
-        deleted: false,
-      },
-    };
+    const { state } = await new PageRecordRepository(
+      this.ctx.storage,
+      createObjectDatabase(this.ctx.storage),
+      new ObjectSyncRepository(
+        this.ctx.storage,
+        createObjectDatabase(this.ctx.storage),
+        "page",
+      ),
+    ).loadPage();
 
     if (request.method === "POST") {
       const { command, actor, version } = (await request.json()) as {

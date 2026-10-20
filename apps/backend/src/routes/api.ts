@@ -1,4 +1,4 @@
-import { FeatureHandlers } from "../handlers/features";
+import { FeatureFlagHandlers } from "../handlers/feature-flags";
 import type { WithPathParameter } from "../types/proxy";
 import type { ExtractSchema } from "hono/types";
 import type { AuthorizationRoutes } from "./authorization";
@@ -18,7 +18,7 @@ import { WorkspaceApiRoutes } from "./api/workspaces";
 export class ApiRoutes {
   readonly router: ReturnType<typeof ApiRoutes.define>;
   constructor(
-    @inject(FeatureHandlers) features: FeatureHandlers,
+    @inject(FeatureFlagHandlers) features: FeatureFlagHandlers,
     @inject("auth") auth: AuthInstance,
     @inject(ScopedHandlers) scopedHandlers: ScopedHandlers,
     @inject(AccountRoutes) accounts: AccountRoutes,
@@ -37,7 +37,7 @@ export class ApiRoutes {
     );
   }
   private static define(
-    features: FeatureHandlers,
+    features: FeatureFlagHandlers,
     auth: AuthInstance,
     scopedHandlers: ScopedHandlers,
     accounts: AccountRoutes,

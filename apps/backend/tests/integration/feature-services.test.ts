@@ -1,3 +1,12 @@
+import { userServiceFixture } from "../helpers/services";
+import {
+  roomServiceFixture,
+  discussionServiceFixture,
+} from "../helpers/services";
+import { ObjectSyncRepository } from "@wodge/core/sync/repositories/state";
+import { createObjectDatabase } from "@wodge/infra/database/object-database";
+import { attachSql } from "../helpers/sqlite";
+import { WorkspaceRecordRepository } from "@wodge/core/workspace/repositories/records";
 import { Hono } from "hono";
 import { handleError } from "../../src/errors/handler";
 import { BillingHandlers } from "../../src/handlers/api/billing";
@@ -23,11 +32,7 @@ import { WorkspaceFiles } from "@wodge/core/workspace/services/files";
 import { WorkspaceLifecycle } from "@wodge/core/workspace/services/lifecycle";
 import { ThreadPostSchema } from "@wodge/domain/discussions/validation";
 import { MessageSchema } from "@wodge/domain/rooms/validation";
-import {
-  REPLICACHE_VERSIONS_KEY,
-  makeWorkspaceMembersKey,
-  makeWorkspaceStructureKey,
-} from "@wodge/domain/sync/index";
+import { REPLICACHE_VERSIONS_KEY } from "@wodge/domain/sync/index";
 import type { PaymentEvent } from "@wodge/infra/payments/types";
 import type { ObjectStorage } from "@wodge/infra/storage/types";
 import { afterEach, expect, test, vi } from "vitest";
@@ -79,7 +84,7 @@ function workspace() {
     versions: new Map([["globalVersion", 0]]),
     presenceMap: new Map<string, boolean>(),
   };
-  const store = storage();
+  const store = attachSql(storage());
   const removeUserWorkspace = vi.fn(async () => ({ ok: true }));
   const addUserWorkspace = vi.fn(async () => ({ ok: true }));
   const createBucket = vi.fn(async () => {});
@@ -129,7 +134,24 @@ function workspace() {
       },
     },
     lifecycle: new WorkspaceLifecycle(
-      new WorkspaceLifecycleRepository(party.ctx.storage, party),
+      new WorkspaceLifecycleRepository(
+        new WorkspaceRecordRepository(
+          party.ctx.storage,
+          createObjectDatabase(party.ctx.storage),
+          new ObjectSyncRepository(
+            party.ctx.storage,
+            createObjectDatabase(party.ctx.storage),
+            "workspace",
+          ),
+        ),
+        new ObjectSyncRepository(
+          party.ctx.storage,
+          createObjectDatabase(party.ctx.storage),
+          "workspace",
+        ),
+        party,
+        createObjectDatabase(party.ctx.storage),
+      ),
     ),
   };
 }
@@ -159,12 +181,26 @@ test("workspace lifecycle initializes defaults and persists organization members
     "owner",
     "member",
   ]);
-  expect(w.store.records.get(makeWorkspaceMembersKey())).toEqual(
-    w.state.workspaceMembers,
-  );
-  expect(w.store.records.get(REPLICACHE_VERSIONS_KEY)).toEqual(
-    w.state.versions,
-  );
+  expect(
+    (
+      await new WorkspaceRecordRepository(
+        w.state.ctx.storage,
+        createObjectDatabase(w.state.ctx.storage),
+        new ObjectSyncRepository(
+          w.state.ctx.storage,
+          createObjectDatabase(w.state.ctx.storage),
+          "workspace",
+        ),
+      ).loadWorkspace()
+    ).workspaceMembers,
+  ).toEqual(w.state.workspaceMembers);
+  expect(
+    await new ObjectSyncRepository(
+      w.state.ctx.storage,
+      createObjectDatabase(w.state.ctx.storage),
+      "workspace",
+    ).loadVersions(),
+  ).toEqual(w.state.versions);
   expect(w.addUserWorkspace).not.toHaveBeenCalled();
   expect(w.poke).not.toHaveBeenCalled();
 });
@@ -174,9 +210,19 @@ test("workspace initialization persists local defaults without invoking remote s
   w.addUserWorkspace.mockResolvedValueOnce({ ok: false });
   w.createBucket.mockRejectedValueOnce(new Error("unavailable"));
   expect(await w.lifecycle.createWorkspace("owner")).toBe(true);
-  expect(w.store.records.get(makeWorkspaceMembersKey())).toEqual(
-    w.state.workspaceMembers,
-  );
+  expect(
+    (
+      await new WorkspaceRecordRepository(
+        w.state.ctx.storage,
+        createObjectDatabase(w.state.ctx.storage),
+        new ObjectSyncRepository(
+          w.state.ctx.storage,
+          createObjectDatabase(w.state.ctx.storage),
+          "workspace",
+        ),
+      ).loadWorkspace()
+    ).workspaceMembers,
+  ).toEqual(w.state.workspaceMembers);
   expect(w.addUserWorkspace).not.toHaveBeenCalled();
   expect(w.createBucket).not.toHaveBeenCalled();
 });
@@ -254,18 +300,12 @@ test("presence rejects outsiders and persists member connect/disconnect", async 
 });
 
 test("room service gates send/vote capabilities while preserving author checks", async () => {
-  const state = {
-    messages: record<ReturnType<typeof MessageSchema.parse>[]>([]),
-  };
-  const store = storage();
-  const service = new RoomService({
-    get: () => state.messages.data,
-    save: async (data) => {
-      state.messages = { ...state.messages, data };
-
-      await store.put("messages", state.messages);
-    },
-  });
+  const {
+    state,
+    storage: store,
+    service,
+    records: recordRepository,
+  } = roomServiceFixture();
   const message = MessageSchema.parse({
     id: "message",
     sender: "owner",
@@ -292,7 +332,7 @@ test("room service gates send/vote capabilities while preserving author checks",
   expect(state.messages.data).toEqual([]);
 
   await service.sendMessage(message, actor);
-  expect(store.put).toHaveBeenCalledOnce();
+  expect(store.put).not.toHaveBeenCalled();
 
   await expect(
     service.editMessage(
@@ -304,22 +344,16 @@ test("room service gates send/vote capabilities while preserving author checks",
 
   await service.deleteMessage(message, actor);
   expect(state.messages.data).toEqual([]);
-  expect(store.records.get("messages")).toEqual(state.messages);
+  expect((await recordRepository.loadRoom()).messages).toEqual(state.messages);
 });
 
 test("discussion service gates announcements and preserves author/privilege checks", async () => {
-  const state = {
-    threadPosts: record<ReturnType<typeof ThreadPostSchema.parse>[]>([]),
-  };
-  const store = storage();
-  const service = new DiscussionService({
-    get: () => state.threadPosts.data,
-    save: async (data) => {
-      state.threadPosts = { ...state.threadPosts, data };
-
-      await store.put("posts", state.threadPosts);
-    },
-  });
+  const {
+    state,
+    storage: store,
+    service,
+    records: recordRepository,
+  } = discussionServiceFixture();
   const post = ThreadPostSchema.parse({
     id: "post",
     author: "owner",
@@ -347,28 +381,25 @@ test("discussion service gates announcements and preserves author/privilege chec
 
   await service.deletePost(post, actor);
   expect(state.threadPosts.data).toEqual([]);
-  expect(store.records.get("posts")).toEqual(state.threadPosts);
+  expect((await recordRepository.loadThread()).threadPosts).toEqual(
+    state.threadPosts,
+  );
 });
 
 test("user membership persistence is independent of object notifications", async () => {
-  const store = storage();
-  const workspaces = new Set<string>();
-  const service = new UserService({
-    list: () => [...workspaces],
-    async add(id) {
-      workspaces.add(id);
-      await store.put("workspaces", workspaces);
-    },
-    async remove(id) {
-      workspaces.delete(id);
-      await store.put("workspaces", workspaces);
-    },
-  });
+  const { service, storage: store, state } = userServiceFixture();
   await service.addWorkspace("first");
   await service.addWorkspace("second");
-  expect(service.listWorkspaceIds()).toEqual(["first", "second"]);
-  store.put.mockRejectedValueOnce(new Error("disk full"));
+  expect(await service.listWorkspaceIds()).toEqual(["first", "second"]);
+  const execute = vi.mocked(store.sql.exec).getMockImplementation()!;
+  vi.mocked(store.sql.exec).mockImplementation((query, ...bindings) => {
+    if (/^delete from "user_workspaces"/i.test(query))
+      throw new Error("disk full");
+    return execute(query, ...bindings);
+  });
   await expect(service.removeWorkspace("first")).rejects.toThrow("disk full");
+  expect([...state.workspacesStore]).toEqual(["first", "second"]);
+  expect(store.put).not.toHaveBeenCalled();
 });
 
 function objects() {
@@ -693,7 +724,17 @@ test("organization synchronization is idempotent and preserves resources while r
   expect(w.state.workspaceStructure.data.teams[0]!.moderators).toEqual([]);
   expect(w.state.presenceMap.has("member")).toBe(false);
   expect(w.removeUserWorkspace).not.toHaveBeenCalled();
-  expect(w.store.records.get(makeWorkspaceStructureKey())).toEqual(
-    w.state.workspaceStructure,
-  );
+  expect(
+    (
+      await new WorkspaceRecordRepository(
+        w.state.ctx.storage,
+        createObjectDatabase(w.state.ctx.storage),
+        new ObjectSyncRepository(
+          w.state.ctx.storage,
+          createObjectDatabase(w.state.ctx.storage),
+          "workspace",
+        ),
+      ).loadWorkspace()
+    ).workspaceStructure,
+  ).toEqual(w.state.workspaceStructure);
 });

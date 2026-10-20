@@ -1,3 +1,4 @@
+import { pageServiceFixture, roomServiceFixture } from "../helpers/services";
 import type { Db } from "@wodge/domain/pages/models";
 // @vitest-environment node
 import { billingError } from "@wodge/core/billing/errors";
@@ -19,16 +20,8 @@ const actor = {
 };
 
 test("core operations accept application DTOs and reject denied access with a serializable error", async () => {
-  const state: { data: Db } = { data: { columns: [], tasks: [] } };
-  const save = vi.fn(async () => {});
-  const service = new PageService({
-    get: () => state.data,
-    save: async (data) => {
-      state.data = data;
-
-      await save();
-    },
-  });
+  const { service, state, repository } = pageServiceFixture();
+  const save = vi.spyOn(repository, "insertColumn");
 
   await dispatchPageMutation(
     service,
@@ -47,7 +40,7 @@ test("core operations accept application DTOs and reject denied access with a se
   expect(save).not.toHaveBeenCalled();
 
   await service.createColumn({ id: "column" }, { ...actor, isOwner: true });
-  expect(state.data.columns).toEqual([{ id: "column" }]);
+  expect(state.state.record.data.columns).toEqual([{ id: "column" }]);
   expect(save).toHaveBeenCalledOnce();
   expect(
     JSON.parse(
@@ -64,15 +57,9 @@ test("core operations accept application DTOs and reject denied access with a se
 
 test("author checks produce feature errors and dependency errors retain their original identity", async () => {
   const failure = new Error("storage unavailable");
-  const save = vi.fn(async () => {
+  const { service, repository } = roomServiceFixture();
+  const save = vi.spyOn(repository, "insert").mockImplementation(() => {
     throw failure;
-  });
-  const state = { messages: { data: [] } };
-  const service = new RoomService({
-    get: () => state.messages.data,
-    save: async () => {
-      await save();
-    },
   });
   const message = MessageSchema.parse({
     id: "message",

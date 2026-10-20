@@ -22,6 +22,18 @@ const byName = new Map(
   workspaces.map((workspace) => [workspace.manifest.name, workspace]),
 );
 const errors = [];
+for (const workspace of workspaces) {
+  if (
+    workspace.manifest.name === "web" &&
+    [
+      "dependencies",
+      "devDependencies",
+      "peerDependencies",
+      "optionalDependencies",
+    ].some((field) => "@wodge/core" in (workspace.manifest[field] ?? {}))
+  )
+    errors.push("Web must not depend on @wodge/core");
+}
 let files = 0;
 
 async function inspect(directory, owner) {
@@ -131,10 +143,6 @@ async function inspect(directory, owner) {
         fail("Load reflection support only at the backend DI entrypoint");
       if (
         owner.manifest.name === "web" &&
-        filename.includes("/src/") &&
-        !/^@wodge\/core\/(?:(?:pages|rooms|discussions|workspace)\/mutations\/|features\/(?:flags|policy)$)/.test(
-          specifier,
-        ) &&
         /^(?:@wodge\/(?:core|infra)(?:\/|$)|@wodge\/auth\/(?:server|tickets|membership)(?:\/|$)|(?:tsyringe|reflect-metadata)(?:\/|$)|@supabase\/|better-auth(?:$|\/(?!react|client)))/.test(
           specifier,
         )
@@ -271,9 +279,6 @@ async function inspect(directory, owner) {
       if (
         productionSource &&
         owner.manifest.name === "web" &&
-        !/^@wodge\/core\/(?:(?:pages|rooms|discussions|workspace)\/mutations\/|features\/(?:flags|policy)$)/.test(
-          specifier,
-        ) &&
         /^\s*["']use client["'];/.test(source.text) &&
         /^@wodge\/(?:core(?:\/|$)|domain\/(?:persistence\/|(?:user|workspace)\/schema\/)|infra\/(?!auth\/browser$)|env$)/.test(
           specifier,
@@ -313,7 +318,8 @@ async function inspect(directory, owner) {
       }
       if (
         specifier.startsWith(".") &&
-        !/[/\\](?:tests|__tests__)[/\\]/.test(filename)
+        (owner.manifest.name === "web" ||
+          !/[/\\](?:tests|__tests__)[/\\]/.test(filename))
       ) {
         const target = path.resolve(path.dirname(filename), specifier);
         if (

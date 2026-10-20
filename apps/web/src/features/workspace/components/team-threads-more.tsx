@@ -30,8 +30,6 @@ export function TeamThreadsMore({ teamId }: TeamMoreProps) {
       await workspaceRep?.mutate.createThread({
         teamId,
         name: "New thread",
-        editGroups: [],
-        viewGroups: [],
         id: createEntityId(),
         avatar: "",
       });

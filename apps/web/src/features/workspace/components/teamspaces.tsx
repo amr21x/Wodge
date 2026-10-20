@@ -1,5 +1,5 @@
 import { useFeatureFlags } from "@/components/feature-flags-provider";
-import { CHANNEL_FEATURES } from "@wodge/core/features/policy";
+import { CHANNEL_FEATURES } from "@wodge/domain/features/models";
 import * as React from "react";
 
 import { SidebarItem } from "./sidebar-item";

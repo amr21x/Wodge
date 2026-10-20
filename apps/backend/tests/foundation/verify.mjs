@@ -38,7 +38,7 @@ async function check(name, test) {
 }
 
 const forbidden =
-  /(?:apps\/backend\/src\/|tsyringe|reflect-metadata|next-on-pages|(?:^|\/)next\/|packages\/env\/index|packages\/core\/src\/(?!features\/(?:flags|policy)\.ts|errors\.ts|(?:pages|rooms|discussions|workspace)\/(?:mutations\/|errors\.ts|defaults\.ts))|packages\/infra\/src\/(?:database\/|storage\/|payments\/|auth\/(?:tokens|supabase))|domain\/src\/(?:persistence|user\/schema|workspace\/schema|auth\/schema)|packages\/auth\/src\/(?:server|tickets|membership)|better-auth\/dist\/(?:auth|api|db|adapters)\/)/;
+  /(?:apps\/backend\/src\/|tsyringe|reflect-metadata|next-on-pages|(?:^|\/)next\/|packages\/env\/index|packages\/core\/|packages\/infra\/src\/(?:database\/|storage\/|payments\/|auth\/(?:tokens|supabase))|domain\/src\/(?:persistence|user\/schema|workspace\/schema|auth\/schema)|packages\/auth\/src\/(?:server|tickets|membership)|better-auth\/dist\/(?:auth|api|db|adapters)\/)/;
 
 const common = {
   absWorkingDir: root,
@@ -103,7 +103,7 @@ try {
     },
   );
   await check(
-    "core services and repositories bundle independently of apps, transports, browser clients and infrastructure",
+    "core services and repositories exclude hosts, transports, browser clients and provider implementations",
     async () => {
       const result = await build({
         ...common,
@@ -120,10 +120,14 @@ try {
       });
 
       assert.deepEqual(
-        Object.keys(result.metafile.inputs).filter((p) =>
-          /(?:^apps\/|packages\/(?:env|infra)\/|node_modules\/.*(?:partykit|partyserver|hono|replicache|react))/.test(
-            p,
-          ),
+        Object.keys(result.metafile.inputs).filter(
+          (p) =>
+            !/^packages\/infra\/(?:src\/database\/(?:durable-sql|object-database|object-migrations)\.ts|database\/objects\/[^/]+\/bundle\.json)$/.test(
+              p,
+            ) &&
+            /(?:^apps\/|packages\/(?:env|infra)\/|node_modules\/.*(?:partykit|partyserver|hono|replicache|react))/.test(
+              p,
+            ),
         ),
         [],
       );
@@ -138,8 +142,8 @@ try {
           "apps/backend/tests/foundation/browser.ts",
           "apps/web/src/features/auth/client.ts",
           "apps/web/src/client/api.ts",
-          "packages/core/src/features/flags.ts",
-          "packages/core/src/features/policy.ts",
+          "apps/web/src/client/features/flags.ts",
+          "apps/web/src/client/features/pages.ts",
           ...["pages", "rooms", "discussions", "workspace"].map(
             (feature) => `apps/web/src/client/sync/${feature}/mutators.ts`,
           ),

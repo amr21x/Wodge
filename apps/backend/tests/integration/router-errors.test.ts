@@ -1,3 +1,5 @@
+import * as Y from "yjs";
+import { attachSql } from "../helpers/sqlite";
 import { ResourceGrantCache } from "@wodge/auth/authorization/grants";
 import { WorkspaceAccess } from "@wodge/auth/authorization/workspace-access";
 import { BetterAuthMembership } from "@wodge/auth/membership";
@@ -42,7 +44,12 @@ function roomBindings(issue: () => Promise<string>): TestRouteResources {
   const party = {
     name: "room",
     authorization: roomAuthorizationFixture(),
-    ctx: { storage: {} },
+    ctx: {
+      storage: attachSql({
+        get: async () => undefined,
+        list: async () => new Map(),
+      }),
+    },
     env: {},
   } as unknown as RoomParty;
   const container = createRuntimeContainer(party.env, {
@@ -203,13 +210,14 @@ test("page startup waits for storage and rejects read failures", async () => {
   });
   const party = {
     name: "fixture",
+    document: new Y.Doc(),
     ctx: {
-      storage: {
+      storage: attachSql({
         get: vi
           .fn()
           .mockReturnValueOnce(pending)
           .mockResolvedValueOnce(new Map([["globalVersion", 0]])),
-      },
+      }),
     },
     env: {},
   } as unknown as PageParty;
@@ -230,7 +238,9 @@ test("page startup waits for storage and rejects read failures", async () => {
   expect(party.state.record.data.columns).toEqual([]);
   const failure = new Error("read unavailable");
 
-  party.ctx.storage.get = vi.fn().mockRejectedValue(failure);
+  vi.mocked(party.ctx.storage.sql.exec).mockImplementation(() => {
+    throw failure;
+  });
   vi.spyOn(console, "error").mockImplementation(() => {});
 
   await expect(PageServer.prototype.onStart.call(party)).rejects.toMatchObject({
@@ -251,7 +261,12 @@ test("a shared page router isolates request bindings for different objects", asy
       },
       versions: new Map([["globalVersion", 0]]),
       name: "fixture",
-      ctx: { storage: {} },
+      ctx: {
+        storage: attachSql({
+          get: async () => undefined,
+          list: async () => new Map(),
+        }),
+      },
       env: {},
     } as unknown as PageParty;
   }
@@ -316,11 +331,17 @@ test("workspace administrative guards protect only their explicit endpoints", as
     workspaceMembers: {
       data: { createdBy: "owner", members: [{ id: "member", role: "member" }] },
     },
-    workspaceStructure: { data: { teams: [], groups: [] } },
+    workspaceStructure: { data: { teams: [] } },
     versions: new Map([["globalVersion", 0]]),
     poke: vi.fn(async () => {}),
     name: "one",
-    ctx: { storage: { get: async () => undefined, put: async () => {} } },
+    ctx: {
+      storage: attachSql({
+        get: async () => undefined,
+        list: async () => new Map(),
+        put: async () => {},
+      }),
+    },
     env: {},
   } as unknown as import("../../src/servers/workspace").default;
   const env = workspaceBindings(party);

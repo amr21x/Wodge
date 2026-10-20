@@ -35,7 +35,6 @@ packages/core/src/
   <feature>/
     services/                   business operations and persistence coordination
     repositories/                    pure database/object data access
-    mutations/                  pure transformations, including optimistic reuse
     errors.ts                   application error factories where needed
   errors.ts                     application error class
 
@@ -112,11 +111,15 @@ Workspace internals and resource authorization policies belong to the workspace
 Durable Object. Backend handlers coordinate identity writes and projection updates;
 public Better Auth mutations that bypass this coordination are restricted.
 
-Objects are SQLite-backed but currently persist KV records. Native Durable Object
+Objects persist structural entities and binary Yjs snapshots/update journals through
+Drizzle in their SQLite databases, with separate connections and migrations from D1.
+Sync metadata, authorization, presence and room bindings also use relational tables.
+Native KV reads are limited to one-time imports of legacy records. Native Durable Object
 storage gates protect local storage operations; they do not create a transaction
-spanning D1, another object or an arbitrary asynchronous request. Full relational
-SQL migration and durable cross-store reconciliation remain follow-up work.
+spanning D1, another object or an arbitrary asynchronous request. Deployed namespace
+transfer and durable cross-store reconciliation remain follow-up work.
 
 Web contains presentation, browser authentication and optimistic sync adapters.
-It can reuse core pure mutation modules, but cannot import core services, repositories,
-DI, database clients or provider integrations. Browser bundling checks enforce this.
+Its optimistic transformations live under web/client/sync; it cannot import or depend
+on core. Shared declarative schemas and DTOs live in domain. Boundary and browser
+bundling checks enforce this.

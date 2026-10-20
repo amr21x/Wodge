@@ -389,9 +389,6 @@ importers:
       "@wodge/auth":
         specifier: workspace:*
         version: link:../../packages/auth
-      "@wodge/core":
-        specifier: workspace:*
-        version: link:../../packages/core
       "@wodge/domain":
         specifier: workspace:*
         version: link:../../packages/domain
@@ -681,9 +678,6 @@ importers:
       "@wodge/infra":
         specifier: workspace:*
         version: link:../infra
-      array-move:
-        specifier: ^4.0.0
-        version: 4.0.0
       drizzle-orm:
         specifier: 0.45.2
         version: 0.45.2(@cloudflare/workers-types@4.20260424.1)(@types/better-sqlite3@7.6.9)(better-sqlite3@9.5.0)(kysely@0.29.6)

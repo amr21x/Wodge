@@ -1,4 +1,6 @@
-import { FeatureHandlers } from "../handlers/features";
+import { PageDocumentRepository } from "@wodge/core/pages/repositories/document";
+import { PageCollaborationHandlers } from "../handlers/pages/collaboration";
+import { FeatureFlagHandlers } from "../handlers/feature-flags";
 import { validateServerEnvironment } from "@wodge/env/server";
 import { createRuntimeContainer } from "../container";
 import { BackendApplication } from "../application";
@@ -52,7 +54,7 @@ export async function initializeRoom(object: RoomServer) {
   object.messages = restored.messages;
   object.versions = restored.versions;
   const routes = container.resolve(RoomRoutes);
-  return { routes, features: container.resolve(FeatureHandlers) };
+  return { routes, features: container.resolve(FeatureFlagHandlers) };
 }
 
 /** Initialize once during ThreadServer.onStart, before requests can run. */
@@ -67,7 +69,7 @@ export async function initializeThread(object: ThreadServer) {
   object.threadPosts = restored.threadPosts;
   object.versions = restored.versions;
   const routes = container.resolve(DiscussionRoutes);
-  return { routes, features: container.resolve(FeatureHandlers) };
+  return { routes, features: container.resolve(FeatureFlagHandlers) };
 }
 
 /** Initialize once during UserServer.onStart, before requests can run. */
@@ -84,7 +86,7 @@ export async function initializeUser(object: UserServer) {
   const routes = container.resolve(UserRoutes);
   return {
     routes,
-    features: container.resolve(FeatureHandlers),
+    features: container.resolve(FeatureFlagHandlers),
     workspaceGateway: container.resolve(WorkspaceGateway),
   };
 }
@@ -109,7 +111,7 @@ export async function initializeWorkspace(object: WorkspaceServer) {
   return {
     routes,
     invalidations,
-    features: container.resolve(FeatureHandlers),
+    features: container.resolve(FeatureFlagHandlers),
   };
 }
 
@@ -125,5 +127,10 @@ export async function initializePage(object: PageServer) {
   object.state = restored.state;
   object.versions = restored.versions;
   const routes = container.resolve(PageRoutes);
-  return { routes, records, features: container.resolve(FeatureHandlers) };
+  return {
+    routes,
+    document: container.resolve(PageDocumentRepository),
+    collaboration: container.resolve(PageCollaborationHandlers),
+    features: container.resolve(FeatureFlagHandlers),
+  };
 }
