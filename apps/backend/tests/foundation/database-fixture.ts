@@ -19,7 +19,7 @@ export function createDatabaseFixture(env: DatabaseBindings) {
   const database = createDatabase(environment);
   const users = new AccountService(new UserRepository(database));
   const workspaces = new WorkspaceRepository(database);
-  const auth = createAuth(environment, database, { send: async () => {} });
+  const auth = createAuth(environment, database);
   const identity = new BetterAuthMembership(
     new OrganizationRepository(database),
     auth,

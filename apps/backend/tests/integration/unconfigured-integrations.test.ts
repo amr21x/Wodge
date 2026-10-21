@@ -26,7 +26,7 @@ const environment = () =>
     LIVEKIT_API_SECRET: undefined,
   });
 
-test("the application starts and keeps session protection without provider credentials", async () => {
+test("the application starts and keeps session protection with OAuth configured and other providers absent", async () => {
   const env = environment() as WorkerEnvironment;
   const container = createRuntimeContainer(env);
   try {

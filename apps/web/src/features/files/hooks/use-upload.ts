@@ -1,3 +1,4 @@
+import { failureMessage, requireOk } from "@/client/errors";
 import { env } from "@wodge/env/client";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -10,14 +11,14 @@ export function useUpload(
   const { mutate: upload, isPending: isUploading } = useMutation({
     mutationFn: async (data: FormData) => {
       if (!id) {
-        return false;
+        throw new Error("No upload target selected");
       }
 
-      const tokenRes = await fetch("/api/users/token");
+      const tokenRes = await fetch("/api/users/token", {
+        headers: { "is-upload": "true" },
+      });
 
-      if (!tokenRes.ok) {
-        throw new Error("Failed to get token");
-      }
+      await requireOk(tokenRes);
 
       const { token } = await tokenRes.json<{ token: string }>();
 
@@ -29,9 +30,7 @@ export function useUpload(
         },
       );
 
-      if (!uploadRes.ok) {
-        throw new Error("Failed to upload avatar");
-      }
+      await requireOk(uploadRes);
 
       const { key } = await uploadRes.json<{ key: string }>();
 
@@ -42,9 +41,7 @@ export function useUpload(
         },
       });
 
-      if (!updateRes.ok) {
-        throw new Error("Failed to update avatar");
-      }
+      await requireOk(updateRes);
 
       return true;
     },
@@ -55,8 +52,10 @@ export function useUpload(
         onSuccess();
       }
     },
-    onError: () => {
-      toast.error("Failed to upload avatar");
+    onError: (error) => {
+      toast.error(
+        failureMessage(error, "Avatar upload failed. Please try again."),
+      );
     },
   });
 

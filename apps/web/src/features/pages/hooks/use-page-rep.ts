@@ -36,29 +36,27 @@ export function useCurrentPageRep() {
     return folder?.channels.find((c) => c.id === channelId);
   }, [folder, channelId]);
 
+  const userId = user?.id;
+  const exists = !!team && !!channel;
   useEffect(() => {
-    if (workspaceId && team && channel && user && !rep) {
-      const repTemp = createPageRep({
-        channelId: channel.id,
-        workspaceId,
-        teamId: team.id,
-        userId: user.id,
-        folderId,
-      });
+    setRep(undefined);
+    if (!workspaceId || !exists || !userId) return;
+    const instance = createPageRep({
+      channelId,
+      workspaceId,
+      teamId,
+      userId,
+      folderId,
+    });
+    setRep(instance);
+    const unregister = setChannelRep(instance);
+    return () => {
+      unregister();
+      void instance.close();
+    };
+  }, [workspaceId, teamId, channelId, userId, exists, setChannelRep, folderId]);
 
-      setRep(repTemp);
-      setChannelRep(repTemp);
-    }
-  }, [
-    workspaceId,
-    team,
-    channel,
-    structure.teams,
-    user,
-    setChannelRep,
-    rep,
-    folderId,
-  ]);
-
-  return rep;
+  return userId && exists && rep?.name === `${userId}-${channelId}`
+    ? rep
+    : undefined;
 }

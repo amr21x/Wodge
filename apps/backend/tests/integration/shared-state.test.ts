@@ -12,7 +12,6 @@ import { makeWorkspaceStructureKey } from "@wodge/domain/sync/index";
 import { IDBKeyRange, indexedDB } from "fake-indexeddb";
 import {
   Replicache,
-  TEST_LICENSE_KEY,
   type MutatorDefs,
   type WriteTransaction,
 } from "replicache";
@@ -60,7 +59,6 @@ function client<M extends MutatorDefs>(mutators: M) {
   const instance = new Replicache({
     name: crypto.randomUUID(),
     mutators,
-    licenseKey: TEST_LICENSE_KEY,
     pullInterval: null,
     logLevel: "error",
   });

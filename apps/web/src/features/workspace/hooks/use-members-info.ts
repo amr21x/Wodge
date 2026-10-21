@@ -1,3 +1,4 @@
+import { requireOk } from "@/client/errors";
 import { useQuery } from "@tanstack/react-query";
 
 import { PublicUserType } from "@wodge/domain/user/models";
@@ -11,9 +12,7 @@ export function useMembersInfo() {
     queryFn: async () => {
       const res = await fetch(`/api/workspaces/${workspaceId}/members`);
 
-      if (!res.ok) {
-        throw new Error("Failed to fetch members data");
-      }
+      await requireOk(res);
 
       const data = (await res.json()) as PublicUserType[];
 

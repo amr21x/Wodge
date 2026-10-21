@@ -30,7 +30,7 @@ export function MessageEditor({ rep }: { rep?: Replicache<RoomMutators> }) {
   });
 
   async function onSubmit() {
-    if (editor) {
+    if (editor && canEdit && rep) {
       if (editor.isEmpty) {
         return;
       }
@@ -64,7 +64,7 @@ export function MessageEditor({ rep }: { rep?: Replicache<RoomMutators> }) {
     <div className="flex h-12 shrink-0 items-end overflow-hidden border-t border-border/50 bg-dim px-3.5 pb-2.5 pt-2">
       {!canEdit && (
         <p className="text-muted-foreground">
-          Your are not allowed to send messages in this room.
+          You are not allowed to send messages in this room.
         </p>
       )}
       {canEdit && (

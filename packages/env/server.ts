@@ -12,10 +12,10 @@ export interface ServerEnvironment {
   SECRET_KEY: string;
   RESEND_API_KEY?: string;
   RESEND_EMAIL_FROM?: string;
-  GOOGLE_CLIENT_ID?: string;
-  GOOGLE_CLIENT_SECRET?: string;
-  GITHUB_CLIENT_ID?: string;
-  GITHUB_CLIENT_SECRET?: string;
+  GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
+  GITHUB_CLIENT_ID: string;
+  GITHUB_CLIENT_SECRET: string;
   LIVEKIT_API_KEY?: string;
   LIVEKIT_API_SECRET?: string;
   R2_ENDPOINT?: string;
@@ -49,8 +49,6 @@ const optionalSetting = z
   )
   .optional();
 const providerSettings = {
-  RESEND_API_KEY: optionalSetting,
-  RESEND_EMAIL_FROM: optionalSetting,
   R2_ENDPOINT: optionalSetting,
   R2_ACCESS_KEY: optionalSetting,
   R2_SECRET_KEY: optionalSetting,
@@ -66,10 +64,12 @@ const serverConfiguration = z
     BETTER_AUTH_SECRET: z.string().trim().min(32),
     SECRET_KEY: z.string().trim().min(32),
     INTEGRATION_MODE: z.enum(["partial", "ready"]).default("partial"),
-    GOOGLE_CLIENT_ID: optionalSetting,
-    GOOGLE_CLIENT_SECRET: optionalSetting,
-    GITHUB_CLIENT_ID: optionalSetting,
-    GITHUB_CLIENT_SECRET: optionalSetting,
+    GOOGLE_CLIENT_ID: z.string().trim().min(1, "is required"),
+    GOOGLE_CLIENT_SECRET: z.string().trim().min(1, "is required"),
+    GITHUB_CLIENT_ID: z.string().trim().min(1, "is required"),
+    GITHUB_CLIENT_SECRET: z.string().trim().min(1, "is required"),
+    RESEND_API_KEY: optionalSetting,
+    RESEND_EMAIL_FROM: optionalSetting,
     ...providerSettings,
   })
   .superRefine((configuration, context) => {
@@ -77,13 +77,6 @@ const serverConfiguration = z
       context.addIssue({ code: "custom", path: [key], message });
     if (configuration.SECRET_KEY === configuration.BETTER_AUTH_SECRET)
       require("SECRET_KEY", "must differ from BETTER_AUTH_SECRET");
-    for (const provider of ["GOOGLE", "GITHUB"] as const) {
-      if (
-        Boolean(configuration[`${provider}_CLIENT_ID`]) !==
-        Boolean(configuration[`${provider}_CLIENT_SECRET`])
-      )
-        require(`${provider}_CLIENT_ID`, "OAuth client ID and secret must be configured together");
-    }
     for (const key of ["APP_DOMAIN", "BACKEND_DOMAIN"] as const) {
       try {
         const url = new URL(configuration[key]);

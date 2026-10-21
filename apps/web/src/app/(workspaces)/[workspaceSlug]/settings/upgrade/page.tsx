@@ -1,5 +1,6 @@
 "use client";
 
+import { failureMessage, requireOk } from "@/client/errors";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -114,9 +115,7 @@ function UpgradePage() {
         `/api/workspaces/${workspace?.id}/billing/checkout`,
       );
 
-      if (!res.ok) {
-        throw new Error("Failed to upgrade");
-      }
+      await requireOk(res);
 
       const data = await res.json<{ url: string }>();
 
@@ -124,7 +123,7 @@ function UpgradePage() {
     },
 
     onError: (_e) => {
-      toast.error("Failed to upgrade");
+      toast.error(failureMessage(_e));
     },
   });
 
@@ -134,9 +133,7 @@ function UpgradePage() {
         `/api/workspaces/${workspace?.id}/billing/portal`,
       );
 
-      if (!res.ok) {
-        throw new Error("Failed to revert");
-      }
+      await requireOk(res);
 
       const data = await res.json<{ url: string }>();
 
@@ -144,7 +141,7 @@ function UpgradePage() {
     },
 
     onError: (_e) => {
-      toast.error("Failed to revert");
+      toast.error(failureMessage(_e));
     },
   });
 

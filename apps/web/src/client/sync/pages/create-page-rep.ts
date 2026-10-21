@@ -1,11 +1,4 @@
-import {
-  PullerResult,
-  PullRequest,
-  PusherResult,
-  PushRequest,
-  Replicache,
-} from "replicache";
-import { env } from "@wodge/env/client";
+import { Replicache } from "replicache";
 import { replicacheWrapper } from "../transport";
 import { pageMutators } from "./mutators";
 
@@ -24,30 +17,19 @@ export function createPageRep({
 }) {
   return new Replicache<typeof pageMutators>({
     name: `${userId}-${channelId}`,
-    licenseKey: env.NEXT_PUBLIC_REPLICACHE_KEY,
     mutators: pageMutators,
     pullInterval: null,
     pushURL: undefined,
     pullURL: undefined,
-    puller: replicacheWrapper<PullRequest, PullerResult>(
-      "pull",
-      "page",
-      channelId,
-      {
-        "x-workspace-id": workspaceId,
-        "x-team-id": teamId,
-        "x-folder-id": folderId,
-      },
-    ),
-    pusher: replicacheWrapper<PushRequest, PusherResult>(
-      "push",
-      "page",
-      channelId,
-      {
-        "x-workspace-id": workspaceId,
-        "x-team-id": teamId,
-        "x-folder-id": folderId,
-      },
-    ),
+    puller: replicacheWrapper("pull", "page", channelId, {
+      "x-workspace-id": workspaceId,
+      "x-team-id": teamId,
+      "x-folder-id": folderId,
+    }),
+    pusher: replicacheWrapper("push", "page", channelId, {
+      "x-workspace-id": workspaceId,
+      "x-team-id": teamId,
+      "x-folder-id": folderId,
+    }),
   });
 }

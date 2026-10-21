@@ -12,6 +12,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { DialogClose } from "@/components/ui/dialog";
@@ -31,7 +32,17 @@ function JoinWorkspaceFormContent() {
   useQueryClient();
 
   async function onSubmit(data: z.infer<typeof JoinWorkspaceSchema>) {
-    router.push(data.url);
+    const url = new URL(data.url, window.location.origin);
+    if (
+      url.origin !== window.location.origin ||
+      !/^\/[^/]+\/join\/[^/]+$/.test(url.pathname)
+    ) {
+      form.setError("url", {
+        message: "Enter an invitation link for this Wodge site.",
+      });
+      return;
+    }
+    router.push(url.pathname);
   }
 
   return (
@@ -53,6 +64,7 @@ function JoinWorkspaceFormContent() {
                   placeholder={"https://domain.com/" + nanoid(6)}
                 />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />

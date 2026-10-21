@@ -72,41 +72,43 @@ export function useSubscribe<
   options: UseSubscribeOptions<QueryRet, Default> = {},
 ): { snapshot: RemoveUndefined<QueryRet> | Default; isPending: boolean } {
   const { default: def, dependencies = [], isEqual } = options;
-  const [snapshot, setSnapshot] = useState<QueryRet | undefined>(undefined);
-  const [isPending, setIsPending] = useState(true);
+  const [result, setResult] = useState<{
+    source: typeof r;
+    snapshot: QueryRet;
+  }>();
 
   /* oxlint-disable react-hooks/exhaustive-deps -- Replicache resubscribes only when the caller-supplied dependencies change; inline query and comparator identities are intentionally ignored. */
   useEffect(() => {
-    if (!r) {
-      return;
-    }
-
+    if (!r) return;
+    let active = true;
     const unsubscribe = r.subscribe(query, {
       onData: (data) => {
         // This is safe because we know that subscribe in fact can only return
         // `R` (the return type of query or def).
-        callbacks.push(() => setSnapshot(data));
+        callbacks.push(() => {
+          if (active) setResult({ source: r, snapshot: data });
+        });
 
         if (!hasPendingCallback) {
           void Promise.resolve().then(doCallback);
           hasPendingCallback = true;
         }
-
-        setIsPending(false);
       },
       isEqual,
     });
 
     return () => {
+      active = false;
       unsubscribe();
-      setSnapshot(undefined);
     };
   }, [r, ...dependencies]);
   /* oxlint-enable react-hooks/exhaustive-deps */
 
-  if (snapshot === undefined) {
-    return { snapshot: def as Default, isPending };
+  if (result?.source !== r || result?.snapshot === undefined) {
+    return { snapshot: def as Default, isPending: !!r && result?.source !== r };
   }
-
-  return { snapshot: snapshot as RemoveUndefined<QueryRet>, isPending };
+  return {
+    snapshot: result.snapshot as RemoveUndefined<QueryRet>,
+    isPending: false,
+  };
 }

@@ -8,8 +8,9 @@ or silently relinked. No remote deployment or resource migration was performed.
 
 ## Local configuration
 
-Copy the public root `.env.example` to `apps/web/.env.local`. Copy backend secrets
-from `apps/backend/.dev.vars.example` into its ignored `.dev.vars`. Production and
+Copy the public root `.env.example` to `apps/web/.env.local`. Backend secrets
+named in `apps/backend/.dev.vars.example` come from Bitwarden Secrets Manager
+through the OS credential store and `pnpm secrets run`; see [local secrets](../../README.md#local-secrets). Production and
 local Worker bindings are defined in `apps/backend/wrangler.jsonc`; the separate
 foundation configuration remains a compatibility fixture. Web has no D1 binding
 or backend secrets. See [setup](../development/setup.md).
@@ -24,7 +25,7 @@ setup work. The manually triggered deployment workflow uses Wrangler.
 
 Secrets belong in Cloudflare-managed bindings. The backend uses `BETTER_AUTH_SECRET`
 for sessions and `SECRET_KEY` for internal calls and signed, session-bound tickets.
-Google/GitHub credentials, Resend and payment/storage credentials stay out of web.
+Google/GitHub credentials and payment/storage credentials stay out of web.
 The production public auth base URL is `APP_DOMAIN` with `/api/auth/*` routed to
 the Worker. Existing PartySocket hosts can keep using the backend hostname.
 

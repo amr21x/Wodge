@@ -12,6 +12,10 @@ export function createTestEnvironment(
     BETTER_AUTH_SECRET:
       "foundation-test-secret-more-than-thirty-two-characters",
     SECRET_KEY: "test-only-ticket-signing-key-more-than-32-characters",
+    GOOGLE_CLIENT_ID: "test-google-client",
+    GOOGLE_CLIENT_SECRET: "test-google-secret",
+    GITHUB_CLIENT_ID: "test-github-client",
+    GITHUB_CLIENT_SECRET: "test-github-secret",
     RESEND_API_KEY: "test-email-key",
     RESEND_EMAIL_FROM: "test@example.test",
     LIVEKIT_API_KEY: "local-key",

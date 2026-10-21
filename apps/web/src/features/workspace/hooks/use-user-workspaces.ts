@@ -1,7 +1,9 @@
 "use client";
 
 import { useCurrentUser } from "../../account/hooks/use-current-user";
-import { Workspace } from "@wodge/domain/workspace/models";
+import { api } from "@/client/api";
+import { requireOk } from "@/client/errors";
+import type { Workspace } from "@wodge/domain/workspace/models";
 import { useQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 
@@ -10,15 +12,15 @@ export function useUserWorkspaces() {
   const pathname = usePathname();
 
   const { data, isPending, isError } = useQuery({
-    queryKey: ["user-workspaces"],
+    queryKey: ["user-workspaces", user?.id],
     queryFn: async () => {
-      const res = await fetch(`/api/users/workspaces`);
+      const res = await api.api.users.workspaces.$get();
+      await requireOk(res);
 
-      if (!res.ok) {
-        throw new Error("Failed to fetch workspaces data");
-      }
-
-      const data = (await res.json()) as Workspace[];
+      const data = (await res.json()).map((workspace) => ({
+        ...workspace,
+        createdAt: new Date(workspace.createdAt),
+      })) satisfies Workspace[];
 
       return data;
     },
@@ -30,5 +32,8 @@ export function useUserWorkspaces() {
     console.error("Failed to fetch workspaces data");
   }
 
-  return { userWorkspaces: data, isUserWorkspacesPending: isPending };
+  return {
+    userWorkspaces: user ? data : undefined,
+    isUserWorkspacesPending: isPending,
+  };
 }

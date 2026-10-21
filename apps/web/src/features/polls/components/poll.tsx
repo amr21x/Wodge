@@ -10,6 +10,7 @@ export type Poll = {
   votes?: number[];
 };
 
+import { useRoomAction } from "@/features/workspace/hooks/use-room-action";
 import { useMemo } from "react";
 import { PollOptions } from "./poll-options";
 import { useParams } from "next/navigation";
@@ -43,11 +44,14 @@ function PollUIContent({
     [pollVoters, user],
   );
 
+  const roomVoteAllowed = useRoomAction("vote", isRoom);
+  const canVote = !isRoom || roomVoteAllowed;
   const rep = useCurrentRoomRep();
   const tRep = useCurrentThreadRep();
   const sendVote = async (option: number) => {
+    if (!canVote) return;
     try {
-      if (!vote) {
+      if (vote === undefined) {
         if (isRoom) {
           await rep?.mutate.vote({ msgId: id, option });
         } else {
@@ -63,6 +67,7 @@ function PollUIContent({
   };
 
   const removeVote = async () => {
+    if (!canVote) return;
     try {
       if (vote !== undefined) {
         if (isRoom) {
@@ -81,6 +86,7 @@ function PollUIContent({
 
   return (
     <PollOptions
+      disabled={!canVote}
       options={options}
       votes={votes}
       vote={vote}

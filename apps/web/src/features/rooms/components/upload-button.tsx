@@ -12,7 +12,7 @@ import {
 import { SidebarItemBtn } from "../../workspace/components/sidebar-item-btn";
 import { Plus } from "lucide-react";
 import Uppy from "@uppy/core";
-import { useMemo, useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import XHRUpload from "@uppy/xhr-upload";
 import { Dashboard } from "@uppy/react";
 
@@ -26,6 +26,7 @@ import Webcam from "@uppy/webcam";
 
 import Audio from "@uppy/audio";
 import { toast } from "sonner";
+import { failureMessage, reportAccessFailure } from "@/client/errors";
 import { useUploadToken } from "../../workspace/components/use-upload-token";
 
 function UploadButtonContent({
@@ -43,7 +44,11 @@ function UploadButtonContent({
 
   const { user } = useCurrentUser();
 
-  const token = useUploadToken();
+  const {
+    data: token,
+    error: tokenError,
+    refetch: refreshToken,
+  } = useUploadToken();
 
   const completeUpload = useCallback(
     async (fileId?: string, type?: Message["type"], name?: string) => {
@@ -73,61 +78,80 @@ function UploadButtonContent({
     [rep, user],
   );
 
-  const uppyRef = useMemo(() => {
-    return !token
-      ? null
-      : new Uppy({
-          allowMultipleUploadBatches: false,
-          restrictions: {
-            allowedFileTypes: [
-              "image/*",
-              "text/*",
-              "audio/*",
-              "video/*",
-              "application/*",
-              ".ppsx",
-            ],
-            maxNumberOfFiles: 1,
-          },
-        })
-          .use(Audio)
-          .use(Webcam)
-          .use(XHRUpload, {
-            limit: 1,
-            method: "POST",
-            endpoint: `${env.NEXT_PUBLIC_BACKEND_DOMAIN}/parties/workspace/${workspaceId}/file/${teamId}/${channelId}`,
-            headers: {
-              authorization: token,
-            },
-          })
-          .on("complete", (e) => {
-            let type = e.successful[0]?.type?.split("/")[0];
+  const tokenRef = useRef(token);
+  tokenRef.current = token;
+  const [uppyRef, setUppy] = useState<Uppy | null>(null);
+  useEffect(() => {
+    const instance = new Uppy({
+      allowMultipleUploadBatches: false,
+      restrictions: {
+        allowedFileTypes: [
+          "image/*",
+          "text/*",
+          "audio/*",
+          "video/*",
+          "application/*",
+          ".ppsx",
+        ],
+        maxNumberOfFiles: 1,
+      },
+    })
+      .use(Audio)
+      .use(Webcam)
+      .use(XHRUpload, {
+        limit: 1,
+        method: "POST",
+        endpoint: `${env.NEXT_PUBLIC_BACKEND_DOMAIN}/parties/workspace/${workspaceId}/file/${teamId}/${channelId}`,
+        headers: () => ({ authorization: tokenRef.current ?? "" }),
+      })
+      .on("upload-error", (_file, _error, response) => {
+        reportAccessFailure(response?.status ?? 0);
+        toast.error(
+          response?.status === 503
+            ? "Uploads are currently unavailable. Your selected files have been kept."
+            : "Upload failed. Check your access and connection, then try again.",
+        );
+      })
+      .on("complete", (e) => {
+        let type = e.successful[0]?.type?.split("/")[0];
 
-            if (type !== "audio" && type !== "video" && type !== "image") {
-              type = "file";
-            }
+        if (type !== "audio" && type !== "video" && type !== "image") {
+          type = "file";
+        }
 
-            // console.log("type", type, e);
+        // console.log("type", type, e);
 
-            // const img = document.createElement("img");
-            // img.style.display = "none";
-            // img.src = e.successful[0]?.preview;
-            // document.body.appendChild(img);
-            // console.log(img.naturalWidth, img.naturalHeight);
-            // document.body.removeChild(img);
+        // const img = document.createElement("img");
+        // img.style.display = "none";
+        // img.src = e.successful[0]?.preview;
+        // document.body.appendChild(img);
+        // console.log(img.naturalWidth, img.naturalHeight);
+        // document.body.removeChild(img);
 
-            const name = e.successful[0]?.name;
-            const fileId = e.successful[0]?.response?.body?.fileId as
-              | string
-              | undefined;
+        const name = e.successful[0]?.name;
+        const fileId = e.successful[0]?.response?.body?.fileId as
+          | string
+          | undefined;
 
-            completeUpload(fileId, type as Message["type"], name);
-          })
-          .on("dashboard:show-panel", () => {});
-  }, [token, channelId, completeUpload, workspaceId, teamId]);
+        completeUpload(fileId, type as Message["type"], name);
+      })
+      .on("dashboard:show-panel", () => {});
+    setUppy(instance);
+    return () => instance.close();
+  }, [channelId, completeUpload, workspaceId, teamId]);
 
-  if (!uppyRef) {
-    return null;
+  if (!token || !uppyRef) {
+    return (
+      <button
+        type="button"
+        className="p-2 text-xs"
+        onClick={() => void refreshToken()}
+      >
+        {tokenError
+          ? failureMessage(tokenError) + " Retry upload access"
+          : "Loading upload access…"}
+      </button>
+    );
   }
 
   return (

@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { env } from "@wodge/env/client";
 import { authRoutes, publicRoutes } from "./routes";
+import { loginPath } from "./features/auth/redirect";
 import type { PublicUserType } from "@wodge/domain/user/models";
 
 export async function middleware(request: NextRequest) {
@@ -10,29 +11,33 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const response = await fetch(
-    `${env.NEXT_PUBLIC_BACKEND_DOMAIN}/api/users/me`,
-    {
+  let response: Response;
+  const unavailable = () => {
+    if (authRoutes.includes(path)) return NextResponse.next();
+    const url = new URL("/unavailable", request.url);
+    url.searchParams.set("returnTo", path + request.nextUrl.search);
+    return NextResponse.redirect(url);
+  };
+  try {
+    response = await fetch(`${env.NEXT_PUBLIC_BACKEND_DOMAIN}/api/users/me`, {
       headers: { cookie: request.headers.get("cookie") ?? "" },
       cache: "no-store",
-    },
-  );
+    });
+  } catch {
+    return unavailable();
+  }
 
   if (response.status === 401) {
     if (authRoutes.includes(path)) {
       return NextResponse.next();
     }
 
-    const login = new URL("/login", request.url);
-
-    login.searchParams.set("redirect", path);
-
-    return NextResponse.redirect(login);
+    return NextResponse.redirect(
+      new URL(loginPath(path + request.nextUrl.search), request.url),
+    );
   }
 
-  if (!response.ok) {
-    return NextResponse.next();
-  }
+  if (!response.ok) return unavailable();
 
   const user = (await response.json()) as PublicUserType;
 

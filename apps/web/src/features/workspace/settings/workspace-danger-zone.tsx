@@ -1,3 +1,4 @@
+import { failureMessage, requireOk } from "@/client/errors";
 import { useIsOwnerOrAdmin } from "@/features/workspace/hooks/use-is-owner-or-admin";
 import { SettingsContentAction } from "./settings";
 import { useIsOwner } from "@/features/workspace/hooks/use-is-owner";
@@ -20,9 +21,7 @@ export function WorkspaceDangerZone() {
         method: "POST",
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to leave workspace");
-      }
+      await requireOk(res);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -30,8 +29,8 @@ export function WorkspaceDangerZone() {
       });
       router.push("/");
     },
-    onError: () => {
-      toast.error("Failed to leave workspace");
+    onError: (error) => {
+      toast.error(failureMessage(error));
     },
   });
 
@@ -41,15 +40,13 @@ export function WorkspaceDangerZone() {
         method: "DELETE",
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to delete workspace");
-      }
+      await requireOk(res);
     },
     onSuccess: () => {
       router.push("/");
     },
-    onError: () => {
-      toast.error("Failed to delete workspace");
+    onError: (error) => {
+      toast.error(failureMessage(error));
     },
   });
 

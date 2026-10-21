@@ -1,11 +1,4 @@
-import {
-  PullerResult,
-  PullRequest,
-  PusherResult,
-  PushRequest,
-  Replicache,
-} from "replicache";
-import { env } from "@wodge/env/client";
+import { Replicache } from "replicache";
 import { replicacheWrapper } from "../transport";
 import { createThreadMutators, type ThreadMutators } from "./mutators";
 
@@ -22,28 +15,17 @@ export function createThreadRep({
 }) {
   return new Replicache<ThreadMutators>({
     name: `${userId}-${channelId}`,
-    licenseKey: env.NEXT_PUBLIC_REPLICACHE_KEY,
     mutators: createThreadMutators(userId),
     pullInterval: null,
     pushURL: undefined,
     pullURL: undefined,
-    puller: replicacheWrapper<PullRequest, PullerResult>(
-      "pull",
-      "thread",
-      channelId,
-      {
-        "x-workspace-id": workspaceId,
-        "x-team-id": teamId,
-      },
-    ),
-    pusher: replicacheWrapper<PushRequest, PusherResult>(
-      "push",
-      "thread",
-      channelId,
-      {
-        "x-workspace-id": workspaceId,
-        "x-team-id": teamId,
-      },
-    ),
+    puller: replicacheWrapper("pull", "thread", channelId, {
+      "x-workspace-id": workspaceId,
+      "x-team-id": teamId,
+    }),
+    pusher: replicacheWrapper("push", "thread", channelId, {
+      "x-workspace-id": workspaceId,
+      "x-team-id": teamId,
+    }),
   });
 }
