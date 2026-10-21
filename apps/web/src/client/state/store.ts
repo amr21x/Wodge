@@ -34,82 +34,100 @@ export interface AppStore {
       userId: string,
     ) => Replicache<WorkspaceMutators> | void;
     removeWorkspace: (workspaceId: string) => void;
-    setChannelRep: (rep: Replicache<ChannelMutators>) => void;
+    setChannelRep: (rep: Replicache<ChannelMutators>) => () => void;
   };
 }
 
 export const useAppStore = create<AppStore>()(
-  devtools((set, get) => ({
-    userStore: undefined,
-    workspaces: {},
-    micStatus: true,
+  devtools((set, get) => {
+    const channelRegistrations = new Set<{
+      rep: Replicache<ChannelMutators>;
+    }>();
+    return {
+      userStore: undefined,
+      workspaces: {},
+      micStatus: true,
 
-    actions: {
-      reset: async () => {
-        const { socket, userStore, workspaces, activeChanRep } = get();
-        set({
-          socket: undefined,
-          userStore: undefined,
-          workspaces: {},
-          activeChanRep: undefined,
-        });
-        socket?.close();
-        // Close instances without deleting IndexedDB: offline drafts remain recoverable.
-        await Promise.allSettled(
-          [
-            ...new Set([
-              userStore,
-              activeChanRep,
-              ...Object.values(workspaces),
-            ]),
-          ].map((rep) => rep?.close()),
-        );
+      actions: {
+        reset: async () => {
+          const { socket, userStore, workspaces, activeChanRep } = get();
+          const channelReps = [...channelRegistrations].map(({ rep }) => rep);
+          channelRegistrations.clear();
+          set({
+            socket: undefined,
+            userStore: undefined,
+            workspaces: {},
+            activeChanRep: undefined,
+          });
+          socket?.close();
+          // Close instances without deleting IndexedDB: offline drafts remain recoverable.
+          await Promise.allSettled(
+            [
+              ...new Set([
+                userStore,
+                activeChanRep,
+                ...channelReps,
+                ...Object.values(workspaces),
+              ]),
+            ].map((rep) => rep?.close()),
+          );
+        },
+        addWorkspace: (workspaceId, userId) => {
+          // Closing the current workspace so to account for the case of switching from local to cloud
+          if (get().workspaces?.[workspaceId] !== undefined) {
+            get().workspaces?.[workspaceId]?.close();
+          }
+
+          const rep = createWorkspaceRep(userId, workspaceId);
+
+          set({
+            workspaces: {
+              ...get().workspaces,
+              [workspaceId]: rep,
+            },
+          });
+
+          return rep;
+        },
+        getWorkspace: (workspaceId, userId) => {
+          if (!workspaceId) {
+            return;
+          }
+
+          const workspace = get().workspaces[workspaceId];
+
+          if (!workspace) {
+            return get().actions.addWorkspace(workspaceId, userId);
+          }
+
+          return workspace;
+        },
+        removeWorkspace: async (workspaceId: string) => {
+          const { [workspaceId]: removed, ...workspaces } = get().workspaces;
+          set({ workspaces });
+          await removed?.close();
+        },
+        connectSocket: (userId: string) => {
+          if (get().socket) {
+            return;
+          }
+
+          set({ socket: createSocket(userId) });
+        },
+        setChannelRep: (rep) => {
+          const registration = { rep };
+          channelRegistrations.add(registration);
+          set({ activeChanRep: rep });
+          return () => {
+            if (!channelRegistrations.delete(registration)) return;
+            if (get().activeChanRep === rep) {
+              // A dialog may own the newest registration while the page remains mounted.
+              const remaining = [...channelRegistrations].at(-1);
+              set({ activeChanRep: remaining?.rep });
+            }
+          };
+        },
       },
-      addWorkspace: (workspaceId, userId) => {
-        // Closing the current workspace so to account for the case of switching from local to cloud
-        if (get().workspaces?.[workspaceId] !== undefined) {
-          get().workspaces?.[workspaceId]?.close();
-        }
-
-        const rep = createWorkspaceRep(userId, workspaceId);
-
-        set({
-          workspaces: {
-            ...get().workspaces,
-            [workspaceId]: rep,
-          },
-        });
-
-        return rep;
-      },
-      getWorkspace: (workspaceId, userId) => {
-        if (!workspaceId) {
-          return;
-        }
-
-        const workspace = get().workspaces[workspaceId];
-
-        if (!workspace) {
-          return get().actions.addWorkspace(workspaceId, userId);
-        }
-
-        return workspace;
-      },
-      removeWorkspace: async (workspaceId: string) => {
-        const { [workspaceId]: removed, ...workspaces } = get().workspaces;
-        set({ workspaces });
-        await removed?.close();
-      },
-      connectSocket: (userId: string) => {
-        if (get().socket) {
-          return;
-        }
-
-        set({ socket: createSocket(userId) });
-      },
-      setChannelRep: (rep) => {
-        set({ activeChanRep: rep });
-      },
-    },
-  })),
+    };
+  }),
 );

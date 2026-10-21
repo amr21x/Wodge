@@ -49,10 +49,9 @@ export function useCurrentPageRep() {
       folderId,
     });
     setRep(instance);
-    setChannelRep(instance);
+    const unregister = setChannelRep(instance);
     return () => {
-      if (useAppStore.getState().activeChanRep === instance)
-        useAppStore.setState({ activeChanRep: undefined });
+      unregister();
       void instance.close();
     };
   }, [workspaceId, teamId, channelId, userId, exists, setChannelRep, folderId]);
