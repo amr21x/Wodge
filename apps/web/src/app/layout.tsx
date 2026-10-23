@@ -57,8 +57,9 @@ export const metadata: Metadata = {
   ],
 
   icons: [
-    { rel: "apple-touch-icon", url: "icons/icon-128x128.png" },
-    { rel: "icon", url: "icons/icon-128x128.png" },
+    { rel: "icon", url: "/wodge-app-icon.svg", type: "image/svg+xml" },
+    // iOS does not support SVG touch icons.
+    { rel: "apple-touch-icon", url: "/icons/logo-dark-192_x_192.png" },
   ],
 };
 

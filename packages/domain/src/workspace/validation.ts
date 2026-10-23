@@ -37,6 +37,18 @@ export const TeamSchema = z.object({
   default: z.boolean().default(false),
 });
 
+// Workspaces are served at `/<slug>`, so slugs must not shadow top-level
+// backend prefixes or web routes.
+const RESERVED_WORKSPACE_SLUGS = new Set([
+  "api",
+  "parties",
+  "docs",
+  "settings",
+  "info",
+  "demo",
+  "unavailable",
+]);
+
 export const WorkspaceSchema = z.object({
   id: z.string().optional(),
   owner: z.string(),
@@ -49,6 +61,10 @@ export const WorkspaceSchema = z.object({
     .regex(
       /^[a-zA-Z0-9_-]+$/,
       "Only letters, numbers, dashes, and underscores.",
+    )
+    .refine(
+      (slug) => !RESERVED_WORKSPACE_SLUGS.has(slug.toLowerCase()),
+      "This slug is reserved.",
     ),
   avatar: z.string().nullable().optional(),
   createdAt: z.date().optional(),

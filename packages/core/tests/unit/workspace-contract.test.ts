@@ -16,7 +16,17 @@ test("workspace API validation preserves the client shape independently of organ
   expect(
     NewWorkspaceSchema.parse({ ...profile, slug: "  work-space  " }),
   ).toEqual({ name: "Workspace", slug: "work-space" });
-  for (const slug of ["", "ab", "contains spaces", "a".repeat(25)]) {
+  for (const slug of [
+    "",
+    "ab",
+    "contains spaces",
+    "a".repeat(25),
+    "api",
+    "parties",
+    "docs",
+    "API",
+    " settings ",
+  ]) {
     expect(NewWorkspaceSchema.safeParse({ ...profile, slug }).success).toBe(
       false,
     );

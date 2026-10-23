@@ -1,3 +1,5 @@
+![Wodge — your team's workspace for communication, knowledge and tasks](apps/web/public/wodge-readme-banner.svg)
+
 # Wodge
 
 **A local-first collaborative workspace for team communication, knowledge management, and task coordination.**
@@ -7,7 +9,7 @@ Read the [repository documentation and feature index](docs/README.md) for the re
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Replicache](https://img.shields.io/badge/Replicache-local--first-6E56CF)](https://replicache.dev/)
-[![PartyKit](https://img.shields.io/badge/PartyKit-realtime-FF5D01)](https://www.partykit.io/)
+[![PartyServer](https://img.shields.io/badge/PartyServer-realtime-F38020)](https://github.com/cloudflare/partykit/tree/main/packages/partyserver)
 [![Better Auth](https://img.shields.io/badge/Better_Auth-auth-black)](https://better-auth.com/)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
 
@@ -17,14 +19,14 @@ Read the [repository documentation and feature index](docs/README.md) for the re
 
 Wodge is a collaborative workspace that brings structured team communication, real-time rooms, shared knowledge, and task management into one product. It was built as a five-member engineering capstone and received an **A+ evaluation**.
 
-The project explores a local-first architecture in which users can interact with workspace data through responsive local state while synchronization is coordinated through Replicache and PartyServer Durable Objects. Collaborative documents use Yjs/CRDT-based editing, and live audio/video rooms are powered by LiveKit.
+The project explores a local-first architecture in which users can interact with workspace data through responsive local state while synchronization is coordinated through Replicache and PartyServer Durable Objects. Collaborative documents use Yjs/CRDT-based editing. Audio/video calls are temporarily disabled while the backend is migrated.
 
 ## Highlights
 
 - **Local-first synchronization** using Replicache with separate synchronized models for workspaces, pages, threads, rooms, and users.
 - **Real-time collaboration** through PartyServer Durable Objects and presence-aware workspace flows.
 - **Collaborative documents** built with Tiptap and Yjs/CRDTs.
-- **Team communication** through channels, threaded posts, comments, chat, polls, and audio/video rooms.
+- **Team communication** through channels, threaded posts, comments, room chat, and polls.
 - **Embedded task management** with assignees, priorities, table views, and Kanban-style organization.
 - **Workspace administration** including teams, groups, invitations, membership roles, and permission-aware interfaces.
 - **Monorepo architecture** using Turborepo, pnpm workspaces, shared TypeScript configuration, and shared data models.
@@ -42,10 +44,9 @@ The project explores a local-first architecture in which users can interact with
 ### Communication
 
 - Create channels for threaded discussions and live rooms.
-- Publish posts, comments, and Q&A-style content.
+- Publish posts and comments.
 - Send, edit, and delete real-time room messages.
 - Run polls inside collaborative flows.
-- Join LiveKit-powered audio/video conferences with device and track controls.
 
 ### Knowledge and task management
 
@@ -60,20 +61,20 @@ The project explores a local-first architecture in which users can interact with
 ```mermaid
 flowchart LR
     U[Browser] --> W[Next.js web application]
-    W --> A[Better Auth authentication]
-
     W --> R[Replicache clients]
-    R <--> P[PartyServer Durable Objects]
-    P --> E[Workspace, page, thread, room, and user state]
-
     W <--> Y[Tiptap + Yjs collaborative editor]
+
+    W --> B[Backend Worker: Hono API]
+    R <--> P
     Y <--> P
 
-    W <--> L[LiveKit audio and video]
-    W --> D[Drizzle data layer]
-    D --> S[(SQLite / Cloudflare D1)]
-    D --> D1[(Cloudflare D1)]
+    B --> A[Better Auth]
+    A --> D1[(Cloudflare D1: users, organizations, memberships)]
+    B --> P[PartyServer Durable Objects]
+    P --> S[(Durable Object SQLite: workspace, page, thread, room, and user state)]
 ```
+
+The backend follows a route → handler → core service → repository flow. The web application holds UI, API clients, and browser-safe optimistic mutations only; all database access stays in the backend Worker.
 
 ### Synchronization model
 
@@ -85,28 +86,32 @@ Wodge separates synchronized state by domain rather than treating the whole prod
 | ----------------------- | --------------------------------------------------- |
 | Web application         | Next.js, React, TypeScript, Tailwind CSS, Radix UI  |
 | Local-first data        | Replicache, shared mutation models, Zod validation  |
+| Backend API             | Hono, TSyringe dependency injection                 |
 | Real-time backend       | PartyServer, WebSockets, presence-aware services    |
-| Collaborative editing   | Tiptap, Yjs, y-partykit                             |
-| Audio and video         | LiveKit                                             |
-| Data layer              | Drizzle ORM, SQLite/Cloudflare D1                   |
-| Authentication          | Better Auth                                         |
+| Collaborative editing   | Tiptap, Yjs, y-partyserver                          |
+| Data layer              | Drizzle ORM, Cloudflare D1, Durable Object SQLite   |
+| Authentication          | Better Auth (Google and GitHub sign-in)             |
+| Billing                 | Polar (sandbox)                                     |
 | State and data fetching | TanStack Query, Zustand, Jotai, Immer               |
 | Tooling                 | Turborepo, pnpm, Vitest, ESLint, Prettier, Wrangler |
-| Deployment              | Cloudflare Workers/Durable Objects, GitHub Actions  |
+| Deployment              | Cloudflare Workers Builds, Durable Objects          |
 
 ## Repository Structure
 
 ```text
 .
 ├── apps/
-│   ├── web/          # Next.js application, UI, routes, editor, and API handlers
-│   └── backend/      # PartyServer Durable Objects for workspace, room, thread, page, and user sync
+│   ├── web/          # Next.js application: UI, API clients, editor, and optimistic mutations
+│   └── backend/      # Worker: Hono routes and handlers, DI container, PartyServer Durable Objects
 ├── packages/
-│   ├── data/         # Shared schemas, models, mutations, keys, and database utilities
-│   ├── env/          # Shared environment configuration
-│   └── ts/           # Shared TypeScript configuration
-├── config/           # Shared development configuration
-└── .github/          # GitHub Actions workflows
+│   ├── auth/         # Better Auth configuration, sessions, tickets, and permissions
+│   ├── core/         # Business services and repositories, grouped by feature
+│   ├── domain/       # Models, DTOs, schemas, and error contracts
+│   ├── env/          # Typed environment configuration
+│   └── infra/        # Technical clients, storage primitives, and database tooling
+├── config/           # Shared TypeScript and Workers configuration
+├── docs/             # Product, architecture, development, and operations documentation
+└── .github/          # Quality checks workflow
 ```
 
 ## Getting Started
@@ -116,7 +121,6 @@ Wodge separates synchronized state by domain rather than treating the whole prod
 - Node.js 22.19 or newer (`.node-version` selects 24.19.0)
 - pnpm 12 (`packageManager` pins 12.15.0)
 - A Linux-based development environment is recommended
-- LiveKit Server for local audio/video development
 - Accounts or local substitutes for the external services configured in `.env.example`
 
 ### Installation
@@ -154,19 +158,14 @@ configuration only; backend secrets are injected by `pnpm secrets run`. Better
 Auth supports Google and GitHub sign-in; email sign-in is disabled. The web dev server forwards API calls
 to the backend Worker. See [backend setup](apps/backend/README.md).
 
-Production uses manually triggered Wrangler deployment. Namespace/data cutover,
-provider credentials and web-origin routing must be configured before deployment.
+Production deploys automatically from `main` through Cloudflare Workers Builds.
+Provider credentials and web-origin routing must be configured before deployment.
+See [CI/CD](docs/operations/ci-cd.md).
 
 Initialize the local application state and database:
 
 ```bash
 pnpm init:app
-```
-
-Start LiveKit in a separate terminal when testing calls:
-
-```bash
-pnpm livekit
 ```
 
 Start the monorepo with backend secrets injected:
@@ -232,22 +231,11 @@ pnpm generate        # Generate database artifacts
 pnpm migrate:local   # Apply local database migrations
 pnpm studio          # Open the database studio
 pnpm reset:app       # Reset local generated Wrangler state
+pnpm check:boundaries # Check package ownership and import boundaries
 ```
 
 ## Project Status
 
-The public repository contains the capstone version of Wodge and is suitable for architecture review and local exploration. The codebase includes deployment automation for Cloudflare Workers, but a complete turnkey self-hosting guide is still being consolidated.
+Wodge is being revived from its capstone baseline as a portfolio showcase. The backend is migrating to PartyServer, Better Auth, and D1; see the [documentation](docs/README.md) for current scope and limits. Audio/video calls are temporarily disabled, and the retained LiveKit code is not active.
 
-Some integrations require third-party credentials, including Google/GitHub OAuth providers, LiveKit, Cloudflare, and other optional services represented in `.env.example`.
-
-## Team and Contribution
-
-Wodge was built by a five-member team. **Amr Yasser served as Scrum Master and contributed across the majority of the monorepo**, including frontend development, backend services, synchronization flows, collaborative editing, and deployment tooling.
-
-## License
-
-Wodge is licensed under the [GNU Affero General Public License v3.0](LICENSE).
-
-## Contact
-
-For questions about the project or self-hosting status, contact [Amr Yasser](mailto:amryasseremam@gmail.com).
+Some integrations require third-party credentials, including Google/GitHub OAuth providers, Polar, and Cloudflare. Web configuration is listed in `.env.example`; backend settings are documented in `apps/backend/.dev.vars.example`.
