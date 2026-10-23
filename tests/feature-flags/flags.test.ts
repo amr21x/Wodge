@@ -7,7 +7,7 @@ import {
 } from "@wodge/domain/features/models";
 import { FeatureFlagService } from "@wodge/core/features/services/flags";
 import type { FeatureFlagRepository } from "@wodge/core/features/repositories/flags";
-import { FeatureHandlers } from "../../apps/backend/src/handlers/features";
+import { FeatureFlagHandlers } from "../../apps/backend/src/handlers/feature-flags";
 import { createRoomPatch } from "../../apps/backend/src/lib/sync/patches/rooms";
 import { gatePageConnection } from "../../apps/backend/src/lib/feature-connection";
 
@@ -32,7 +32,7 @@ function databaseFlagReader(binding: {
   return new FeatureFlagService(repository as FeatureFlagRepository).read;
 }
 function featureHandlers(read: FeatureFlagService["read"]) {
-  return new FeatureHandlers({ read } as FeatureFlagService);
+  return new FeatureFlagHandlers({ read } as FeatureFlagService);
 }
 const gatePartyRequest = (
   request: Request,
@@ -55,11 +55,8 @@ import {
   resolveFlags,
 } from "@wodge/core/features/flags";
 
-import {
-  httpFeatures,
-  mutationFeatures,
-  pageFeatures,
-} from "@wodge/core/features/policy";
+import { httpFeatures, mutationFeatures } from "@wodge/core/features/policy";
+import { pageFeatures } from "@/client/features/pages";
 
 // Loaded through require because Vitest 1.x does not resolve the newer node:sqlite builtin.
 const { DatabaseSync } = createRequire(import.meta.url)(
@@ -69,10 +66,16 @@ const migration = readFileSync(
   "packages/domain/migrations/0003_feature_flags.sql",
   "utf8",
 );
+// Later migrations keep the table in line with the registry; they run once, in order.
+const registrySync = readFileSync(
+  "packages/domain/migrations/0010_feature_flag_registry.sql",
+  "utf8",
+);
 const seed = readFileSync("packages/domain/seed-feature-flags.sql", "utf8");
 function database() {
   const db = new DatabaseSync(":memory:");
   db.exec(migration);
+  db.exec(registrySync);
   const binding = {
     prepare: (sql: string) => ({
       all: async () => ({ success: true, results: db.prepare(sql).all() }),
@@ -112,6 +115,7 @@ describe("database flag contract", () => {
     );
     db.exec(seed);
     db.exec(migration);
+    db.exec(registrySync);
     expect((await read()).flags.pages).toBe(false);
     expect((await read()).flags.tasks).toBe(true);
     expect(
@@ -257,6 +261,8 @@ describe("authoritative operation gates", () => {
       messages: { data: messages, lastModifiedVersion: 1 },
       readFlags: read,
     };
+    // Storage-backed features start disabled; enable attachments as an operator would.
+    db.exec("UPDATE feature_flags SET enabled=1 WHERE key='attachments'");
     const patch = createRoomPatch(party as any, "member", read);
     const pull = async () => ({
       patch: await patch({ fromVersion: 1 } as any),
@@ -338,7 +344,10 @@ describe("authoritative operation gates", () => {
       await gatePartyRequest(request("workspace"), "workspace", read),
     ).toBeUndefined();
     expect(httpFeatures("/api/feature-flags", "GET")).toEqual([]);
-    expect(httpFeatures("/api/billing/webhook", "POST")).toEqual([]);
+    // Identity reads stay open. Polar webhooks are served by Better Auth under
+    // /api/auth, which is outside the flag gate entirely.
+    expect(httpFeatures("/api/users/me", "GET")).toEqual([]);
+    expect(httpFeatures("/api/users/token", "GET")).toEqual([]);
     expect(pageFeatures("/login")).toEqual([]);
     expect(pageFeatures("/onboarding")).toEqual([]);
   });

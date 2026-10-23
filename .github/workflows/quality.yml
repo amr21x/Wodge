@@ -72,7 +72,9 @@ jobs:
           pnpm exec tsc -p apps/backend/tsconfig.json --noEmit --incremental false --pretty false
           pnpm --filter backend test:api
       - name: Tests
-        run: pnpm exec vitest run --maxWorkers=2 --minWorkers=1
+        run: |
+          pnpm exec vitest run --maxWorkers=2 --minWorkers=1
+          pnpm test:feature-flags
       - name: Worker runtime checks
         run: |
           pnpm --filter backend test:foundation

@@ -28,7 +28,7 @@ buckets that the backend creates through the S3 API.
 
 R2 is not provisioned yet (it requires a payment method). Until it is, deploy with
 `INTEGRATION_MODE:partial` and leave the `R2_*` secrets unset. Migration
-`0010_storage_feature_flags.sql` and the seed start the `attachments` and `avatars`
+`0010_feature_flag_registry.sql` and the seed start the `attachments` and `avatars`
 flags disabled, so the UI shows uploads as disabled and the backend refuses them. To
 enable storage, add the `R2_*` secrets, deploy with `INTEGRATION_MODE:ready`, and run
 in the D1 console:
@@ -99,7 +99,8 @@ environment. Configure required reviewers on it so each run waits for approval.
 - `quality`: lint and format checks on every change, including documentation.
 - `scope`: decides whether the change is documentation-only (every path, including
   both sides of a rename, under `docs/`).
-- `application`: boundaries, type checks, API contract, Vitest suites, local Worker
+- `application`: boundaries, type checks, API contract, Vitest suites (including the
+  feature-flag suite), local Worker
   runtime checks, the backend dry-run build and the Pages build. Skipped for
   documentation-only changes.
 - `result`: the stable required check; it passes when the jobs above pass or are

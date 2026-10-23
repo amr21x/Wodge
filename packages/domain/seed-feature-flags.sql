@@ -4,7 +4,6 @@ INSERT INTO feature_flags (key, enabled) VALUES
   ('workspaceSettings', 1),
   ('membership', 1),
   ('teamManagement', 1),
-  ('groups', 1),
   ('discussions', 1),
   ('messaging', 1),
   ('polls', 1),
