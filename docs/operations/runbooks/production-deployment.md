@@ -26,6 +26,17 @@ Avatars are public objects in the R2 bucket `avatars`, served from the R2 custom
 domain `https://wodge-avatars.amr21.dev`. Workspace files use private per-workspace
 buckets that the backend creates through the S3 API.
 
+R2 is not provisioned yet (it requires a payment method). Until it is, deploy with
+`INTEGRATION_MODE:partial` and leave the `R2_*` secrets unset. Migration
+`0010_storage_feature_flags.sql` and the seed start the `attachments` and `avatars`
+flags disabled, so the UI shows uploads as disabled and the backend refuses them. To
+enable storage, add the `R2_*` secrets, deploy with `INTEGRATION_MODE:ready`, and run
+in the D1 console:
+
+```sql
+UPDATE feature_flags SET enabled = 1 WHERE key IN ('attachments', 'avatars');
+```
+
 ## Resources
 
 | Resource                   | Name / value                                                                                 |
@@ -43,12 +54,12 @@ earlier PartyKit or Supabase deployment.
 Public Worker variables are passed with `wrangler deploy --var`. The web build
 receives the same values as `NEXT_PUBLIC_*` at build time.
 
-| Worker variable    | Web build variable           | Production value                  |
-| ------------------ | ---------------------------- | --------------------------------- |
-| `APP_DOMAIN`       | `NEXT_PUBLIC_APP_DOMAIN`     | `https://wodge.amr21.dev`         |
-| `BACKEND_DOMAIN`   | `NEXT_PUBLIC_BACKEND_DOMAIN` | `https://wodge.amr21.dev`         |
-| `AVATARS_URL`      | `NEXT_PUBLIC_AVATARS_URL`    | `https://wodge-avatars.amr21.dev` |
-| `INTEGRATION_MODE` | —                            | `ready`                           |
+| Worker variable    | Web build variable           | Production value                               |
+| ------------------ | ---------------------------- | ---------------------------------------------- |
+| `APP_DOMAIN`       | `NEXT_PUBLIC_APP_DOMAIN`     | `https://wodge.amr21.dev`                      |
+| `BACKEND_DOMAIN`   | `NEXT_PUBLIC_BACKEND_DOMAIN` | `https://wodge.amr21.dev`                      |
+| `AVATARS_URL`      | `NEXT_PUBLIC_AVATARS_URL`    | `https://wodge-avatars.amr21.dev`              |
+| `INTEGRATION_MODE` | —                            | `partial` until R2 is configured, then `ready` |
 
 Worker secrets (names and purposes are in `apps/backend/.dev.vars.example`):
 
@@ -113,7 +124,7 @@ custom domain `wodge.amr21.dev` after the first successful build.
 `NODE_VERSION=24.19.0` and `PNPM_VERSION=12.15.0`, and this deploy command:
 
 ```sh
-pnpm exec wrangler d1 migrations apply wodge --remote && pnpm exec wrangler deploy --var APP_DOMAIN:https://wodge.amr21.dev --var BACKEND_DOMAIN:https://wodge.amr21.dev --var AVATARS_URL:https://wodge-avatars.amr21.dev --var INTEGRATION_MODE:ready
+pnpm exec wrangler d1 migrations apply wodge --remote && pnpm exec wrangler deploy --var APP_DOMAIN:https://wodge.amr21.dev --var BACKEND_DOMAIN:https://wodge.amr21.dev --var AVATARS_URL:https://wodge-avatars.amr21.dev --var INTEGRATION_MODE:partial
 ```
 
 Pass the public variables on the command line: each deploy replaces dashboard
@@ -133,7 +144,7 @@ cd apps/backend
 pnpm exec wrangler secret bulk secrets.json
 pnpm exec wrangler deploy \
   --var APP_DOMAIN:https://wodge.amr21.dev --var BACKEND_DOMAIN:https://wodge.amr21.dev \
-  --var AVATARS_URL:https://wodge-avatars.amr21.dev --var INTEGRATION_MODE:ready
+  --var AVATARS_URL:https://wodge-avatars.amr21.dev --var INTEGRATION_MODE:partial
 cd ../web
 NEXT_PUBLIC_APP_DOMAIN=https://wodge.amr21.dev NEXT_PUBLIC_BACKEND_DOMAIN=https://wodge.amr21.dev \
   NEXT_PUBLIC_AVATARS_URL=https://wodge-avatars.amr21.dev pnpm pages:build

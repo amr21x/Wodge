@@ -304,6 +304,28 @@ try {
     }
   }
 
+  // Storage-backed features start disabled; this runtime configures object storage.
+  const storageFlags = await database
+    .prepare(
+      "SELECT key, enabled FROM feature_flags WHERE key IN ('attachments','avatars') ORDER BY key",
+    )
+    .all();
+  assert.deepEqual(
+    storageFlags.results.map((/** @type {any} */ row) => [
+      row.key,
+      row.enabled,
+    ]),
+    [
+      ["attachments", 0],
+      ["avatars", 0],
+    ],
+  );
+  await database
+    .prepare(
+      "UPDATE feature_flags SET enabled=1 WHERE key IN ('attachments','avatars')",
+    )
+    .run();
+
   await check(
     "canonical user migration preserves profiles and sessions and removes duplicate storage",
     async () => {

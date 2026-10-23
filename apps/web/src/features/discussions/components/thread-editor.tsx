@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useCurrentUser } from "@/features/account/hooks/use-current-user";
 import { useThreadEditor } from "@/features/discussions/hooks/use-thread-editor";
 import OfflineEditor from "@/features/editor/block-editor/offline-editor";
+import { UploadsDisabledButton } from "@/features/files/components/uploads-disabled-button";
 import { PollMaker } from "@/features/polls/components/poll-maker";
 import { SidebarItemBtn } from "@/features/workspace/components/sidebar-item-btn";
 import { useIsTeamModerator } from "@/features/workspace/hooks/use-is-team-moderator";
@@ -116,7 +117,12 @@ export function ThreadEditor({
           </div>
 
           <div className="ml-0.5 flex items-center py-1.5 pl-8">
-            <FeatureGate feature="attachments">
+            <FeatureGate
+              feature="attachments"
+              fallback={
+                <UploadsDisabledButton Icon={Image} className="p-1.5" />
+              }
+            >
               <SidebarItemBtn
                 className="p-1.5"
                 Icon={Image}

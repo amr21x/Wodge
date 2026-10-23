@@ -10,7 +10,7 @@ on:
         description: Integration configuration (ready requires storage and Polar settings)
         type: choice
         required: true
-        default: ready
+        default: partial
         options:
           - partial
           - ready

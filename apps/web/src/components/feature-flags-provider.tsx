@@ -83,15 +83,18 @@ export function useFeatureFlags() {
   return useContext(FeatureFlagsContext);
 }
 
+/** Renders children when the feature is enabled; `fallback` can explain a disabled control. */
 export function FeatureGate({
   feature,
   children,
+  fallback = null,
 }: {
   feature: Feature;
   children: ReactNode;
+  fallback?: ReactNode;
 }) {
   const flags = useFeatureFlags();
-  return flags[feature] ? <>{children}</> : null;
+  return <>{flags[feature] ? children : fallback}</>;
 }
 
 export function FeatureRouteGate({ children }: { children: ReactNode }) {
