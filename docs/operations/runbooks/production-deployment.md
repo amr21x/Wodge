@@ -2,7 +2,9 @@
 
 [Docs home](../../README.md) · [Operate Wodge](../README.md)
 
-The showcase runs on Cloudflare under the `amr21.dev` zone. Every deployment still
+The configured showcase topology targets Cloudflare under the `amr21.dev` zone.
+Live readiness at the currently reviewed source revision is Unverified; see the
+[source verification record](../../development/documentation-verification.md). Every deployment still
 needs owner approval for the exact reviewed commit; see
 [deployment authorization](revival-deployment.md). Calls stay disabled and do not
 need LiveKit settings.
@@ -85,7 +87,8 @@ value returns errors naming the setting, never its value.
 
 `Production Deploy` (`.github/workflows/deploy.yml`) runs from the `production`
 environment for deployment credentials. Configure required reviewers on it so each
-run waits for approval before builds, migrations or deployment. Public origin variables
+deploy job waits for approval before remote migrations or deployment. The reusable
+checks job runs validation/builds before this approval. Public origin variables
 may be set at repository scope for CI and in the production environment for deployment.
 If unset, the workflows use the production URLs listed above.
 
@@ -191,8 +194,10 @@ settings or custom build scripts. Builds work from normal clones and git worktre
 1. `curl https://wodge.amr21.dev/health` returns `{"ok":true}`.
 2. Sign in with Google and with GitHub; complete onboarding.
 3. Create a workspace, open a room and a page in two browsers, and confirm live updates.
-4. Upload an avatar; it loads from `wodge-avatars.amr21.dev`.
-5. Start a sandbox checkout, pay with a Polar test card, and confirm the webhook
+4. In partial mode, verify upload controls report disabled. Only after storage and
+   flags are configured, upload an avatar and verify the configured public origin.
+5. With Polar sandbox configured, start a sandbox checkout, use test payment data,
+   and confirm the webhook
    delivery succeeds and the workspace shows the Pro plan.
 
 ## Recovery

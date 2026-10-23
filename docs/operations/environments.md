@@ -10,14 +10,14 @@ or silently relinked. No remote deployment or resource migration was performed.
 
 Copy the public root `.env.example` to `apps/web/.env.local`. Backend secrets
 named in `apps/backend/.dev.vars.example` come from Bitwarden Secrets Manager
-through the OS credential store and `pnpm secrets run`; see [local secrets](../../README.md#local-secrets). Production and
+through the OS credential store and `pnpm secrets run`; see [local secrets](../development/setup.md#local-secrets). Production and
 local Worker bindings are defined in `apps/backend/wrangler.jsonc`; the separate
 foundation configuration remains a compatibility fixture. Web has no D1 binding
 or backend secrets. See [setup](../development/setup.md).
 
 ## Deployment boundary
 
-The web UI remains Next-on-Pages. Backend now owns authentication, application
+The web UI uses Next.js/OpenNext on a separate frontend Worker. Backend now owns authentication, application
 APIs, billing and scoped collaboration. Supabase and the PartyKit CLI have been
 removed from active application code. Provider credentials, callback registrations,
 web-origin API routes and existing Durable Object/Yjs data cutover remain external
@@ -32,7 +32,7 @@ the Worker. Existing PartySocket hosts can keep using the backend hostname.
 ## Verification limits
 
 Actual local Worker compilation and D1 fixture results do not validate production
-sessions, MCP authorization, collaboration persistence, browser journeys, usage,
+sessions, deferred MCP capabilities, collaboration persistence, browser journeys, usage,
 or operating cost. The current project requires bounded operating cost, but this
 page does not adopt numerical budgets or dates from unrelated project records.
 

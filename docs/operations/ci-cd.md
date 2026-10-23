@@ -1,44 +1,25 @@
-# CI/CD and deployment gates
+# CI/CD and deployment boundaries
 
 [Docs home](../README.md) · [Operate Wodge](README.md)
 
-## Current configuration
+## Checked-in automation
 
-[The checked-in workflow](../../.github/workflows/deploy.yml) is a manually triggered
-Wrangler deployment for the backend Worker. It configures Worker secrets from the
-`BACKEND_SECRETS` JSON secret and public origin variables. Automatic PartyKit deploy
-on push has been removed. Production namespace/data migration and hostname routing
-remain deployment prerequisites; no remote deployment was executed. This workflow
-does not yet implement the complete lint/format/type/test/build gates below.
+[Code Quality](../../.github/workflows/quality.yml) runs on pull requests and pushes to `main`/`dev`. It always installs dependencies and runs lint/format checks. For application changes it also runs boundaries, types, API contracts, tests, local Worker runtime checks and both Worker builds. Its final `quality` job checks the validation/build outcomes.
 
-## Documentation-only changes
+The implemented documentation exemption applies only when every changed path is under `docs/`, counting both sides of a rename. It skips application type/test/build jobs, while lint/format and the final result still run. Root `README.md` changes are outside this exemption. This describes actual workflow behavior; older policy records requesting a broader exemption are not evidence that it is enforced.
 
-CI/CD must always skip pull requests and changes whose changed files are all under `docs/`. This applies to pull requests, pushes and their merge commits. Documentation-only changes must not run application lint, formatting, type checks, tests, builds, releases or deployments. Documentation review and link checks are independent of application CI/CD; no documentation publishing service is required.
+[Production Deploy](../../.github/workflows/deploy.yml) is manually dispatched for a selected ref. It calls the same quality workflow with full validation/builds, then uses the `production` environment for remote migrations, Worker secrets and deployment of both backend and OpenNext frontend. Configure required reviewers on that environment. The checks job runs before environment approval; production mutation steps belong to the environment-gated deploy job. DNS, OAuth provider setup and initial resources remain operator responsibilities.
 
-| Changed files                                            | Required behavior                                                                                   |
-| -------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| Only `docs/**`, including additions, edits and deletions | Skip application CI/CD.                                                                             |
-| `docs/**` together with any path outside `docs/`         | Run the normal checks for the application change; deployment still requires approval.               |
-| Any path outside `docs/`                                 | Apply the normal pipeline policy. Root configuration and workflow files are outside this exemption. |
+## Pushes without CI/CD
 
-Determine the scope from the complete change set, including both paths of a rename. A move into or out of `docs/` is not documentation-only. Reviewers still check documentation accuracy, navigation and links; a skipped pipeline is not approval evidence or proof that requirements have shipped.
+When the owner requests a push without CI/CD, use a commit message prefixed with `[skip ci]`, push the task branch and do not dispatch a workflow. Creating a pull request can create additional automation events; it is not part of a push-only request. Do not change workflow configuration just to deliver documentation.
 
-When revisiting the pipeline, apply the exclusion to every application CI/CD entry point. Non-required workflows can use `paths-ignore: ['docs/**']` for both pull-request and push events. GitHub leaves required checks pending when an entire required workflow is skipped by a path filter, so required workflows need a lightweight scope check that succeeds for documentation-only changes and skips all application jobs. This scope check must not trigger a build or deployment. See [GitHub's path-filter rules](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#onpushpull_requestpull_request_targetpathspaths-ignore).
+Cloudflare Git integration is independent of GitHub Actions. [GitHub skip instructions](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/skip-workflow-runs) cover push/pull-request workflows; [Cloudflare Pages](https://developers.cloudflare.com/pages/configuration/git-integration/github-integration/#skipping-a-build-via-a-commit-message) documents a `[skip ci]` prefix, and the [Cloudflare Workers SDK maintainer response](https://github.com/cloudflare/workers-sdk/discussions/13216) confirms Workers Builds support. These controls do not stop a manual deployment or arbitrary third-party automation. Confirm branch/build settings where necessary; record unverified external automation separately.
 
-This is the approved policy; enforcement remains outstanding in the checked-in workflow. Reconcile the affected verification and deployment work through the existing delivery scope below.
+## Approval, verification and recovery
 
-## Approved target
+An explicit owner request authorizes its specified push; it does not authorize deployment, remote D1 migration, secret rotation or provider/resource changes. Check remote branch movement and push without force. A production action needs explicit authorization for the reviewed revision and configuration.
 
-For changes outside the documentation-only exemption, GitHub Actions must check lint, formatting, types, tests and builds before manually approved Cloudflare deployment. The [tooling contract](../development/tooling.md) supplies the intended commands; [testing strategy](../development/testing-strategy.md) supplies evidence requirements. Separate web/backend deployment units require correct D1/R2/SQLite Durable Object bindings, trusted origins, callbacks and server-only provider secrets.
+See [the production runbook](runbooks/production-deployment.md) for topology, manual procedures and schema-aware recovery. Code rollback does not reverse D1 migrations or Durable Object state. Passing CI/liveness checks does not establish full application acceptance; record the deployed revision and manual journey results separately.
 
-Reuse Configure GitHub actions verification checks for verification checks and Replace automatic deployment with manual Cloudflare approval for replacing automatic deployment. Preserve their current scope, status and blockers. Passing CI does not authorize a push or deployment.
-
-## Approval and recovery
-
-Show the exact push command and wait for explicit confirmation. Check remote movement before pushing; report remote-only commits rather than force pushing. Deployment requires separate manual approval and reviewed commit/build identity. [Revival deployment coordination](runbooks/revival-deployment.md) retains preflight, smoke and schema-aware recovery requirements.
-
-Repository protection settings, active cloud bindings, installed secrets, remote CI runs and enforcement capabilities have not been verified. Do not mark a pipeline or protection gate implemented from this document.
-
-## Sources
-
-[Decision 006](../decisions/006-verification-release-control.md), [workflow](../development/workflow.md), [environments](environments.md), and [original release plan](runbooks/revival-deployment.md).
+The [source verification record](../development/documentation-verification.md) distinguishes checked-in automation from remotely verified enforcement, deployments and costs.

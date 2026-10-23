@@ -1,21 +1,15 @@
-# Foundation security boundaries
+# Security boundaries
 
 [Docs home](../README.md) · [Architecture](README.md)
 
-Preserve existing backend permission authority during the dependency/runtime work.
-Persistence factories are not authorization endpoints. HTTP, synchronization, and
-MCP callers must enforce the acting member's permissions.
+Better Auth sessions identify the acting user. HTTP handlers and direct object/realtime entry points enforce backend permissions; browser controls and optimistic mutations are not authorization. Realtime ingress verifies signed, session-bound tickets and replaces caller-supplied identity headers. Workspace policies remain authoritative for resource access.
 
-Browser exports stay separate from server/database/protocol exports. Public browser
-configuration is separate from server bindings and credentials. Shared persistence
-receives D1 explicitly, while Next request context stays inside the web adapter.
+D1 owns canonical identity/organization membership. Handlers coordinate changes with object projections; those stores do not share one transaction. Revocation and failed permission refresh must close protected writes. [Persistence boundaries](data-model.md) describe page access checks and durable Yjs updates.
 
-Local configuration files remain ignored. The owner-directed secret-export CLI
-removal changes scripts and configuration; it does not migrate remote secret values.
-The editor uses public Tiptap v2 packages. Private extension imports and the
-private registry mapping are removed; no registry authentication is required.
+Browser modules contain public configuration and typed API clients only. Provider credentials, signing secrets and D1 bindings stay in the backend. Local secrets use Bitwarden/OS credential storage; production secrets use Cloudflare. Do not put secret values, cookies, signed URLs or private content in diagnostics. See [setup](../development/setup.md).
 
-See the [security cleanup record](../development/security-evidence.md) and
-[foundation evidence](../development/backend-foundation.md) for actual observations.
-Auth sessions, MCP authorization/discovery, production binding wiring, and permission
-journeys require their separate implementation and validation.
+Polar webhook signatures authenticate incoming events; the backend reads current sandbox subscription state before granting entitlements. Workspace checkout requires administrator access and the portal is purchaser-only. Calls remain disabled; generation endpoints are removed. MCP is deferred and has no supported client or executable transport in this revision. Future MCP operations must enforce the acting member's permissions.
+
+Feature flags provide an additional fail-closed capability guard, independent of permissions and provider configuration. They do not erase data or revoke previously downloaded files, issued tokens or local copies. See [flag behavior](../operations/runbooks/feature-flags.md).
+
+The [historical security cleanup](../development/security-evidence.md), [frontend verification](../development/frontend-integration-evidence.md) and [documentation verification](../development/documentation-verification.md) have revision-specific limits. A source review or local fixture pass does not establish current production authorization, multi-user browser acceptance or infrastructure enforcement.

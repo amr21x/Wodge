@@ -12,7 +12,9 @@ Wodge is a local-first collaborative workspace for team conversations, shared pa
 
 Only [AMR21 / Wodge Revival & Enhancements](https://linear.app/amr21/project/wodge-revival-and-enhancements-ee86a6345a5d) governs active delivery. The [current project scope](development/documentation.md) distinguishes retained behavior, necessary migrations, and deferred work.
 
-Retain the existing Next.js/Tailwind/Radix application and product behavior. Backend PartyServer/Better Auth/D1 and minimal member-controlled MCP are current migration goals. Calls and hosted generation are to be disabled; broader framework/tooling/UI redesign and call restoration are deferred. See the [backend foundation record](development/backend-foundation.md) and [baseline](development/baseline.md) for actual observations and limits.
+Current source uses Next.js/OpenNext, PartyServer/SQLite Durable Objects, Better Auth/D1 and Polar sandbox billing. Replicache and Yjs remain the collaboration systems. Calls are disabled, hosted generation is removed, and MCP is deferred to milestone 2 with no supported clients in this revision. The planned TanStack migration must refresh affected documentation when complete.
+
+Start with [setup and recovery](development/setup.md), [current architecture](architecture/overview.md), [the showcase walkthrough](development/showcase-walkthrough.md) and [revision-specific verification/publication status](development/documentation-verification.md).
 
 ## Features
 

@@ -58,7 +58,7 @@ RPC. Better Auth's own client remains the authentication client.
 
 Store the keys listed in `.dev.vars.example` in the application's Bitwarden
 Secrets Manager project and run `pnpm secrets setup` once per machine (`pnpm secrets refresh` after changes); see
-[local secrets](../../README.md#local-secrets). Set the public web environment from
+[local secrets](../../docs/development/setup.md#local-secrets). Set the public web environment from
 the root `.env.example`. Start backend with
 `pnpm secrets run -- pnpm --filter backend dev` and web with `pnpm --filter web dev`. Next forwards `/api/*` to the local Worker.
 
@@ -146,8 +146,10 @@ secrets listed in `.dev.vars.example`.
 The deployment workflow is manually triggered while namespace cutover remains
 unverified. It uses Cloudflare credentials, a `BACKEND_SECRETS` JSON secret and
 `APP_DOMAIN`, `BACKEND_DOMAIN`, `AVATARS_URL` repository variables. The initial Worker
-must exist before bulk secret configuration. It does not apply remote migrations
-or create the web-origin route automatically.
+must exist before bulk secret configuration. The workflow applies remote D1 migrations
+and deploys the backend routes declared in `wrangler.jsonc`, then deploys the OpenNext
+frontend Worker. DNS, OAuth registrations, initial resource provisioning and Cloudflare
+Git-build controls remain operator setup; see the [production runbook](../../docs/operations/runbooks/production-deployment.md).
 
 The structural/type review handoff is in
 [backend-review-handoff.md](../../docs/development/backend-review-handoff.md).

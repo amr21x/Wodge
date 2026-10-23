@@ -2,12 +2,12 @@
 
 [Docs home](../README.md)
 
-Explore the target architecture, data boundaries, security requirements, and the compatibility evidence behind the stack.
+Explore the current architecture, data boundaries, security requirements, and the compatibility evidence behind the stack.
 
 | Read                                                                | What you will find                                                          |
 | ------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| [Architecture](overview.md)                                         | The target architecture, collaboration systems, and capstone evidence.      |
-| [Tech Stack](tech-stack.md)                                         | Approved technology targets and their relationship to the existing stack.   |
+| [Architecture](overview.md)                                         | Current runtime topology, collaboration systems and evidence boundaries.    |
+| [Tech Stack](tech-stack.md)                                         | Verified source dependencies and deferred migrations.                       |
 | [Domain model, invariants and lifecycles](domain-model.md)          | Domain concepts, invariants, ownership, and entity lifecycles.              |
 | [Persistence and data ownership](data-model.md)                     | Persistence boundaries, synchronization, and data ownership.                |
 | [Security](security.md)                                             | Authorization, privacy, secrets, revocation, and integration boundaries.    |

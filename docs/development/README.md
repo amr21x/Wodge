@@ -2,7 +2,7 @@
 
 [Docs home](../README.md)
 
-Begin with local setup and the recorded baseline. Use the engineering references to understand the system before changing it; use Linear for executable work and delivery state.
+Begin with local setup and the current source verification record. Use the engineering references to understand the system before changing it; use Linear for executable work and delivery state.
 
 | Read                                                | What you will find                                                |
 | --------------------------------------------------- | ----------------------------------------------------------------- |
@@ -22,6 +22,9 @@ Begin with local setup and the recorded baseline. Use the engineering references
 - [Decisions](../decisions/README.md) — reasoning and significant engineering choices.
 - [Baseline and known failures](baseline.md), [failure inventory](failure-inventory.md), and [smoke-test matrix](smoke-test-matrix.md) — recorded evidence and checks.
 - [Operate Wodge](../operations/README.md) — deployment and operational guidance.
+
+- [Showcase walkthrough](showcase-walkthrough.md) — manual journeys and expected recovery behavior.
+- [Current source verification](documentation-verification.md) — checked revision, actual results and publication limits.
 
 ## Evidence and history
 

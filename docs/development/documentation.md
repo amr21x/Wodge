@@ -2,45 +2,24 @@
 
 [Docs home](../README.md) · [Develop Wodge](README.md)
 
-The only active Linear scope for this repository is **AMR21 / Wodge Revival &
-Enhancements**. [Open the verified project](https://linear.app/amr21/project/wodge-revival-and-enhancements-ee86a6345a5d). Connection display names
-are not workspace verification; returned project, team, and workspace URLs must
-match this scope before a record is used.
+The active delivery scope is **AMR21 / Wodge Revival & Enhancements**. [Open the project](https://linear.app/amr21/project/wodge-revival-and-enhancements-ee86a6345a5d). Repository source and revision-specific verification establish implementation; feature designs describe intended behavior and do not prove acceptance.
 
-## Current portfolio milestone
+## Current milestone
 
-Restore a reliable portfolio showcase with bounded operating cost. Retain the
-existing product and frontend UI, Replicache/Yjs, and working Polar sandbox billing.
-Migrate backend realtime services to PartyServer with SQLite Durable Objects and
-authentication to Better Auth/D1. Provide minimal member-controlled MCP discovery,
-page reading, and task creation/update. Temporarily disable calls in both UI
-and backend. Hosted generation is fully removed at the owner’s instruction.
+The showcase retains the existing product/UI, Replicache and Yjs. PartyServer/SQLite Durable Objects, Better Auth/D1 and Polar sandbox billing are implemented in the reviewed source. Calls are disabled; hosted generation is removed. MCP is deferred to milestone 2 unless a specific capability has executable implementation evidence. This revision has no supported MCP clients or executable MCP tools.
 
-Necessary retained Next.js/React and maintained Cloudflare adapter compatibility
-work is approved while preserving Tailwind, Radix, and the current UI. Broader
-framework/tooling changes, custom roles, resource/invitation redesigns, expanded
-MCP, and call restoration are deferred. Exact future versions and provider choices
-are not approved execution requirements.
+The planned TanStack frontend migration is the final milestone increment and owns updating affected documentation when complete. Current source still uses Next.js/OpenNext. The full editorial rewrite does not delay the earliest deployment; essential setup, limitations and recovery guidance accompany deployment preparation. Publish a demo link only after verification.
 
-## Evidence and approval
+## Source and evidence
 
-Current authority consists of the verified project and its own foundation and
-retained-web work descriptions, direct owner instructions in this conversation,
-the owner-confirmed starting revision, and actual local command output. Remote
-publication of prepared source revisions remains unverified. No project-associated
-Linear documents were returned by the scoped document query.
+The canonical source reviewed for this rewrite is `e8feb97cce617a26c55c5cc627c868341f3a2df3`, the current checkout supplied for the task. The owner requested completion and a push without CI/CD on 2026-10-23. That authorizes this documentation delivery, not blanket application acceptance or production deployment.
 
-Imported document timestamps, author names, approval labels, and records from
-another workspace or project are not evidence of current-project approval. Those
-source/approval blocks and outside-project delivery links have been removed.
+Earlier preparation records referenced baseline `63f7352ccb132cdd9be8901310ce691bed00e984`, local revisions `portfolio-milestones-draft-1`, `portfolio-quality-draft-2`, `portfolio-compatibility-draft-3` and handoff `portfolio-delivery-4`. Remote publication of those amendments remains unverified; they are provenance rather than an assertion that the current build was approved for release.
 
-The [backend foundation record](backend-foundation.md), [application baseline](baseline.md),
-and [security record](security-evidence.md) describe local observations and their
-limits. A fixture pass does not establish full application or milestone acceptance.
-Do not put issue identifiers in documentation or evidence.
+[Documentation verification](documentation-verification.md) records actual checks and Pass/Fail/Unverified boundaries. Historical [foundation](backend-foundation.md), [baseline](baseline.md), [persistence](relational-object-persistence.md) and [frontend](frontend-integration-evidence.md) records retain their original revisions and environments. Their passing fixtures or browser sessions must not be promoted to acceptance of a newer build.
 
-## Remote actions
+## Publication and remote actions
 
-The current project scope does not authorize a push, deployment, production
-resource change, or named release. Local implementation and verification remain
-separate from those actions.
+At documentation review time, publication is pending the task's final commit/push; the delivered commit and push result are identified by the delivery report and Git history. Live showcase publication and acceptance at this reviewed revision remain Unverified. The configured hostname and deployment instructions are not evidence of a verified demo.
+
+A production deployment, remote migration, provider/resource change or named release requires separate explicit authorization for the concrete revision/action. A push authorization does not grant those actions. GitHub Actions and Cloudflare Git builds have independent triggers; see [deployment boundaries](setup.md#deployment-boundary). Do not put issue identifiers in authored documentation or evidence.

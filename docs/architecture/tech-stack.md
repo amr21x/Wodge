@@ -1,43 +1,27 @@
-# Technology scope
+# Verified source technology
 
 [Docs home](../README.md) · [Architecture](README.md)
 
-The [verified current project](../development/documentation.md) governs scope.
-Versions below distinguish retained implementation, foundation candidates, and
-work still awaiting application acceptance.
+The manifests and runtime configuration at the [reviewed revision](../development/documentation-verification.md) establish this inventory. Versions are manifest declarations, not a fresh-install or production-build result.
 
-## Retained application
+| Area                    | Current source                                                            |
+| ----------------------- | ------------------------------------------------------------------------- |
+| Web                     | Next.js 15.5.28, React 18, TypeScript, Tailwind CSS 3, Radix              |
+| Worker adapter          | OpenNext Cloudflare 1.20.13; frontend and backend Wrangler 4.152.0        |
+| Structured browser data | Replicache ^15.3.0; no license-key configuration                          |
+| Collaborative editing   | Public Tiptap 2.27.3 packages, Yjs, y-partyserver 2.2.0                   |
+| Backend                 | Hono 4.13.13, PartyServer 0.5.10, SQLite Durable Objects                  |
+| Identity                | Better Auth in `@wodge/auth`, Google/GitHub OAuth, D1                     |
+| Persistence             | Drizzle, D1 and private SQLite per object                                 |
+| Billing                 | Polar SDK and Better Auth Polar plugin, sandbox only                      |
+| Optional files          | S3-compatible object storage adapter; uploads/avatars disabled by default |
+| Dependency injection    | TSyringe 4.10.0, explicit tokens, reflect-metadata                        |
+| UI state                | TanStack Query/Table, Zustand, Jotai, Immer                               |
+| Tooling                 | pnpm 12.15.0, Turborepo, Vitest, Oxlint 1.89.0, Oxfmt 0.74.0              |
+| Node                    | >=22.19.0; `.node-version` selects 24.19.0                                |
 
-The checkout retains Next.js 14 and React 18, Tailwind CSS 3, Radix components,
-Tiptap 2 with its original premium packages, and Replicache/Yjs. Existing source
-still contains PartyKit and Supabase paths. Hosted generation has been removed from the application, including provider
-endpoints, editor controls, SDK dependencies and API key configuration. Calls
-remain in the capstone source and must be disabled for the current milestone;
-that separate disablement is not established by the generation removal.
+The frontend is not yet TanStack Start. Calls retain LiveKit packages but cannot issue call tokens. Auth/MCP dependencies do not establish executable MCP support. No MCP clients are supported in this revision; implementation is deferred to milestone 2.
 
-## Current migration scope
+Supabase, hosted generation providers, premium Tiptap registry setup, Replicache license keys and Stripe are retired from active application configuration. Historical migration/evidence files may retain their names. Polar is the current mandatory test-billing provider. Read [setup](../development/setup.md) rather than replaying capstone service instructions.
 
-- PartyServer 0.5.10 and y-partyserver 2.2.0, targeting SQLite Durable Objects.
-- Better Auth and official MCP/Drizzle adapter family 1.7.8 over D1.
-- Drizzle ORM 0.45.2 with Kit 0.31.4.
-- Zod 4 at isolated protocol adapters; retained domain schemas stay on Zod 3.
-- Node >=22.19.0 and deliberately pinned compatible Workers tooling.
-- A separately scoped Next.js/React/maintained Cloudflare adapter update while
-  retaining Tailwind, Radix, existing routes, and UI behavior.
-
-The [foundation evidence](../development/backend-foundation.md) records exact
-installed versions, import/build/runtime checks, and unresolved installation gates.
-It does not establish production auth, MCP, Yjs, or full application acceptance.
-
-## Deferred work
-
-Broader frontend/framework/tooling modernization, custom roles, resource/invitation
-redesigns, expanded MCP, and call-provider restoration belong to a later milestone.
-Specific replacement frameworks, visual libraries, compilers, linters, formatters,
-and call providers are not selected by this page.
-
-## Configuration
-
-D1/Drizzle remain the database direction. Cloudflare holds deployed Worker secrets;
-local configuration uses ignored environment files and explicit bindings. No remote
-secret or infrastructure migration was performed by the local foundation work.
+Cloudflare production secrets and local OS-credential-store secrets are separate. Web configuration is public and browser safe. Remote provisioning and deployment require explicit authorization; [operations](../operations/runbooks/production-deployment.md) describes the configured topology without establishing live verification.
