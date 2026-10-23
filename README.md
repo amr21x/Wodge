@@ -11,7 +11,7 @@ Read the [repository documentation and feature index](docs/README.md) for the re
 [![Better Auth](https://img.shields.io/badge/Better_Auth-auth-black)](https://better-auth.com/)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
 
-[![Watch the Wodge walkthrough](https://img.youtube.com/vi/IBZvqOu6Xro/maxresdefault.jpg)](https://youtu.be/IBZvqOu6Xro)
+[![Watch the Wodge walkthrough](https://img.youtube.com/vi/IBZvqOu6Xro/maxresdefault.jpg)]([https://youtu.be/IBZvqOu6Xro](https://youtu.be/vNmMOMotGfY))
 
 > Watch the [project walkthrough](https://youtu.be/IBZvqOu6Xro) for a complete product tour.
 
