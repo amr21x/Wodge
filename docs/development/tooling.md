@@ -77,12 +77,13 @@ custom build scripts run. The frontend's server-side backend calls use the
 compatibility fixture, import-boundary checks and local Worker/D1 checks. These do not deploy or validate all product journeys.
 The evidence records explicit backend, protocol, and shared-data type commands.
 
-The backend owns its Wrangler 4.148.0 dependency, so its scripts run `wrangler`
-directly. Backend/shared code uses Workers v4 types because `y-partyserver` and
-`hono-party` require them. Wrangler's optional v5 types peer only feeds
-`wrangler types`, which the backend does not use, so the root `package.json`
-allows v4 for that single peer in `pnpm-workspace.yaml`. Remove the rule when
-the PartyServer libraries accept v5. The frontend Worker uses Wrangler 4.152.0 and the OpenNext adapter.
+Both applications pin Wrangler 4.152.0 directly, so their scripts run `wrangler`
+without a separate CLI package. Backend/shared code uses Workers v4 types because
+`y-partyserver` and `hono-party` require them. Wrangler's optional v5 types peer only feeds
+`wrangler types`, which the backend does not use, so `pnpm-workspace.yaml`
+allows v4 for that single peer. Remove the rule when
+`hono-party` and `y-partyserver` accept v5; `partyserver` itself already does. The
+frontend Worker uses the OpenNext adapter.
 
 ## Configuration and secrets
 
