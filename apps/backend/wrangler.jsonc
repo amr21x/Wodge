@@ -22,7 +22,7 @@
     {
       "binding": "DB",
       "database_name": "wodge",
-      "database_id": "f17da2ae-c255-422f-99ad-b8b93733b758",
+      "database_id": "640d47d7-e804-4224-a71c-250c5b5dd1fe",
       "migrations_dir": "../../packages/domain/migrations",
     },
   ],
