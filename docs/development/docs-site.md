@@ -4,9 +4,12 @@
 
 The `apps/docs` workspace renders this repository's `docs/` Markdown with
 VitePress. The independent Cloudflare Worker `wodge-docs` serves
-`https://wodge.amr21.dev/docs/`. Its exact `/docs` and `/docs/*` routes take
-precedence over the frontend Worker's custom domain; they do not match
-`/docsmith`, application pages, APIs or realtime endpoints.
+`https://wodge.amr21.dev/docs/`. Its `/docs*` route takes precedence over the frontend Worker's custom domain.
+Cloudflare includes query strings in route matching, so this covers both `/docs`
+and `/docs?ref=share`. Matching docs assets are served directly. The small fallback
+Worker sends missing docs paths to the asset binding for a proper 404 and forwards
+other prefix matches (such as `/docsmith`) to `wodge-web` through the `WEB` service
+binding. Application pages, APIs and realtime endpoints retain their existing behavior.
 
 ## Content and navigation
 
@@ -31,6 +34,7 @@ pnpm --filter docs dev
 Open `http://localhost:5173/docs/`. For deployment-like asset routing:
 
 ```sh
+pnpm --filter docs test
 pnpm --filter docs typecheck
 pnpm --filter docs build
 pnpm --filter docs exec wrangler dev --port 8790
@@ -48,7 +52,8 @@ The root Turborepo build includes this workspace and caches its `dist/` output.
 ## Deploy this Worker independently
 
 Deployment requires Cloudflare access to the account/zone hosting `amr21.dev`.
-The existing web/backend Workers do not need rebuilding or redeployment.
+The existing web/backend Workers do not need rebuilding or redeployment. The
+frontend Worker must already exist for the fallback service binding.
 
 From the repository root, after reviewing the candidate:
 
@@ -56,8 +61,8 @@ From the repository root, after reviewing the candidate:
 pnpm --filter docs deploy
 ```
 
-This builds the docs and deploys `apps/docs/wrangler.jsonc`. It publishes assets
-and the two docs routes only. It does not run application migrations, change
+This builds the docs and deploys `apps/docs/wrangler.jsonc`. It publishes assets, the fallback adapter, its frontend service binding and the
+docs route. It does not run application migrations, change
 application secrets or dispatch GitHub Actions. `workers_dev` is disabled; the
 custom hostname must already resolve through Cloudflare for the app.
 
@@ -76,7 +81,7 @@ CI/CD. Subsequent source pushes that must skip automation use the supported
 ## Recovery and cost
 
 Deploy the previous reviewed docs revision to roll back content; this static
-Worker has no application database or migration state. Removing its two routes
+Worker has no application database or migration state. Removing its route
 returns `/docs` traffic to the frontend Worker and makes documentation unavailable;
 it does not remove backend API routes. A docs deployment must not replace the
 frontend Worker's custom domain.

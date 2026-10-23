@@ -8,5 +8,5 @@
     "skipLibCheck": true,
     "types": ["node"]
   },
-  "include": [".vitepress/**/*.mts"]
+  "include": [".vitepress/**/*.mts", "src/**/*.ts"]
 }
