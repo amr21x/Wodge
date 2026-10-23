@@ -15,9 +15,9 @@ For the deployed environment, use `--remote` through the normal authorized deplo
 Inspect and edit individual values directly:
 
 ```sh
-pnpm --filter @wodge/worker-tools exec wrangler d1 execute wodge --config ../../apps/backend/wrangler.jsonc --local --command "SELECT key, enabled FROM feature_flags ORDER BY key"
-pnpm --filter @wodge/worker-tools exec wrangler d1 execute wodge --config ../../apps/backend/wrangler.jsonc --local --command "UPDATE feature_flags SET enabled = 0 WHERE key = 'polls'"
-pnpm --filter @wodge/worker-tools exec wrangler d1 execute wodge --config ../../apps/backend/wrangler.jsonc --local --command "UPDATE feature_flags SET enabled = 1 WHERE key = 'polls'"
+pnpm --filter backend exec wrangler d1 execute wodge --local --command "SELECT key, enabled FROM feature_flags ORDER BY key"
+pnpm --filter backend exec wrangler d1 execute wodge --local --command "UPDATE feature_flags SET enabled = 0 WHERE key = 'polls'"
+pnpm --filter backend exec wrangler d1 execute wodge --local --command "UPDATE feature_flags SET enabled = 1 WHERE key = 'polls'"
 ```
 
 Substitute `--remote` only when deliberately operating the deployed environment. Confirm the affected row with SELECT. UPDATE of a misspelled name changes no rows. Unknown database keys are ignored. Delete of a known row restores its explicit registry default on the next successful read; use UPDATE to disable it.
@@ -25,7 +25,7 @@ Substitute `--remote` only when deliberately operating the deployed environment.
 To add missing definitions safely after introducing registry entries, rerun:
 
 ```sh
-pnpm --filter @wodge/worker-tools exec wrangler d1 execute wodge --config ../../apps/backend/wrangler.jsonc --local --file ../../packages/domain/seed-feature-flags.sql
+pnpm --filter backend exec wrangler d1 execute wodge --local --file ../../packages/domain/seed-feature-flags.sql
 ```
 
 The seed and migration use `ON CONFLICT(key) DO NOTHING`; reruns preserve all operator values, including disabled values. Tests verify parity between the registry, migration, and seed. Rollback normally means restoring individual previous values, not dropping the table. A missing table causes fail-closed behavior.

@@ -61,15 +61,10 @@ import {
   pageFeatures,
 } from "@wodge/core/features/policy";
 
-const require = createRequire(import.meta.url);
-let DatabaseSync: any;
-try {
-  DatabaseSync = require("node:sqlite").DatabaseSync;
-} catch {
-  DatabaseSync = createRequire(
-    new URL("../../apps/web/package.json", import.meta.url),
-  )("better-sqlite3");
-}
+// Loaded through require because Vitest 1.x does not resolve the newer node:sqlite builtin.
+const { DatabaseSync } = createRequire(import.meta.url)(
+  "node:sqlite",
+) as typeof import("node:sqlite");
 const migration = readFileSync(
   "packages/domain/migrations/0003_feature_flags.sql",
   "utf8",

@@ -116,7 +116,7 @@ Wodge separates synchronized state by domain rather than treating the whole prod
 ### Prerequisites
 
 - Node.js 22.19 or newer (`.node-version` selects 24.19.0)
-- pnpm 9
+- pnpm 12 (`packageManager` pins 12.15.0)
 - A Linux-based development environment is recommended
 - LiveKit Server for local audio/video development
 - Accounts or local substitutes for the external services configured in `.env.example`

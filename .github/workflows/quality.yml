@@ -6,8 +6,11 @@ on:
       - main
       - dev
   pull_request:
+  # The production deploy workflow runs the same gates before deploying.
+  workflow_call:
 
 jobs:
+  # Source checks also cover documentation formatting, so they run for every change.
   quality:
     runs-on: ubuntu-latest
     steps:
@@ -15,9 +18,84 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
+      # Uses the version pinned by packageManager in package.json.
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9.4.0
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: pnpm lint
       - run: pnpm format:check
+
+  # Documentation-only changes skip the application gates. A path filter cannot be
+  # used because GitHub leaves skipped required workflows pending.
+  scope:
+    runs-on: ubuntu-latest
+    outputs:
+      application: ${{ steps.scope.outputs.application }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: scope
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          # New branches have no previous commit to compare; run everything.
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
+            echo "application=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Without rename detection a move lists both paths, so moves in or out of docs/ count.
+          changed=$(git diff --no-renames --name-only "$BASE...$HEAD")
+          if [ -n "$changed" ] && ! printf '%s\n' "$changed" | grep -qv '^docs/'; then
+            echo "Documentation-only change; skipping application gates."
+            echo "application=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "application=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  application:
+    needs: scope
+    if: needs.scope.outputs.application == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+      # Uses the version pinned by packageManager in package.json.
+      - uses: pnpm/action-setup@v4
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check:boundaries
+      - name: Type check
+        run: |
+          pnpm -r --if-present typecheck
+          pnpm exec tsc -p apps/backend/tsconfig.json --noEmit --incremental false --pretty false
+          pnpm --filter backend test:api
+      - name: Tests
+        run: pnpm exec vitest run --maxWorkers=2 --minWorkers=1
+      - name: Worker runtime checks
+        run: |
+          pnpm --filter backend test:foundation
+          pnpm --filter backend test:runtime
+      - name: Build backend Worker
+        run: pnpm --filter backend build
+      - name: Build web for Cloudflare Pages
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+          NEXT_PUBLIC_APP_DOMAIN: ${{ vars.APP_DOMAIN || 'https://wodge.amr21.dev' }}
+          NEXT_PUBLIC_BACKEND_DOMAIN: ${{ vars.BACKEND_DOMAIN || 'https://wodge.amr21.dev' }}
+          NEXT_PUBLIC_AVATARS_URL: ${{ vars.AVATARS_URL || 'https://wodge-avatars.amr21.dev' }}
+        run: pnpm --filter web pages:build
+
+  # Stable required check: passes when the application gates pass or are skipped as docs-only.
+  result:
+    needs: [quality, scope, application]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          for result in $RESULTS; do
+            case $result in success | skipped) ;; *) exit 1 ;; esac
+          done

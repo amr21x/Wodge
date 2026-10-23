@@ -1,51 +1,83 @@
-name: Backend Worker Deploy
+name: Production Deploy
 
-# Production Durable Object namespace mapping must be verified before cutover.
+# Manually dispatched for a reviewed ref. The `production` GitHub environment holds the
+# Cloudflare credentials, backend secrets and public origins; add required reviewers to
+# it so every run waits for owner approval. See docs/operations/runbooks/production-deployment.md.
 on:
   workflow_dispatch:
     inputs:
       integration_mode:
-        description: Integration configuration (partial for temporary minimal deployment)
+        description: Integration configuration (ready requires storage and Polar settings)
         type: choice
         required: true
-        default: partial
+        default: ready
         options:
           - partial
           - ready
 
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
 jobs:
+  checks:
+    uses: ./.github/workflows/quality.yml
+
   deploy:
+    needs: checks
     runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ vars.APP_DOMAIN }}
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .node-version
+      # Uses the version pinned by packageManager in package.json.
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9.4.0
       - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-      - run: pnpm format:check
+      # Migrations are forward-only and run before the Worker that depends on them.
+      - name: Apply D1 migrations
+        run: pnpm --filter backend db:migration:cloud
       - name: Configure Worker secrets
-        working-directory: config/workers
+        working-directory: apps/backend
         env:
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           BACKEND_SECRETS: ${{ secrets.BACKEND_SECRETS }}
-        run: printf '%s' "$BACKEND_SECRETS" | pnpm exec wrangler secret bulk --config ../../apps/backend/wrangler.jsonc
-      - name: Deploy Worker
-        working-directory: config/workers
+        run: printf '%s' "$BACKEND_SECRETS" | pnpm exec wrangler secret bulk
+      - name: Deploy backend Worker
+        working-directory: apps/backend
         env:
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           APP_DOMAIN: ${{ vars.APP_DOMAIN }}
           BACKEND_DOMAIN: ${{ vars.BACKEND_DOMAIN }}
           AVATARS_URL: ${{ vars.AVATARS_URL }}
           INTEGRATION_MODE: ${{ inputs.integration_mode }}
         run: >-
-          pnpm exec wrangler deploy --config ../../apps/backend/wrangler.jsonc
+          pnpm exec wrangler deploy
           --var "APP_DOMAIN:$APP_DOMAIN"
           --var "BACKEND_DOMAIN:$BACKEND_DOMAIN"
           --var "AVATARS_URL:$AVATARS_URL"
           --var "INTEGRATION_MODE:$INTEGRATION_MODE"
+          --message "$GITHUB_SHA"
+      - name: Build web
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+          NEXT_PUBLIC_APP_DOMAIN: ${{ vars.APP_DOMAIN }}
+          NEXT_PUBLIC_BACKEND_DOMAIN: ${{ vars.BACKEND_DOMAIN }}
+          NEXT_PUBLIC_AVATARS_URL: ${{ vars.AVATARS_URL }}
+        run: pnpm --filter web pages:build
+      - name: Deploy web to Cloudflare Pages
+        working-directory: apps/web
+        run: >-
+          pnpm exec wrangler pages deploy .vercel/output/static
+          --project-name wodge --branch main
+          --commit-hash "$GITHUB_SHA" --commit-dirty=false
+      - name: Smoke check
+        env:
+          APP_DOMAIN: ${{ vars.APP_DOMAIN }}
+        run: |
+          curl -fsS --retry 5 --retry-delay 5 "$APP_DOMAIN/health"
+          curl -fsS --retry 5 --retry-delay 5 -o /dev/null "$APP_DOMAIN/login"
