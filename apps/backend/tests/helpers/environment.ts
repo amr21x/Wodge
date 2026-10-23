@@ -23,9 +23,9 @@ export function createTestEnvironment(
     R2_ENDPOINT: "https://objects.example.test",
     R2_ACCESS_KEY: "local-key",
     R2_SECRET_KEY: "local-secret",
-    STRIPE_SECRET_KEY: "sk_test_local_only",
-    STRIPE_WH_SECRET: "whsec_local_only",
-    STRIPE_LOOKUP_KEY: "test-price",
+    POLAR_ACCESS_TOKEN: "polar_oat_local_only",
+    POLAR_WEBHOOK_SECRET: "polar_whs_local_only",
+    POLAR_PRODUCT_ID: "product_local",
     ...overrides,
   };
 }

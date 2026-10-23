@@ -2,7 +2,7 @@ import { HttpClient } from "@wodge/infra/http/client";
 import { IntegrationUnavailableError } from "@wodge/infra/integration-unavailable";
 import { ResendEmail } from "@wodge/infra/email/resend";
 import { LiveKitCallTokens } from "@wodge/infra/calls/livekit";
-import { StripePayments } from "@wodge/infra/payments/payments";
+import { PolarPayments } from "@wodge/infra/payments/polar";
 import { S3ObjectStorage } from "@wodge/infra/storage/object-storage";
 import { expect, test, vi } from "vitest";
 import { BackendApplication } from "../../src/application";
@@ -19,9 +19,9 @@ const environment = () =>
     R2_ENDPOINT: undefined,
     R2_ACCESS_KEY: undefined,
     R2_SECRET_KEY: undefined,
-    STRIPE_SECRET_KEY: undefined,
-    STRIPE_WH_SECRET: undefined,
-    STRIPE_LOOKUP_KEY: undefined,
+    POLAR_ACCESS_TOKEN: undefined,
+    POLAR_WEBHOOK_SECRET: undefined,
+    POLAR_PRODUCT_ID: undefined,
     LIVEKIT_API_KEY: undefined,
     LIVEKIT_API_SECRET: undefined,
   });
@@ -63,14 +63,11 @@ test("unconfigured providers reject before any outbound request", async () => {
     IntegrationUnavailableError,
   );
   storage.dispose();
-  const payments = new StripePayments(env);
-  expect(() => payments.createPortal({ customer: "customer" })).toThrow(
-    IntegrationUnavailableError,
-  );
-  expect(() => payments.listPrices(undefined)).toThrow(
-    IntegrationUnavailableError,
-  );
-  expect(() => payments.verifyEvent("{}", "signature", undefined)).toThrow(
+  const payments = new PolarPayments(env);
+  expect(payments.configured).toBe(false);
+  expect(() => payments.client).toThrow(IntegrationUnavailableError);
+  expect(() => payments.productId).toThrow(IntegrationUnavailableError);
+  await expect(payments.subscription("subscription")).rejects.toBeInstanceOf(
     IntegrationUnavailableError,
   );
   await expect(

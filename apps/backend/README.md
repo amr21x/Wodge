@@ -86,34 +86,47 @@ no Supabase accounts, passwords or sessions are imported. Existing application d
 is not deleted or linked to newly authenticated accounts automatically.
 
 - `pnpm --filter backend test`: domain/application/transport regression tests.
-- `pnpm --filter backend test:runtime`: production Worker, real D1/DOs and Better Auth checks in Miniflare. OAuth providers and object storage are mocked at the network boundary.
+- `pnpm --filter backend test:runtime`: production Worker, real D1/DOs and Better Auth checks in Miniflare. OAuth providers, the Polar sandbox API and object storage are mocked at the network boundary.
 - `pnpm --filter backend test:foundation`: retained package and database compatibility checks.
 - `pnpm --filter backend build`: Wrangler dry-run bundle.
 
 ## Billing event processing
 
-The signed webhook accepts subscription created/updated/deleted events and validates their
-identity, timestamps and workspace metadata. It reads the current Stripe subscription rather
-than treating delivery order or event timestamps as authoritative. Core services decide
-entitlement transitions; a repository conditionally writes the subscription cursor and
-organization plan in one D1 batch. The database change token is captured before the provider
-read, so concurrent updates require a complete retry with a fresh Stripe snapshot. Duplicate
-deliveries preserve entitlement and retry the idempotent object notification. An old subscription
-cannot downgrade its replacement. Different replacement subscriptions created in the same
-second return 503 for explicit reconciliation rather than guessing their order; no automated
-reconciliation queue exists yet. Live Checkout/portal behavior and full storage quotas remain
-unverified/incomplete.
+Billing uses Polar through Better Auth's Polar plugin (`@polar-sh/better-auth`), always against
+the Polar sandbox. A workspace subscription belongs to the purchasing administrator's personal
+Polar customer and carries the workspace ID as `metadata.referenceId`; Polar organization
+synchronization is not enabled. The workspace billing API authorizes administrators and calls the
+plugin's checkout and portal server API. Browser calls to the plugin's `/api/auth/checkout`,
+`/api/auth/customer/*` and `/api/auth/usage/*` endpoints are rejected. Only the purchasing
+administrator can open the customer portal; other administrators receive
+`BILLING_PORTAL_PURCHASER_ONLY`. Checkout redirects are not payment evidence.
+
+The plugin verifies webhook signatures at `/api/auth/polar/webhooks`. Every `subscription.*`
+event only identifies the subscription: the backend re-reads it from Polar and ignores other
+products and mismatched workspace references. Core services decide entitlement transitions; a
+repository conditionally writes the subscription cursor and organization plan in one D1 batch.
+The database change token is captured before the provider read, so concurrent updates require a
+complete retry with a fresh Polar snapshot. Duplicate deliveries preserve entitlement and retry
+the idempotent object notification. Scheduled cancellations keep access until Polar reports the
+subscription as canceled. An old subscription cannot downgrade its replacement, and a canceled
+subscription is never restored. Conflicts return 500 so Polar retries the delivery. Different
+replacement subscriptions created in the same millisecond need explicit reconciliation; no
+automated reconciliation queue exists yet. Full storage quotas remain incomplete.
+
+Configure the sandbox webhook endpoint with the Raw format and all `subscription.*` events. Local
+delivery needs a public tunnel to the backend, for example
+`cloudflared tunnel --url http://localhost:8787`.
 
 ## Deployment
 
 The deployment workflow offers `partial` (the temporary default) and `ready` integration modes.
 Both modes require the two signing secrets, Google and GitHub OAuth credentials,
 origins and D1/DO bindings. Ready mode additionally requires complete storage and
-Stripe test settings before serving requests. Email sign-in is disabled; Resend
+Polar sandbox settings before serving requests. Email sign-in is disabled; Resend
 and LiveKit are not prerequisites. Both modes validate signing secrets, HTTP
-origins and all four OAuth settings. Live Stripe
-keys are rejected because this is a test-billing showcase. Configuration errors list field
-names without printing values. The generated billing migration must be applied before webhook use.
+origins and all four OAuth settings. Billing always uses the Polar
+sandbox because this is a test-billing showcase; live payments need separate authorization. Configuration errors list field
+names without printing values. The billing migrations, including the Polar cutover reset, must be applied before webhook use.
 
 The checked-in Worker configuration bootstraps new SQLite-backed Durable Object
 classes. It does not transfer deployed PartyKit namespaces.

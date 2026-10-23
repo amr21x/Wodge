@@ -21,9 +21,9 @@ export interface ServerEnvironment {
   R2_ENDPOINT?: string;
   R2_ACCESS_KEY?: string;
   R2_SECRET_KEY?: string;
-  STRIPE_SECRET_KEY?: string;
-  STRIPE_WH_SECRET?: string;
-  STRIPE_LOOKUP_KEY?: string;
+  POLAR_ACCESS_TOKEN?: string;
+  POLAR_WEBHOOK_SECRET?: string;
+  POLAR_PRODUCT_ID?: string;
 }
 
 /** Validate once at the Worker boundary; never include configuration values in errors. */
@@ -52,9 +52,9 @@ const providerSettings = {
   R2_ENDPOINT: optionalSetting,
   R2_ACCESS_KEY: optionalSetting,
   R2_SECRET_KEY: optionalSetting,
-  STRIPE_SECRET_KEY: optionalSetting,
-  STRIPE_WH_SECRET: optionalSetting,
-  STRIPE_LOOKUP_KEY: optionalSetting,
+  POLAR_ACCESS_TOKEN: optionalSetting,
+  POLAR_WEBHOOK_SECRET: optionalSetting,
+  POLAR_PRODUCT_ID: optionalSetting,
 };
 const serverConfiguration = z
   .object({
@@ -107,10 +107,10 @@ const serverConfiguration = z
     )
       require("RESEND_EMAIL_FROM", "must be a sender email address");
     if (
-      configuration.STRIPE_SECRET_KEY &&
-      !configuration.STRIPE_SECRET_KEY.startsWith("sk_test_")
+      configuration.POLAR_ACCESS_TOKEN &&
+      !configuration.POLAR_ACCESS_TOKEN.startsWith("polar_oat_")
     )
-      require("STRIPE_SECRET_KEY", "showcase billing requires a Stripe test-mode key");
+      require("POLAR_ACCESS_TOKEN", "must be a Polar organization access token");
     if (configuration.INTEGRATION_MODE === "ready")
       for (const key of Object.keys(
         providerSettings,

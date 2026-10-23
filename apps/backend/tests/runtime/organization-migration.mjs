@@ -41,8 +41,26 @@ export async function seedOrganizationMigration(database, migrationSQL) {
     .run();
 }
 
+/** Seeds Stripe-era billing state and returns the organization's plan before the Polar reset. */
 /** @param {any} database */
-export async function verifyOrganizationMigration(database) {
+export async function seedBillingReset(database) {
+  await database
+    .prepare(
+      "INSERT INTO billing_subscriptions (workspace_id,change_id,event_id,event_created,subscription_id,subscription_created,customer_id,is_premium,ended) VALUES ('persisted-workspace','change','evt_stripe',1,'sub_stripe',1,'customer-preserved',1,0)",
+    )
+    .run();
+  return database
+    .prepare(
+      "SELECT is_premium, customer_id FROM auth_organizations WHERE id = 'persisted-workspace'",
+    )
+    .first();
+}
+
+/** @param {any} database @param {any} billingBeforeReset */
+export async function verifyOrganizationMigration(
+  database,
+  billingBeforeReset,
+) {
   const workspace = await database
     .prepare(
       "SELECT * FROM auth_organizations WHERE id = 'persisted-workspace'",
@@ -52,8 +70,21 @@ export async function verifyOrganizationMigration(database) {
   assert.equal(workspace.slug, "canonical-slug");
   assert.equal(workspace.logo, "canonical-logo");
   assert.equal(workspace.is_invite_link_enabled, 0);
-  assert.equal(workspace.is_premium, 1);
-  assert.equal(workspace.customer_id, "customer-preserved");
+  assert.deepEqual(billingBeforeReset, {
+    is_premium: 1,
+    customer_id: "customer-preserved",
+  });
+  // Stripe customers have no Polar counterpart, so the cutover returns workspaces to Basic.
+  assert.equal(workspace.is_premium, 0);
+  assert.equal(workspace.customer_id, null);
+  assert.equal(
+    await database
+      .prepare(
+        "SELECT workspace_id FROM billing_subscriptions WHERE workspace_id = 'persisted-workspace'",
+      )
+      .first(),
+    null,
+  );
   assert.equal(workspace.workspace_id, undefined);
   assert.equal(
     (

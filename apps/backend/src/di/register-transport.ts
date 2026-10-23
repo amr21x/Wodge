@@ -12,6 +12,7 @@ import { WorkspaceGateway } from "../gateways/workspace";
 import { AccountHandlers } from "../handlers/api/account";
 import { AvatarHandlers } from "../handlers/api/avatar";
 import { BillingHandlers } from "../handlers/api/billing";
+import { BillingWebhookHandlers } from "../handlers/billing-webhooks";
 import { ScopedHandlers } from "../handlers/api/scoped";
 import { WorkspaceHandlers } from "../handlers/api/workspace";
 import { AssignmentHandlers } from "../handlers/authorization/assignments";
@@ -112,6 +113,11 @@ export function registerTransport(container: DependencyContainer) {
   container.register(
     BillingHandlers,
     { useClass: BillingHandlers },
+    { lifecycle: Lifecycle.ContainerScoped },
+  );
+  container.register(
+    BillingWebhookHandlers,
+    { useClass: BillingWebhookHandlers },
     { lifecycle: Lifecycle.ContainerScoped },
   );
   container.register(

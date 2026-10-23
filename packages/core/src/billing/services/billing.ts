@@ -27,11 +27,17 @@ export class BillingService {
       throw billingError("BILLING_ALREADY_PREMIUM", "Already premium");
     return workspace;
   }
-  async portal(workspaceId: string) {
+  /** The subscription belongs to the purchasing administrator's personal customer. */
+  async portal(workspaceId: string, userId: string) {
     const workspace = await this.requireWorkspace(workspaceId);
     if (!workspace.isPremium || !workspace.customerId)
       throw billingError("BILLING_NOT_PREMIUM", "Not premium");
-    return { ...workspace, customerId: workspace.customerId };
+    if (workspace.customerId !== userId)
+      throw billingError(
+        "BILLING_PORTAL_PURCHASER_ONLY",
+        "Only the administrator who purchased the subscription can manage it",
+      );
+    return workspace;
   }
   async subscriptionState(workspaceId: string) {
     await this.requireWorkspace(workspaceId);

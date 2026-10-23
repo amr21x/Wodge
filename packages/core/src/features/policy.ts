@@ -8,7 +8,6 @@ export function httpFeatures(
   if (
     [
       "/api/feature-flags",
-      "/api/billing/webhook",
       "/api/users/token",
       "/api/users/me",
       "/api/users/workspaces",

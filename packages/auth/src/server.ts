@@ -1,4 +1,9 @@
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
+import { checkout, polar, portal, webhooks } from "@polar-sh/better-auth";
+import type {
+  PolarCore,
+  webhooks as polarWebhooks,
+} from "@polar-sh/sdk/2026-10";
 import { workspaceMemberLimit } from "@wodge/core/workspace/policy";
 import {
   authAccounts,
@@ -18,8 +23,22 @@ import { betterAuth } from "better-auth";
 import { APIError } from "better-auth/api";
 import { organization } from "better-auth/plugins";
 
+/** Polar billing dependencies; omitted when billing is not configured. */
+export interface AuthBilling {
+  client: PolarCore;
+  /** Receives verified, untrusted subscription payloads; the backend re-reads Polar. */
+  onSubscriptionChanged(subscription: {
+    id: string;
+    metadata: Record<string, unknown>;
+  }): Promise<void>;
+}
+
 /** Configure Better Auth here; the backend supplies environment and dependencies only. */
-export function createAuth(environment: ServerEnvironment, database: Database) {
+export function createAuth(
+  environment: ServerEnvironment,
+  database: Database,
+  billing?: AuthBilling,
+) {
   return betterAuth({
     appName: "Wodge",
     secret: environment.BETTER_AUTH_SECRET,
@@ -105,8 +124,42 @@ export function createAuth(environment: ServerEnvironment, database: Database) {
           },
         },
       }),
+      ...(billing ? [billingPlugin(environment, billing)] : []),
+    ],
+  });
+}
+
+/**
+ * Workspace billing uses metadata-based `reference_id` checkouts on the purchasing admin's
+ * personal Polar customer. Checkout and portal are only called server-side by the workspace
+ * billing API, which authorizes the workspace first; the backend blocks direct browser calls.
+ * Customers are created by checkout, so sign-up never depends on Polar.
+ */
+function billingPlugin(environment: ServerEnvironment, billing: AuthBilling) {
+  return polar({
+    client: billing.client,
+    createCustomerOnSignUp: false,
+    use: [
+      checkout({ authenticatedUsersOnly: true }),
+      portal(),
+      webhooks({
+        // A missing secret makes the plugin reject every delivery as unconfigured.
+        secret: environment.POLAR_WEBHOOK_SECRET ?? "",
+        // Every subscription event triggers the same authoritative re-read.
+        onPayload: async (payload) => {
+          if (isSubscriptionPayload(payload))
+            await billing.onSubscriptionChanged(payload.data);
+        },
+      }),
     ],
   });
 }
 
 export type AuthInstance = ReturnType<typeof createAuth>;
+
+type WebhookPayload = polarWebhooks.WebhookPayload;
+function isSubscriptionPayload(
+  payload: WebhookPayload,
+): payload is Extract<WebhookPayload, { type: `subscription.${string}` }> {
+  return payload.type.startsWith("subscription.");
+}

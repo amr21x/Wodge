@@ -7,7 +7,7 @@ It does not establish a numerical monthly budget, paid plan price, provider usag
 quota, or delivery schedule through this document.
 
 Calls and hosted generation are to be disabled for the portfolio milestone.
-Stripe remains in test mode. No production deployment or remote provisioning was
+Polar billing uses the sandbox only. No production deployment or remote provisioning was
 performed by the local foundation work.
 
 The [foundation evidence](../development/backend-foundation.md) records local

@@ -7,7 +7,7 @@ portfolio milestone:
 
 - Restore a reliable showcase using the existing product and frontend UI.
 - Keep operating cost bounded and distinguish measured usage from assumptions.
-- Retain Replicache/Yjs and working Stripe test billing.
+- Retain Replicache/Yjs and working test billing (Polar sandbox).
 - Make only the necessary backend/auth/runtime compatibility changes.
 - Limit initial MCP to permitted discovery, page reading, and task creation/update.
 - Temporarily disable calls and hosted generation at UI and backend.

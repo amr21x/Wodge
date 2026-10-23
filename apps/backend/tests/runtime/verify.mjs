@@ -19,7 +19,14 @@ const { Miniflare, convertV4MiniflareOptions } = require("miniflare");
 
 const output = await mkdtemp(path.join(tmpdir(), "wodge-runtime-"));
 
-const stripeSubscriptions = new Map();
+/** Mocked Polar sandbox API state and captured requests. */
+const polar = {
+  subscriptions: new Map(),
+  /** @type {any[]} */
+  checkouts: [],
+  /** @type {any[]} */
+  portals: [],
+};
 
 /** @type {string[]} */
 const failures = [];
@@ -167,8 +174,9 @@ try {
       R2_ENDPOINT: "https://objects.example.test",
       R2_ACCESS_KEY: "test",
       R2_SECRET_KEY: "test",
-      STRIPE_SECRET_KEY: "sk_test_runtime",
-      STRIPE_WH_SECRET: "whsec_runtime",
+      POLAR_ACCESS_TOKEN: "polar_oat_runtime",
+      POLAR_WEBHOOK_SECRET: "polar_whs_runtime",
+      POLAR_PRODUCT_ID: "product_runtime",
       LIVEKIT_API_KEY: "must-not-enable-calls",
       LIVEKIT_API_SECRET: "must-not-enable-calls-even-with-credentials",
       GOOGLE_CLIENT_ID: "test-google",
@@ -210,22 +218,34 @@ try {
         });
       }
 
-      if (new URL(req.url).hostname === "api.stripe.com") {
-        const id = new URL(req.url).pathname.split("/").pop();
-        const value = stripeSubscriptions.get(id);
+      if (url.hostname === "sandbox-api.polar.sh") {
+        assert.equal(
+          req.headers.get("authorization"),
+          "Bearer polar_oat_runtime",
+        );
+        if (req.method === "POST" && url.pathname === "/v1/checkouts/") {
+          polar.checkouts.push(await req.json());
+          return Response.json({
+            url: "https://sandbox.polar.sh/checkout",
+            client_secret: "checkout_secret",
+          });
+        }
+        if (
+          req.method === "POST" &&
+          url.pathname === "/v1/customer-sessions/"
+        ) {
+          polar.portals.push(await req.json());
+          return Response.json({
+            customer_portal_url: "https://sandbox.polar.sh/portal",
+          });
+        }
+        const id = url.pathname.match(/^\/v1\/subscriptions\/([^/]+)$/)?.[1];
+        const value = id && polar.subscriptions.get(id);
         const subscription =
           typeof value === "function" ? await value() : value;
         return subscription
           ? Response.json(subscription)
-          : Response.json(
-              {
-                error: {
-                  message: "Unknown subscription",
-                  type: "invalid_request_error",
-                },
-              },
-              { status: 404 },
-            );
+          : Response.json({ error: "ResourceNotFound" }, { status: 404 });
       }
       if (new URL(req.url).hostname.endsWith("objects.example.test")) {
         await req.arrayBuffer();
@@ -243,6 +263,8 @@ try {
   runtime = new Miniflare(convertV4MiniflareOptions(runtimeOptions));
 
   let database = await runtime.getD1Database("DB");
+  /** @type {any} */
+  let billingBeforeReset;
 
   for (const migration of (
     await readdir(path.join(root, "packages/domain/migrations"))
@@ -264,6 +286,11 @@ try {
       await seedUserMigration(database, sql);
     }
 
+    if (migration === "0009_polar_billing_reset.sql") {
+      const { seedBillingReset } = await import("./organization-migration.mjs");
+      billingBeforeReset = await seedBillingReset(database);
+    }
+
     for (const statement of sql
       .replaceAll("--> statement-breakpoint", "")
       .split(";")
@@ -282,11 +309,11 @@ try {
   );
 
   await check(
-    "canonical organization migration preserves workspace IDs, memberships, invitations and billing state",
+    "canonical organization migration preserves workspace IDs, memberships, invitations and billing state until the Polar reset",
     async () => {
       const { verifyOrganizationMigration } =
         await import("./organization-migration.mjs");
-      await verifyOrganizationMigration(database);
+      await verifyOrganizationMigration(database, billingBeforeReset);
     },
   );
 
@@ -648,8 +675,9 @@ try {
         database,
         workspace,
         structure,
+        ownerId: user.id,
         memberCookie: authorizationMemberCookie,
-        stripeSubscriptions,
+        polar,
       });
     },
   );
@@ -742,13 +770,17 @@ try {
           false,
         );
         assert.equal(otp.status, 404, await otp.clone().text());
-        const webhook = await request("/api/billing/webhook", {
-          ...json({}),
-          headers: {
-            "content-type": "application/json",
-            "stripe-signature": "unconfigured",
+        const webhook = await request(
+          "/api/auth/polar/webhooks",
+          {
+            ...json({}),
+            headers: {
+              "content-type": "application/json",
+              "webhook-signature": "unconfigured",
+            },
           },
-        });
+          false,
+        );
         assert.equal(webhook.status, 503, await webhook.clone().text());
       } finally {
         await runtime.setOptions(convertV4MiniflareOptions(runtimeOptions));

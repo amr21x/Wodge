@@ -37,11 +37,11 @@ export default function Component({
           <CircleCheckIcon className="h-10 w-10 text-green-500 dark:text-green-400" />
         </div>
         <h1 className="mt-6 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-          Payment Successful
+          Checkout Complete
         </h1>
         <p className="mt-4 text-muted-foreground">
-          Thank you for your payment. Your transaction was completed
-          successfully.
+          Thank you. Your upgrade is being confirmed and Pro features become
+          available as soon as the payment is verified.
         </p>
         <div className="mt-6">
           <Button

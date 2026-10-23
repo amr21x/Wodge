@@ -9,6 +9,8 @@ export type BillingResult =
 
 export type SubscriptionEvent = z.infer<typeof SubscriptionEventSchema>;
 
+export type SubscriptionStatus = SubscriptionEvent["status"];
+
 export type SubscriptionState = Omit<SubscriptionEvent, "status"> & {
   changeId: string;
   isPremium: boolean;
