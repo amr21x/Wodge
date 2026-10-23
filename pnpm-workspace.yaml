@@ -15,7 +15,7 @@ allowBuilds:
 # Optional peers whose features are unused; drop each rule once versions align.
 peerDependencyRules:
   allowedVersions:
-    # Only feeds `wrangler types`. The PartyServer libraries still require v4.
+    # Only feeds `wrangler types`. hono-party and y-partyserver still require v4.
     wrangler>@cloudflare/workers-types: "4"
     # Only Better Auth's test helpers use Vitest; the repo does not import them.
     better-auth>vitest: "1"
