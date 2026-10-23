@@ -1,6 +1,8 @@
 import { FeatureFlagHandlers } from "./handlers/feature-flags";
 import type { AuthInstance } from "@wodge/auth/server";
 import { SessionTickets } from "@wodge/auth/tickets";
+import { IntegrationUnavailableError } from "@wodge/infra/integration-unavailable";
+import { PolarPayments } from "@wodge/infra/payments/polar";
 import { AccountService } from "@wodge/core/user/services/account";
 import { Hono } from "hono";
 import { partyserverMiddleware } from "hono-party";
@@ -8,7 +10,6 @@ import { cors } from "hono/cors";
 import { inject, injectable } from "tsyringe";
 import { handleError } from "./errors/handler";
 import { WorkspaceGateway } from "./gateways/workspace";
-import { BillingHandlers } from "./handlers/api/billing";
 import { partyIngress } from "./middleware/ingress";
 import { ApiRoutes } from "./routes/api";
 import type { ApiContext } from "./types/hono-context";
@@ -19,30 +20,30 @@ export class BackendApplication {
   constructor(
     @inject(FeatureFlagHandlers) features: FeatureFlagHandlers,
     @inject("auth") auth: AuthInstance,
-    @inject(BillingHandlers) billing: BillingHandlers,
     @inject(ApiRoutes) api: ApiRoutes,
     @inject(SessionTickets) tickets: SessionTickets,
     @inject(WorkspaceGateway) workspaceGateway: WorkspaceGateway,
     @inject(AccountService) accounts: AccountService,
+    @inject(PolarPayments) payments: PolarPayments,
   ) {
     this.router = BackendApplication.define(
       features,
       auth,
-      billing,
       api,
       tickets,
       workspaceGateway,
       accounts,
+      payments,
     );
   }
   private static define(
     features: FeatureFlagHandlers,
     auth: AuthInstance,
-    billing: BillingHandlers,
     api: ApiRoutes,
     tickets: SessionTickets,
     workspaceGateway: WorkspaceGateway,
     accounts: AccountService,
+    payments: PolarPayments,
   ) {
     const router = new Hono<ApiContext>();
 
@@ -62,24 +63,25 @@ export class BackendApplication {
       c.json({ ok: true }, 200),
     );
 
-    // Better Auth and signed webhooks authenticate themselves, before the API session guard.
+    // Better Auth and its signed Polar webhook authenticate themselves, before the API session guard.
     const withAuthentication = withHealth.all("/api/auth/*", (c) => {
-      // Organization writes must pass through the coordinating backend handlers.
+      // Organization writes and billing must pass through the authorizing backend handlers.
       const operation = c.req.path.slice("/api/auth".length);
-      if (organizationWrites.has(operation))
+      if (
+        organizationWrites.has(operation) ||
+        billingOperations.test(operation)
+      )
         return c.json(
           { error: "Use the workspace API for this operation" },
           403,
         );
+      // Without configuration the Polar plugin is absent; report the capability as unavailable.
+      if (operation === "/polar/webhooks" && !payments.webhooksConfigured)
+        throw new IntegrationUnavailableError("Billing webhook");
       return auth.handler(c.req.raw);
     });
 
-    const withWebhook = withAuthentication.post(
-      "/api/billing/webhook",
-      billing.webhook,
-    );
-
-    const withApi = withWebhook.route("/api", api.router);
+    const withApi = withAuthentication.route("/api", api.router);
 
     // Verify identity and replace untrusted headers before the plugin can upgrade a WebSocket.
     router.use(
@@ -105,6 +107,9 @@ export class BackendApplication {
     return withApi;
   }
 }
+
+// The Polar plugin does not authorize workspace membership for checkout or customer endpoints.
+const billingOperations = /^\/(?:checkout|customer|usage)(?:\/|$)/;
 
 const organizationWrites = new Set([
   "/organization/create",

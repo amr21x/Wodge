@@ -76,12 +76,14 @@ Browser bundle verification includes the actual typed frontend client.
   helper cannot create a media session. Billing upgrades and provider credentials cannot enable calls.
 - Billing uses a conditional D1 batch for its subscription cursor and plan update. Native tests
   exercise duplicates, stale/replaced subscriptions, concurrent events, rollback and retry.
-  Each delivery reads the current Stripe subscription; a stale in-flight snapshot cannot overwrite
-  a newer database change. Ambiguous same-second replacement subscriptions return 503;
-  automated Stripe reconciliation remains follow-up work.
+  Polar webhooks are verified by Better Auth's Polar plugin; each delivery re-reads the current
+  Polar subscription, and a stale in-flight snapshot cannot overwrite a newer database change.
+  Ambiguous same-millisecond replacement subscriptions fail for retry; automated reconciliation
+  remains follow-up work. Checkout and portal are only reachable through the authorizing
+  workspace billing API.
 - Worker configuration is validated once per environment. Partial local mode retains unavailable
   integrations; deployment ready mode requires email, storage and test billing. Neither permits
-  missing/weak/shared signing secrets or live Stripe keys.
+  missing/weak/shared signing secrets or malformed Polar tokens; billing always uses the Polar sandbox.
 - Malformed object identifiers and upload bodies return client errors before provider access.
 
 ## Known limits for behavior review

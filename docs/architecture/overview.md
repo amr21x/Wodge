@@ -16,7 +16,7 @@ Existing code still includes Supabase and PartyKit until their scoped migrations
 
 Backend realtime services move to PartyServer with SQLite Durable Objects. Auth
 moves to Better Auth/D1, with minimal member-controlled MCP for discovery, page
-reading, and task creation/update. Existing Stripe test billing is retained. Calls
+reading, and task creation/update. Billing uses Polar sandbox subscriptions through Better Auth's Polar plugin. Calls
 and hosted generation are to be disabled for the portfolio milestone.
 
 The foundation separates neutral/browser/server exports and supplies D1 explicitly

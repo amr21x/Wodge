@@ -10,6 +10,7 @@ import { WorkspaceRecordRepository } from "@wodge/core/workspace/repositories/re
 import { Hono } from "hono";
 import { handleError } from "../../src/errors/handler";
 import { BillingHandlers } from "../../src/handlers/api/billing";
+import { BillingWebhookHandlers } from "../../src/handlers/billing-webhooks";
 import { WorkspaceFilesHandlers } from "../../src/handlers/workspace/files";
 import { dispatchRoomMutation } from "../../src/lib/sync/mutations/rooms";
 import type {
@@ -29,7 +30,7 @@ import { WorkspaceFiles } from "@wodge/core/workspace/services/files";
 import { WorkspaceLifecycle } from "@wodge/core/workspace/services/lifecycle";
 import { ThreadPostSchema } from "@wodge/domain/discussions/validation";
 import { MessageSchema } from "@wodge/domain/rooms/validation";
-import type { PaymentEvent } from "@wodge/infra/payments/types";
+import type { SubscriptionStatus } from "@wodge/domain/billing/dto";
 import type { ObjectStorage } from "@wodge/infra/storage/types";
 import { afterEach, expect, test, vi } from "vitest";
 import type WorkspaceParty from "../../src/servers/workspace";
@@ -488,19 +489,23 @@ test("invalid encoded paths fail validation before provider I/O", async () => {
 
 function billing() {
   const payments = {
-    listPrices: vi.fn(async () => ({ data: [{ id: "price" }] })),
-    createCheckout: vi.fn(async () => ({ url: "https://payments/checkout" })),
-    createPortal: vi.fn(async () => ({ url: "https://payments/portal" })),
+    configured: true,
+    productId: "product",
     subscription: vi.fn(async (_id: string) => ({
       id: "subscription",
       created: 1,
-      status: "active",
-      metadata: { workspaceId: "workspace" },
-      customer: "customer",
+      modified: 100,
+      status: "active" as SubscriptionStatus,
+      productId: "product",
+      metadata: { referenceId: "workspace" } as Record<string, unknown>,
+      customerExternalId: "owner" as string | null,
     })),
-    verifyEvent: vi.fn<[], Promise<PaymentEvent>>(async () => ({
-      type: "ignored",
-    })),
+  };
+  const auth = {
+    api: {
+      checkout: vi.fn(async () => ({ url: "https://payments/checkout" })),
+      portal: vi.fn(async () => ({ url: "https://payments/portal" })),
+    },
   };
   const current = {
     id: "workspace",
@@ -540,6 +545,11 @@ function billing() {
     service,
     payments as never,
     { isAdmin } as never,
+    auth as never,
+  );
+  const webhooks = new BillingWebhookHandlers(
+    service,
+    payments as never,
     { notify: poke } as never,
   );
   const app = new Hono<ApiContext>();
@@ -550,29 +560,20 @@ function billing() {
   });
   app.get("/:workspaceId/checkout", handlers.checkout);
   app.get("/:workspaceId/portal", handlers.portal);
-  app.post("/webhook", handlers.webhook);
   const environment = createTestEnvironment({
     APP_DOMAIN: "https://wodge.test",
-    STRIPE_LOOKUP_KEY: "premium",
   });
   return {
     service,
     payments,
+    auth,
     workspace,
     isAdmin,
     poke,
     current,
     request: (path: string) => app.request(path, {}, environment as never),
-    webhook: () =>
-      app.request(
-        "/webhook",
-        {
-          method: "POST",
-          headers: { "stripe-signature": "verified-fixture" },
-          body: "{}",
-        },
-        environment as never,
-      ),
+    deliver: (metadata: Record<string, unknown>) =>
+      webhooks.subscriptionChanged({ id: "subscription", metadata }),
   };
 }
 
@@ -584,76 +585,80 @@ test("billing handler authorizes before querying or calling the provider", async
   expect(await (await b.request("/workspace/checkout")).json()).toEqual({
     url: "https://payments/checkout",
   });
-  expect(b.payments.createCheckout).toHaveBeenCalledWith(
+  expect(b.auth.api.checkout).toHaveBeenCalledWith(
     expect.objectContaining({
-      success_url: "https://wodge.test/slug/billing/success",
-      cancel_url: "https://wodge.test/slug/billing/failure",
-      subscription_data: { metadata: { workspaceId: "workspace" } },
-      customer_email: "owner@example.test",
+      body: {
+        products: ["product"],
+        reference_id: "workspace",
+        success_url:
+          "https://wodge.test/slug/billing/success?checkout_id={CHECKOUT_ID}",
+        return_url: "https://wodge.test/slug/settings/upgrade",
+        redirect: false,
+      },
     }),
   );
   b.current.isPremium = true;
   expect((await b.request("/workspace/checkout")).status).toBe(400);
   expect((await b.request("/workspace/portal")).status).toBe(400);
-  b.current.customerId = "customer";
+  // Another administrator cannot open the purchaser's personal customer portal.
+  b.current.customerId = "another-admin";
+  expect((await b.request("/workspace/portal")).status).toBe(409);
+  b.current.customerId = "owner";
   expect(await (await b.request("/workspace/portal")).json()).toEqual({
     url: "https://payments/portal",
   });
+  expect(b.auth.api.portal).toHaveBeenCalledTimes(1);
 });
 
-test("verified billing events persist before notifications and reject missing metadata", async () => {
+test("unconfigured billing fails clearly before reaching the Polar plugin", async () => {
   const b = billing();
-  const event = (
-    type: string,
-    metadata: Record<string, string>,
-    customer = "customer",
-  ) =>
-    ({
-      id: type,
-      created: type === "customer.subscription.deleted" ? 200 : 100,
-      type,
-      data: {
-        object: {
-          id: "subscription",
-          created: 1,
-          status: "active",
-          metadata,
-          customer,
-        },
-      },
-    }) as PaymentEvent;
-  b.payments.verifyEvent.mockResolvedValue(
-    event("customer.subscription.created", {}),
-  );
-  expect((await b.webhook()).status).toBe(400);
-  expect(b.poke).not.toHaveBeenCalled();
-  b.payments.verifyEvent.mockResolvedValue(
-    event("customer.subscription.created", { workspaceId: "workspace" }),
-  );
-  expect((await b.webhook()).status).toBe(200);
+  b.payments.configured = false;
+  b.current.isPremium = true;
+  b.current.customerId = "owner";
+  expect((await b.request("/workspace/portal")).status).toBe(503);
+  expect(b.auth.api.portal).not.toHaveBeenCalled();
+});
+
+test("verified billing events re-read Polar, persist before notifications and ignore foreign subscriptions", async () => {
+  const b = billing();
+  await b.deliver({});
+  expect(b.payments.subscription).not.toHaveBeenCalled();
+  await b.deliver({ referenceId: "workspace" });
   expect(b.workspace.setBilling).toHaveBeenCalledWith("workspace", {
     isPremium: true,
-    customerId: "customer",
+    customerId: "owner",
   });
+  // The payload reference must match the subscription Polar returns.
   b.payments.subscription.mockResolvedValueOnce({
-    id: "subscription",
-    created: 1,
-    status: "canceled",
-    metadata: { workspaceId: "workspace" },
-    customer: "customer",
+    ...(await b.payments.subscription("subscription")),
+    metadata: { referenceId: "other" },
   });
-  b.payments.verifyEvent.mockResolvedValue(
-    event("customer.subscription.deleted", { workspaceId: "workspace" }),
-  );
-  expect((await b.webhook()).status).toBe(200);
-  expect(b.workspace.setBilling).toHaveBeenCalledWith("workspace", {
+  await b.deliver({ referenceId: "workspace" });
+  b.payments.subscription.mockResolvedValueOnce({
+    ...(await b.payments.subscription("subscription")),
+    productId: "another-product",
+  });
+  await b.deliver({ referenceId: "workspace" });
+  expect(b.poke).toHaveBeenCalledTimes(1);
+  b.payments.subscription.mockResolvedValueOnce({
+    ...(await b.payments.subscription("subscription")),
+    modified: 200,
+    status: "canceled",
+  });
+  await b.deliver({ referenceId: "workspace" });
+  expect(b.workspace.setBilling).toHaveBeenLastCalledWith("workspace", {
     isPremium: false,
     customerId: null,
   });
   expect(b.poke).toHaveBeenCalledTimes(2);
-  b.payments.verifyEvent.mockResolvedValue({ type: "ignored" });
-  await b.webhook();
-  expect(b.poke).toHaveBeenCalledTimes(2);
+});
+
+test("billing events for a deleted workspace are acknowledged without provider reads", async () => {
+  const b = billing();
+  b.workspace.getWorkspaceById.mockResolvedValueOnce(undefined as never);
+  await b.deliver({ referenceId: "workspace" });
+  expect(b.payments.subscription).not.toHaveBeenCalled();
+  expect(b.poke).not.toHaveBeenCalled();
 });
 
 test("workspace directory validates admission without performing identity writes", async () => {

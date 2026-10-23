@@ -16,23 +16,23 @@ test("ready mode requires storage and billing while email login and LiveKit are 
   ).toThrow("R2_SECRET_KEY");
 });
 
-test("configuration rejects weak/shared signing secrets, incomplete OAuth, unsafe origins and live billing keys", () => {
+test("configuration rejects weak/shared signing secrets, incomplete OAuth, unsafe origins and malformed billing tokens", () => {
   for (const changes of [
     { SECRET_KEY: "short" },
     { SECRET_KEY: createTestEnvironment().BETTER_AUTH_SECRET },
     { GOOGLE_CLIENT_SECRET: "" },
     { APP_DOMAIN: "https://example.test/path" },
     { R2_ENDPOINT: "ftp://example.test" },
-    { STRIPE_SECRET_KEY: "sk_live_do_not_use" },
+    { POLAR_ACCESS_TOKEN: "not-an-organization-token" },
     { INTEGRATION_MODE: "invalid" },
   ])
     expect(() =>
       validateServerEnvironment(createTestEnvironment(changes as never)),
     ).toThrow("Invalid backend configuration");
-  const sensitive = "sk_live_never_print_this_value";
+  const sensitive = "never_print_this_billing_value";
   try {
     validateServerEnvironment(
-      createTestEnvironment({ STRIPE_SECRET_KEY: sensitive }),
+      createTestEnvironment({ POLAR_ACCESS_TOKEN: sensitive }),
     );
   } catch (error) {
     expect(String(error)).not.toContain(sensitive);

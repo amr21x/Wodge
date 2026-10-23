@@ -219,7 +219,7 @@ async function inspect(directory, owner) {
         productionSource &&
         owner.manifest.name === "@wodge/core" &&
         !coreRepositoryFile &&
-        /^(?:@wodge\/auth(?:\/|$)|better-auth(?:\/|$)|reflect-metadata(?:\/|$)|@aws-sdk\/|stripe(?:\/|$)|jose(?:\/|$)|@cloudflare\/)/.test(
+        /^(?:@wodge\/auth(?:\/|$)|better-auth(?:\/|$)|reflect-metadata(?:\/|$)|@aws-sdk\/|@polar-sh\/|jose(?:\/|$)|@cloudflare\/)/.test(
           specifier,
         )
       )
@@ -262,7 +262,7 @@ async function inspect(directory, owner) {
       if (
         productionSource &&
         owner.manifest.name === "backend" &&
-        /^(?:@aws-sdk\/|@supabase\/|better-auth(?:\/|$)|@better-auth\/|drizzle-orm(?:\/|$)|jose(?:\/|$)|stripe(?:\/|$)|livekit-server-sdk(?:\/|$))/.test(
+        /^(?:@aws-sdk\/|@supabase\/|better-auth(?:\/|$)|@better-auth\/|drizzle-orm(?:\/|$)|jose(?:\/|$)|@polar-sh\/|livekit-server-sdk(?:\/|$))/.test(
           specifier,
         )
       ) {

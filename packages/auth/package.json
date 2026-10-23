@@ -18,12 +18,14 @@
     "@wodge/domain": "workspace:*",
     "@wodge/infra": "workspace:*",
     "better-auth": "1.7.10",
+    "@polar-sh/better-auth": "2.1.0",
+    "@polar-sh/sdk": "1.0.2",
     "@better-auth/drizzle-adapter": "1.7.10",
     "@wodge/env": "workspace:*",
     "tsyringe": "4.10.0",
     "@wodge/core": "workspace:*",
     "drizzle-orm": "0.45.2",
-    "jose": "^5.4.1"
+    "jose": "^6.1.0"
   },
   "devDependencies": {
     "@wodge/ts": "workspace:*",

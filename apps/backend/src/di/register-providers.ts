@@ -1,6 +1,6 @@
 import { AuthorizationRetry } from "@wodge/infra/durable-objects/authorization-retry";
 import { HttpClient } from "@wodge/infra/http/client";
-import { StripePayments } from "@wodge/infra/payments/payments";
+import { PolarPayments } from "@wodge/infra/payments/polar";
 import { S3ObjectStorage } from "@wodge/infra/storage/object-storage";
 import { Lifecycle, type DependencyContainer } from "tsyringe";
 
@@ -17,8 +17,8 @@ export function registerIntegrationClasses(container: DependencyContainer) {
     { lifecycle: Lifecycle.ContainerScoped },
   );
   container.register(
-    StripePayments,
-    { useClass: StripePayments },
+    PolarPayments,
+    { useClass: PolarPayments },
     { lifecycle: Lifecycle.ContainerScoped },
   );
   container.register(

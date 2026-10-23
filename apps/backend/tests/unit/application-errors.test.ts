@@ -86,8 +86,7 @@ test.each([
   ["BILLING_WORKSPACE_NOT_FOUND", 404, "Workspace not found"],
   ["BILLING_ALREADY_PREMIUM", 400, "Already premium"],
   ["BILLING_NOT_PREMIUM", 400, "Not premium"],
-  ["BILLING_PRICE_NOT_FOUND", 404, "No price found"],
-  ["BILLING_CHECKOUT_URL_MISSING", 400, "Bad request"],
+  ["BILLING_PORTAL_PURCHASER_ONLY", 409, "Purchaser only"],
 ] as const)(
   "web maps %s to its existing HTTP response",
   async (code, status, message) => {

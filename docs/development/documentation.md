@@ -10,7 +10,7 @@ match this scope before a record is used.
 ## Current portfolio milestone
 
 Restore a reliable portfolio showcase with bounded operating cost. Retain the
-existing product and frontend UI, Replicache/Yjs, and working Stripe test billing.
+existing product and frontend UI, Replicache/Yjs, and working Polar sandbox billing.
 Migrate backend realtime services to PartyServer with SQLite Durable Objects and
 authentication to Better Auth/D1. Provide minimal member-controlled MCP discovery,
 page reading, and task creation/update. Temporarily disable calls in both UI
