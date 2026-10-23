@@ -7,6 +7,12 @@
   // Production shares the web origin: these paths go to the Worker and the frontend Worker serves
   // everything else. `wrangler dev` ignores routes; deploys override the local vars.
   "workers_dev": false,
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "invocation_logs": true,
+    },
+  },
   "routes": [
     { "pattern": "wodge.amr21.dev/api/*", "zone_name": "amr21.dev" },
     { "pattern": "wodge.amr21.dev/parties/*", "zone_name": "amr21.dev" },
