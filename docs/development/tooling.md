@@ -23,7 +23,8 @@ may run, and `peerDependencyRules` waives optional peers whose features are unus
   uses its separately pinned version; it is not a repository-wide runner upgrade.
 
 Other tooling modernization remains separately scoped; this migration does not
-upgrade Next.js, React, TypeScript, pnpm or Turborepo.
+upgrade React, TypeScript, pnpm or Turborepo. The Workers deployment migration
+uses Next.js 15.5.28 with OpenNext 1.20.13.
 
 ## Commands and verification
 
@@ -34,7 +35,7 @@ Run these commands from the repository root:
 - `pnpm format` writes formatting for supported source, config and documentation files.
 - `pnpm format:check` checks the same files without modifying them.
 
-The web workspace lint script forwards to the root command. Next.js 14 build-time
+The web workspace lint script forwards to the root command. Next.js build-time
 ESLint integration is disabled because linting runs separately. The Code Quality
 workflow checks lint and formatting on pushes and pull requests, including docs-only
 changes; these are source checks, not application build/test jobs. The manual Worker
@@ -52,8 +53,8 @@ Hooks violations are errors. The lint command fails on either errors or warnings
 now that the existing backlog has been cleaned up. React Compiler-specific checks are disabled because
 this React 18 application does not use React Compiler. This is not exact ESLint rule
 parity: the removed Cloudflare next-on-pages plugin's four provider-specific rules
-and Turbo environment rule have no native replacement here. The retained Pages
-adapter build remains the deployment compatibility check. The unused TanStack
+and Turbo environment rule have no native replacement here. The OpenNext
+Worker build is the deployment compatibility check. The unused TanStack
 plugin was installed but not enabled in the old configuration.
 
 `.oxfmtrc.json` keeps the previous 80-column formatting and Tailwind class sorting
@@ -67,10 +68,11 @@ it as the formatter; its lint integration reads the same root configuration.
 
 `pnpm --filter backend build` compiles the production Worker through Wrangler's
 dry run. The frontend uses the source `backend/api` type export, without a generator.
-`pnpm --filter web pages:build` invokes the Pages adapter through `npm exec` so its
-Vercel invocation uses the installed CLI rather than pnpm's incompatible package
-lookup. The command clears pnpm's inherited user-agent before invoking npm. `apps/web/vercel.json` selects the Next.js build command and skips dependency
-installation inside Vercel; run `pnpm install` first. No custom build scripts run.
+`pnpm --filter web workers:build` invokes OpenNext to build the Next.js frontend
+and its Cloudflare Worker in `.open-next/`. `pnpm --filter web preview` runs that
+build in the Workers runtime. Pages and Vercel CLI dependencies are removed; no
+custom build scripts run. The frontend's server-side backend calls use the
+`BACKEND` service binding in production and HTTP during Next.js development.
 `pnpm --filter backend test:foundation` builds and runs the retained
 compatibility fixture, import-boundary checks and local Worker/D1 checks. These do not deploy or validate all product journeys.
 The evidence records explicit backend, protocol, and shared-data type commands.
@@ -80,8 +82,7 @@ directly. Backend/shared code uses Workers v4 types because `y-partyserver` and
 `hono-party` require them. Wrangler's optional v5 types peer only feeds
 `wrangler types`, which the backend does not use, so the root `package.json`
 allows v4 for that single peer in `pnpm-workspace.yaml`. Remove the rule when
-the PartyServer libraries accept v5. The retained web adapter keeps Wrangler 3.50.0
-until its separately scoped migration.
+the PartyServer libraries accept v5. The frontend Worker uses Wrangler 4.152.0 and the OpenNext adapter.
 
 ## Configuration and secrets
 

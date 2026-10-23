@@ -14,11 +14,7 @@ import { useIsTeamModerator } from "@/features/workspace/hooks/use-is-team-moder
 import { Folders } from "../../../../../../../features/files/components/folders";
 import { Files } from "../../../../../../../features/files/components/files";
 
-function TeamResourcePage(_input: {
-  params: {
-    path: string[];
-  };
-}) {
+function TeamResourcePage() {
   useUpdateRecentlyVisited("resources");
 
   const activePath = useChannelPath();

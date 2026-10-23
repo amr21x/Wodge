@@ -43,13 +43,13 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Build web for Cloudflare Pages
+      - name: Build frontend Worker
         env:
           NEXT_TELEMETRY_DISABLED: 1
           NEXT_PUBLIC_APP_DOMAIN: ${{ env.APP_DOMAIN }}
           NEXT_PUBLIC_BACKEND_DOMAIN: ${{ env.BACKEND_DOMAIN }}
           NEXT_PUBLIC_AVATARS_URL: ${{ env.AVATARS_URL }}
-        run: pnpm --filter web pages:build
+        run: pnpm --filter web workers:build
       # Migrations are forward-only and run before the Worker that depends on them.
       - name: Apply D1 migrations
         run: pnpm --filter backend db:migration:cloud
@@ -69,12 +69,10 @@ jobs:
           --var "AVATARS_URL:$AVATARS_URL"
           --var "INTEGRATION_MODE:$INTEGRATION_MODE"
           --message "$GITHUB_SHA"
-      - name: Deploy web to Cloudflare Pages
+      - name: Deploy frontend Worker
         working-directory: apps/web
         run: >-
-          pnpm exec wrangler pages deploy .vercel/output/static
-          --project-name wodge --branch main
-          --commit-hash "$GITHUB_SHA" --commit-dirty=false
+          pnpm exec opennextjs-cloudflare deploy
       - name: Smoke check
         run: |
           curl -fsS --retry 5 --retry-delay 5 "$APP_DOMAIN/health"

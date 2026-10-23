@@ -1,36 +1,25 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Web application
 
-## Getting Started
+The frontend uses Next.js 15 and React 18. OpenNext builds it for Cloudflare Workers;
+`wodge-backend` continues to own API routes, authentication and Durable Objects.
 
-First, run the development server:
+From the repository root:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- `pnpm --filter web dev`: Next.js development server, with API requests sent to the local backend.
+- `pnpm --filter web build`: standard Next.js build.
+- `pnpm --filter web workers:build`: build the frontend Worker and static assets in `.open-next/`.
+- `pnpm --filter web preview`: build and preview under the Workers runtime.
+- `pnpm --filter web deploy:app`: build and deploy the frontend Worker.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Set the three `NEXT_PUBLIC_*` values documented in the root `.env.example` before
+building. Production uses the `BACKEND` service binding declared in
+`wrangler.jsonc` for server-side API requests; browser requests stay on the public
+origin. Start the backend Wrangler dev server when testing the Workers preview
+locally so the service binding can resolve.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Authenticated pages remain dynamic. No incremental-cache R2 bucket is configured.
+PWA installation and the existing service worker remain enabled. No Pages project,
+Vercel CLI or custom build script is required.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+See the [production runbook](../../docs/operations/runbooks/production-deployment.md)
+for Cloudflare build settings, secrets, domain cutover and verification.

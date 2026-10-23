@@ -88,10 +88,10 @@ jobs:
           path: apps/web/.next/cache
           key: nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
           restore-keys: nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
-      - name: Build web for Cloudflare Pages
+      - name: Build frontend Worker
         env:
           NEXT_TELEMETRY_DISABLED: 1
-        run: pnpm --filter web pages:build
+        run: pnpm --filter web workers:build
 
   # Keep the existing required check green for docs-only changes, but fail closed.
   result:

@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { env } from "@wodge/env/client";
+import { fetchBackend } from "./lib/backend";
 import { authRoutes, publicRoutes } from "./routes";
 import { loginPath } from "./features/auth/redirect";
 import type { PublicUserType } from "@wodge/domain/user/models";
@@ -19,7 +19,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   };
   try {
-    response = await fetch(`${env.NEXT_PUBLIC_BACKEND_DOMAIN}/api/users/me`, {
+    response = await fetchBackend("/api/users/me", {
       headers: { cookie: request.headers.get("cookie") ?? "" },
       cache: "no-store",
     });

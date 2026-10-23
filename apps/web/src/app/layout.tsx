@@ -17,8 +17,9 @@ import { FeatureRouteGate } from "@/components/feature-flags-provider";
 import { Toaster } from "@/components/ui/toast";
 import { CallWindow } from "../features/rooms/components/call-window";
 
-/** Runtime = edge require in order to make next-auth works with cf-pages */
-export const runtime = "edge";
+// Pages previously used the Edge runtime, which disabled static generation.
+// Keep authenticated navigation dynamic without adding a shared page cache.
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Wodge App",

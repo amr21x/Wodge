@@ -1,0 +1,4 @@
+# Used by OpenNext's local Workers preview when selecting Next.js environment files.
+NEXTJS_ENV=development
+# Public NEXT_PUBLIC_* build settings are documented in the root .env.example.
+# Backend OAuth and signing secrets belong only to wodge-backend, not this Worker.
