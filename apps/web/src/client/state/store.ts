@@ -16,7 +16,7 @@ import { createWorkspaceRep } from "./create-workspace-rep";
 
 type ChannelMutators = RoomMutators | ThreadMutators | typeof pageMutators;
 
-export interface AppStore {
+interface AppStore {
   userStore?: Replicache<typeof userMutators>;
   workspaces: Record<string, Replicache<WorkspaceMutators>>;
   activeChanRep?: Replicache<ChannelMutators>;

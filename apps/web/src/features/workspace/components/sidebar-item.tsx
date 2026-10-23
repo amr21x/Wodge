@@ -6,7 +6,7 @@ import { forwardRef } from "react";
 import { IconType } from "react-icons/lib";
 import { cn } from "@/lib/utils/index";
 
-export interface SidebarItemProps extends React.HTMLAttributes<HTMLDivElement> {
+interface SidebarItemProps extends React.HTMLAttributes<HTMLDivElement> {
   Icon?: LucideIcon | IconType | null;
   children?: React.ReactNode;
   className?: string;

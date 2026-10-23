@@ -114,5 +114,3 @@ export const ImageBlock = Image.extend({
     return ReactNodeViewRenderer(memo(ImageBlockView));
   },
 });
-
-export default ImageBlock;

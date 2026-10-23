@@ -1,4 +1,3 @@
-import { env } from "@wodge/env/client";
 import { makeWorkspaceMembersKey } from "@wodge/domain/sync/index";
 import type {
   PullRequest,
@@ -135,8 +134,4 @@ export function replicacheWrapper(
       return failed(error);
     }
   };
-}
-
-export function getAvatarAddress(id?: string) {
-  return `${env.NEXT_PUBLIC_AVATARS_URL}/${id}`;
 }

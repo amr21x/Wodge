@@ -4,7 +4,7 @@ import { Toolbar } from "./ui/toolbar";
 import Tooltip from "./ui/Tooltip/index";
 import { Pen, Trash2 } from "lucide-react";
 
-export type LinkPreviewPanelProps = {
+type LinkPreviewPanelProps = {
   url: string;
   onEdit: () => void;
   onClear: () => void;

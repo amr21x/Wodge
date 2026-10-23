@@ -58,8 +58,6 @@ export function useWorkspaceSubscription() {
   const { snapshot: structure, isPending: isStructurePending } = useSubscribe(
     currentRep,
     (tx: ReadTransaction) => {
-      // console.log("will sub 1");
-
       return tx.get<WorkspaceStructure>(makeWorkspaceStructureKey());
     },
     {
@@ -70,8 +68,6 @@ export function useWorkspaceSubscription() {
   const { snapshot: members, isPending: isMembersPending } = useSubscribe(
     currentRep,
     (tx: ReadTransaction) => {
-      // console.log("will sub 2");
-
       return tx.get<WorkspaceMembers>(makeWorkspaceMembersKey());
     },
     {

@@ -18,8 +18,6 @@ const CollapsibleTrigger = React.forwardRef<
   );
 });
 
-// CollapsibleTrigger.displayName = "CollapsibleTrigger";
-
 const CollapsibleContent = React.forwardRef<
   React.ElementRef<typeof CollapsiblePrimitive.CollapsibleContent>,
   React.ComponentPropsWithoutRef<typeof CollapsiblePrimitive.CollapsibleContent>
@@ -32,6 +30,5 @@ const CollapsibleContent = React.forwardRef<
     />
   );
 });
-// CollapsibleContent.displayName = "CollapsibleContent";
 
 export { Collapsible, CollapsibleTrigger, CollapsibleContent };

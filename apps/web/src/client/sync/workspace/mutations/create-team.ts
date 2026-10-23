@@ -51,7 +51,6 @@ export function createTeamMutation({
         id: "root-" + newTeamBase.id,
       },
     ],
-    // tags: [],
     rooms: [],
     threads: [],
     default: false,

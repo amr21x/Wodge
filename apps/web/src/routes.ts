@@ -12,12 +12,6 @@ export const publicRoutes: string[] = ["/demo", "/info", "/unavailable"];
 export const authRoutes: string[] = ["/login", "/login/error"];
 
 /**
- * The prefix for API authentication routes
- * Routes that start with prefix are used for API authentication purposes
- */
-export const apiPrefix = "/api";
-
-/**
  * Default redirect path after logging in
  */
 export const DEFAULT_LOGIN_REDIRECT = "/";

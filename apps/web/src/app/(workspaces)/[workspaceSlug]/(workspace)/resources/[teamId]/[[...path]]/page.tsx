@@ -35,10 +35,6 @@ function TeamResourcePage(_input: {
     return null;
   }
 
-  // if ((files?.length === 0 || dirs?.length === 0) && path?.length > 0) {
-  //   router.back();
-  // }
-
   return (
     <div className="flex w-full flex-col px-4 py-3">
       <h2 className="text-xl">{activePath?.team.name} Resources</h2>

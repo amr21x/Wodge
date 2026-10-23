@@ -70,8 +70,6 @@ export function deleteTeamFoldersMutation({
     throw workspaceError("WORKSPACE_NOT_FOUND", "Team does not exist");
   }
 
-  // const removalIds = update.map((dir) => dir.id);
-
   // 2. Update the folders
 
   const newStructure = produce(structure, (draft) => {

@@ -207,24 +207,6 @@ function TableWrapper({ editor }: { editor: Editor }) {
   return <TableView editor={editor} />;
 }
 
-// const [priority, setPriority] = useState("");
-// const [title, setTitle] = useState("");
-// const [assignees, setAssignees] = useState<string[]>([]);
-// const [due, setDue] = useState<DateRange>();
-// const [includeTime, setIncludeTime] = useState(false);
-// const [isFilterOpen, setIsFilterOpen] = useState(false);
-
-// const [boardViewAtom, setBoardViewAtom] = useAtom(dbsViewsAtom);
-
-// const boardId = useRef(node.attrs["data-id"]).current;
-
-// const board = useMemo(() => {
-//   console.log("fetching boards");
-//   return boards?.find((b) => b.id === boardId);
-// }, [boards]);
-
-// const boardView = boardViewAtom[boardId] || "kanban";
-
 {
   /* <div className="flex w-full items-center gap-2 pb-2">
         <ToggleGroup

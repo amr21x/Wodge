@@ -22,5 +22,3 @@ export const isTextSelected = ({ editor }: { editor: Editor }) => {
 
   return true;
 };
-
-export default isTextSelected;

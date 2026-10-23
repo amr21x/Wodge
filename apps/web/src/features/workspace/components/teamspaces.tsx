@@ -182,7 +182,7 @@ interface DraggableProps {
   isMod: boolean;
 }
 
-export const Teamspace = React.forwardRef<
+const Teamspace = React.forwardRef<
   HTMLDivElement,
   { team: DrObj<Team> } & DraggableProps & React.HTMLAttributes<HTMLDivElement>
 >(
@@ -260,5 +260,3 @@ export const Teamspace = React.forwardRef<
     );
   },
 );
-
-// Teamspace.displayName = "Teamspace";

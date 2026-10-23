@@ -1,15 +1,12 @@
 import * as Popover from "@radix-ui/react-popover";
 import { icons } from "lucide-react";
-import { forwardRef } from "react";
 import { Surface } from "./surface";
 import { Toolbar } from "./toolbar";
 import { cn } from "@/lib/utils/index";
 
-export const Trigger = Popover.Trigger;
+const Trigger = Popover.Trigger;
 
-export const Portal = Popover.Portal;
-
-export type MenuProps = {
+type MenuProps = {
   children: React.ReactNode;
   trigger: React.ReactNode;
   triggerClassName?: string;
@@ -21,7 +18,7 @@ export type MenuProps = {
   isActive?: boolean;
 };
 
-export const Menu = ({
+const Menu = ({
   customTrigger,
   trigger,
   triggerClassName,
@@ -107,26 +104,14 @@ export const Item = ({
   );
 };
 
-export type CategoryTitle = {
+type CategoryTitle = {
   children: React.ReactNode;
 };
 
-export const CategoryTitle = ({ children }: CategoryTitle) => {
+const CategoryTitle = ({ children }: CategoryTitle) => {
   return (
     <div className="mb-1.5 mt-4 select-none px-1 text-[0.625rem] font-medium uppercase text-neutral-400 first:mt-1.5 dark:text-neutral-600">
       {children}
     </div>
   );
 };
-
-export const Divider = forwardRef<HTMLHRElement>((props, ref) => {
-  return (
-    <hr
-      {...props}
-      ref={ref}
-      className="my-1 border-neutral-200 dark:border-neutral-800"
-    />
-  );
-});
-
-// Divider.displayName = "Divider";

@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils/index";
 import { useCallback } from "react";
 
-export type ToggleProps = {
+type ToggleProps = {
   active?: boolean;
   onChange: (active: boolean) => void;
   size?: "small" | "large";

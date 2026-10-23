@@ -42,7 +42,6 @@ export function MemberMultiSelect({
   setValue,
   icon = true,
 }: MemberMultiSelectProps) {
-  // const [value, setValue] = useState<string[]>(preset || []);
   const [open, setOpen] = useState(false);
 
   const { channelId } = useParams<{

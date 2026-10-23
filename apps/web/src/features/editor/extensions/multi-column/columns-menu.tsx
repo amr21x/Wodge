@@ -10,7 +10,7 @@ import { Icon } from "../../ui/icon";
 import { Toolbar } from "../../ui/toolbar";
 import { ColumnLayout } from "./columns";
 
-export const ColumnsMenu = ({ editor, appendTo }: MenuProps) => {
+const ColumnsMenu = ({ editor, appendTo }: MenuProps) => {
   const getReferenceClientRect = useCallback(() => {
     const renderContainer = getRenderContainer(editor, "columns");
     const rect =

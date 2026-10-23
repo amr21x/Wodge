@@ -170,7 +170,7 @@ interface DraggableProps {
   isMod: boolean;
 }
 
-export const Folder = React.forwardRef<
+const Folder = React.forwardRef<
   HTMLLIElement,
   { folder: DrObj<FolderType> } & DraggableProps &
     React.HTMLAttributes<HTMLLIElement>
@@ -215,5 +215,3 @@ export const Folder = React.forwardRef<
     );
   },
 );
-
-// Folder.displayName = "Folder";

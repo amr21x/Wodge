@@ -12,10 +12,7 @@ export function closedFlags(): FeatureFlags {
   ) as FeatureFlags;
 }
 
-export function parseFlagSnapshot(
-  value: unknown,
-  now = Date.now(),
-): FlagSnapshot {
+function parseFlagSnapshot(value: unknown, now = Date.now()): FlagSnapshot {
   const snapshot = value as FlagSnapshot;
   if (
     !snapshot ||

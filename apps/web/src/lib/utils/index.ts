@@ -10,22 +10,6 @@ export type Mutable<Type> = {
   -readonly [Key in keyof Type]: Type[Key];
 };
 
-export function hexToRgb(hex: string) {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-
-  if (!result) {
-    return null;
-  }
-
-  const rgb = [
-    parseInt(result[1]!, 16),
-    parseInt(result[2]!, 16),
-    parseInt(result[3]!, 16),
-  ].join(",");
-
-  return rgb;
-}
-
 export function randomElement(array: Array<any>) {
   return array[Math.floor(Math.random() * array.length)];
 }

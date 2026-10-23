@@ -10,7 +10,7 @@ import TableRowMenu from "../extensions/table/table-row/index";
 import TableColumnMenu from "../extensions/table/table-column/index";
 import ImageBlockMenu from "../extensions/image-block/image-block-menu";
 
-export const OfflineEditor = memo(
+const OfflineEditor = memo(
   ({
     editor,
     isThread = false,

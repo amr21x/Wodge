@@ -5,7 +5,7 @@ import { useCallback } from "react";
 import { UPLOADS_DISABLED } from "@/features/files/components/uploads-disabled-button";
 import { ImageUploader } from "./image-uploader";
 
-export const ImageUploadComp = ({
+const ImageUploadComp = ({
   getPos,
   editor,
 }: {

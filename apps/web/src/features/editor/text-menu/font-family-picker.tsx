@@ -40,7 +40,7 @@ const FONT_FAMILIES = FONT_FAMILY_GROUPS.flatMap((group) => [
   group.options,
 ]).flat();
 
-export type FontFamilyPickerProps = {
+type FontFamilyPickerProps = {
   onChange: (value: string) => void;
   value: string;
 };

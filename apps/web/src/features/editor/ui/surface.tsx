@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils/index";
 import { HTMLProps, forwardRef } from "react";
 
-export type SurfaceProps = HTMLProps<HTMLDivElement> & {
+type SurfaceProps = HTMLProps<HTMLDivElement> & {
   withShadow?: boolean;
   withBorder?: boolean;
   children?: React.ReactNode;
@@ -26,5 +26,3 @@ export const Surface = forwardRef<HTMLDivElement, SurfaceProps>(
     );
   },
 );
-
-// Surface.displayName = "Surface";

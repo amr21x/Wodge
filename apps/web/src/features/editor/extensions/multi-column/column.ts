@@ -33,5 +33,3 @@ export const Column = Node.create({
     ];
   },
 });
-
-export default Column;

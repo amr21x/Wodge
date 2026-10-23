@@ -36,7 +36,7 @@ function TaskCard({ task, index, col, rep, editor }: TaskCardProps) {
   );
 }
 
-export function TaskCardCore({
+function TaskCardCore({
   isEditing,
   task,
   index,

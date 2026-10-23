@@ -256,7 +256,6 @@ export {
   SettingsCollapsiblePlaceHolder,
   SettingsSidebarItem,
   SettingsContent,
-  SettingsClose,
   SettingsContentHeader,
   SettingsContentSection,
   SettingsContentDescription,

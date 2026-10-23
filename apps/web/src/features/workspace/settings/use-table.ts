@@ -27,12 +27,12 @@ declare module "@tanstack/react-table" {
   }
 }
 
-export interface UpdateHandlerProps<TData> {
+interface UpdateHandlerProps<TData> {
   data: Partial<TData>;
   idx: number;
 }
 
-export interface DataTableProps<TData, TValue> {
+interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   updateHandler?: ({ data, idx }: UpdateHandlerProps<TData>) => void;
@@ -63,7 +63,6 @@ export function useTable<TData, TValue>({
 
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    // getPaginationRowModel: getPaginationRowModel(),
     onRowSelectionChange: setRowSelection,
     onRowPinningChange: setRowPinning,
     onColumnFiltersChange: setColumnFilters,
@@ -104,32 +103,6 @@ export function useTable<TData, TValue>({
       },
     },
   });
-
-  // React.useEffect(() => {
-  //   setRowPinning({
-  //     top: [],
-  //     bottom: [],
-  //   });
-
-  //   if (withForm) {
-  //     const row = table.getCoreRowModel().rows.at(-1)!;
-
-  //     if (row?.original.id === "add") {
-  //       row.pin("bottom");
-  //     }
-
-  //     // if (row?.original.id === "add") row.pin("bottom");
-  //   }
-  // }, [data]);
-
-  // React.useEffect(() => {
-  //   if (withForm) {
-  //     const formRowIndex = table.getRowCount() - 1;
-
-  //     const row = table.getCoreRowModel().rows[formRowIndex];
-  //     if (row?.getIsSelected()) row.toggleSelected(false);
-  //   }
-  // }, [rowSelection]);
 
   return { table, edited, buffer, setBuffer, setEdited };
 }

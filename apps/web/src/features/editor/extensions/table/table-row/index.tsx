@@ -8,7 +8,7 @@ import { MenuProps, ShouldShowProps } from "@/features/editor/types";
 import { Toolbar } from "@/features/editor/ui/toolbar";
 import { Icon } from "@/features/editor/ui/icon";
 
-export const TableRowMenu = React.memo(
+const TableRowMenu = React.memo(
   ({ editor, appendTo }: MenuProps): JSX.Element => {
     const shouldShow = useCallback(
       ({ view, state, from }: ShouldShowProps) => {
@@ -74,7 +74,5 @@ export const TableRowMenu = React.memo(
     );
   },
 );
-
-// TableRowMenu.displayName = 'TableRowMenu'
 
 export default TableRowMenu;

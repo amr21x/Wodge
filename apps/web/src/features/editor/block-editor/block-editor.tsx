@@ -20,7 +20,7 @@ import ImageBlockMenu from "../extensions/image-block/image-block-menu";
 import { useSetAtom } from "jotai";
 import { editorUsersAtoms } from "./atoms";
 
-export const BlockEditor = ({
+const BlockEditor = ({
   ydoc,
   provider,
   user,

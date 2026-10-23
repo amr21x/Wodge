@@ -4,7 +4,7 @@ import { Team } from "@wodge/domain/workspace/models";
 import { TeamSchema } from "@wodge/domain/workspace/validation";
 import { produce } from "immer";
 
-export interface TeamInfoUpdate extends WorkspaceTeamMutation {
+interface TeamInfoUpdate extends WorkspaceTeamMutation {
   update: {
     name: Team["name"];
     avatar?: Team["avatar"];
@@ -35,10 +35,6 @@ export function updateTeamInfoMutation({
 
   // 2. Check if team already exists
   const teamIdx = structure.teams.findIndex((t) => t.id === teamId);
-
-  // 3. check if the slug does not exist
-  // if (slug && structure.teams.some((t) => t.slug === slug && t.id !== teamId))
-  //   throw workspaceError("WORKSPACE_CONFLICT","Slug already exists");
 
   if (teamIdx === -1) {
     throw workspaceError("WORKSPACE_NOT_FOUND", "Team does not exist");

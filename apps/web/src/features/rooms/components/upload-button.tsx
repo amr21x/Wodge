@@ -120,15 +120,6 @@ function UploadButtonContent({
           type = "file";
         }
 
-        // console.log("type", type, e);
-
-        // const img = document.createElement("img");
-        // img.style.display = "none";
-        // img.src = e.successful[0]?.preview;
-        // document.body.appendChild(img);
-        // console.log(img.naturalWidth, img.naturalHeight);
-        // document.body.removeChild(img);
-
         const name = e.successful[0]?.name;
         const fileId = e.successful[0]?.response?.body?.fileId as
           | string

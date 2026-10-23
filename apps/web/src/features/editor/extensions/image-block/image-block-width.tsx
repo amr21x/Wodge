@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-export type ImageBlockWidthProps = {
+type ImageBlockWidthProps = {
   onChange: (value: number) => void;
   value: number;
 };

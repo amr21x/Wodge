@@ -4,7 +4,7 @@ import { Decoration, DecorationSet } from "@tiptap/pm/view";
 
 import { getCellsInColumn, isRowSelected, selectRow } from "./utils";
 
-export interface TableCellOptions {
+interface TableCellOptions {
   HTMLAttributes: Record<string, any>;
 }
 

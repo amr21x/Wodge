@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils/index";
 import { LucideIcon } from "lucide-react";
 import { memo } from "react";
 
-export type IconProps = {
+type IconProps = {
   Icon?: LucideIcon;
   className?: string;
   strokeWidth?: number;

@@ -9,7 +9,7 @@ import type { Feature } from "@wodge/domain/features/models";
 import type { Context } from "hono";
 import { inject, injectable } from "tsyringe";
 
-export function featureDisabledResponse(feature: Feature) {
+function featureDisabledResponse(feature: Feature) {
   return Response.json(
     { error: "FeatureDisabled", feature },
     {

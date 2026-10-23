@@ -77,7 +77,6 @@ export function TaskSheet({ task, rep }: TaskSheetProps) {
       <SheetHeader
         className="relative"
         onClick={() => {
-          // focusElement(titleRef);
           titleRef?.current?.focus();
         }}
       >
@@ -94,9 +93,6 @@ export function TaskSheet({ task, rep }: TaskSheetProps) {
               return;
             }
           }}
-          // onBlur={() => {
-          //   onEdit({ title });
-          // }}
         >
           {title}
         </SheetTitle>
@@ -113,7 +109,6 @@ export function TaskSheet({ task, rep }: TaskSheetProps) {
           bigger
           value={task?.assignee || []}
           setValue={(v) => {
-            // setAssignee(v);
             onEdit({ assignee: v as string[] });
           }}
           isEditing
@@ -122,11 +117,9 @@ export function TaskSheet({ task, rep }: TaskSheetProps) {
         <DateTimePicker
           bigger
           onSetDate={(d) => {
-            // setDue(d);
             onEdit({ due: d as Task["due"] });
           }}
           setIncludeTime={(t) => {
-            // setIncludeTime(t);
             onEdit({}, t);
           }}
           date={task?.due as DateRange | undefined}
@@ -138,7 +131,6 @@ export function TaskSheet({ task, rep }: TaskSheetProps) {
           priority={task?.priority}
           isEditing
           onSelect={(p) => {
-            // setPriority(p);
             onEdit({ priority: p });
           }}
         />

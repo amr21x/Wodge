@@ -47,7 +47,6 @@ export const createDefaultTeam = (createdBy: string): Team => {
     folders: [createRootFolder(teamId)],
     threads: [createWelcomeThread()],
     rooms: [createWelcomeRoom()],
-    // tags: [],
   };
 };
 

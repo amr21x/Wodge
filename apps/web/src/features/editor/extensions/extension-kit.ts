@@ -47,7 +47,7 @@ interface ExtensionKitProps {
   placeholder?: string;
 }
 
-export const ExtensionKit = ({ placeholder }: ExtensionKitProps) => [
+const ExtensionKit = ({ placeholder }: ExtensionKitProps) => [
   Document,
   Columns,
   TaskList,
@@ -87,27 +87,6 @@ export const ExtensionKit = ({ placeholder }: ExtensionKitProps) => [
   ImageBlock,
   FileHandler.configure({
     allowedMimeTypes: ["image/png", "image/jpeg", "image/gif", "image/webp"],
-    // onDrop: (currentEditor, files, pos) => {
-    //   files.forEach(async () => {
-    //     const url = await API.uploadImage();
-
-    //     currentEditor.chain().setImageBlockAt({ pos, src: url }).focus().run();
-    //   });
-    // },
-    // onPaste: (currentEditor, files) => {
-    //   files.forEach(async () => {
-    //     const url = await API.uploadImage();
-
-    //     return currentEditor
-    //       .chain()
-    //       .setImageBlockAt({
-    //         pos: currentEditor.state.selection.anchor,
-    //         src: url,
-    //       })
-    //       .focus()
-    //       .run();
-    //   });
-    // },
   }),
   Emoji.configure({
     enableEmoticons: true,

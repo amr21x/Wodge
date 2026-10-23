@@ -33,35 +33,6 @@ export function membersColumns({
   workspaceId,
 }: MembersColumnsProps): ColumnDef<DeepReadonly<Member>>[] {
   return [
-    // {
-    //   id: "select",
-    //   header: ({ table }) => (
-    //     <div className="flex items-center">
-    //       <Checkbox
-    //         checked={
-    //           table.getIsAllPageRowsSelected() ||
-    //           (table.getIsSomePageRowsSelected() && "indeterminate")
-    //         }
-    //         onCheckedChange={(value) =>
-    //           table.toggleAllPageRowsSelected(!!value)
-    //         }
-    //         aria-label="Select all"
-    //       />
-    //     </div>
-    //   ),
-    //   cell: ({ row }) => (
-    //     <div className="flex items-center">
-    //       <Checkbox
-    //         checked={row.getIsSelected()}
-    //         onCheckedChange={(value) => row.toggleSelected(!!value)}
-    //         aria-label="Select row"
-    //       />
-    //     </div>
-    //   ),
-    //   enableSorting: false,
-    //   enableHiding: false,
-    // },
-
     {
       id: "member",
       accessorFn: (row) => {
@@ -119,38 +90,6 @@ export function membersColumns({
       },
     },
 
-    // {
-    //   id: "joinMethod",
-    //   header: () => <p className="pl-1">Join Method</p>,
-    //   cell: ({ row }) => {
-    //     const member = row.original;
-
-    //     const inviter = inviters?.find(
-    //       (i) => i?.id === member.joinInfo.created_by,
-    //     );
-
-    //     const token = member.joinInfo.token;
-
-    //     return (
-    //       <div className="flex flex-col">
-    //         <div className="truncate">
-    //           {token ? (
-    //             <TooltipWrapper content={`Created by ${inviter?.email}`}>
-    //               <pre className="truncate rounded-md bg-surface p-1 text-center text-xs">
-    //                 {token}
-    //               </pre>
-    //             </TooltipWrapper>
-    //           ) : (
-    //             <div className="flex items-center gap-2 pl-1">
-    //               <span>Workspace Owner</span>
-    //               <Crown className="h-4 w-4 fill-yellow-500 stroke-yellow-500" />
-    //             </div>
-    //           )}
-    //         </div>
-    //       </div>
-    //     );
-    //   },
-    // },
     {
       id: "role",
       header: () => <Header className="pl-3">Role</Header>,

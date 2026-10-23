@@ -22,7 +22,7 @@ import { Toolbar } from "../ui/toolbar";
 import { Icon } from "../ui/icon";
 import { DropdownButton } from "../ui/Dropdown/Dropdown";
 
-export type ContentItemMenuProps = {
+type ContentItemMenuProps = {
   editor: Editor;
 };
 

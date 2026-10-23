@@ -62,5 +62,3 @@ export const Figure = Node.create({
     ];
   },
 });
-
-export default Figure;

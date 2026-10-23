@@ -72,7 +72,6 @@ export function Sidebar() {
   const { teamId } = useParams<{ teamId: string }>();
 
   return (
-    // <ScrollArea className="flex-1">
     <aside
       className={cn(
         "h-full max-h-full min-h-0 flex-1 shrink-0 grow overflow-y-auto bg-dim px-2.5 py-1.5 transition-all",
@@ -123,6 +122,5 @@ export function Sidebar() {
         )}
       </div>
     </aside>
-    // </ScrollArea>
   );
 }

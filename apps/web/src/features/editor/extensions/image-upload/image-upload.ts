@@ -50,5 +50,3 @@ export const ImageUpload = Node.create({
     return ReactNodeViewRenderer(memo(ImageUploadComp));
   },
 });
-
-export default ImageUpload;

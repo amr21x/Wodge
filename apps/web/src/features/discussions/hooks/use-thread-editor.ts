@@ -17,7 +17,6 @@ export function useThreadEditor({ content, placeholder }: UseEditorProps = {}) {
     ],
     editorProps: {
       attributes: {
-        // autofocus: true,
         autocomplete: "off",
         autocorrect: "off",
         autocapitalize: "off",

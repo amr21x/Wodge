@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export type EditorInfoProps = {
+type EditorInfoProps = {
   users: EditorUser[];
   maxLength?: number;
 };

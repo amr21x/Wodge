@@ -34,14 +34,6 @@ export const teamMembersColumns = ({
   moderatorsIds,
   workspaceId,
 }: MembersColumnsProps): ColumnDef<string>[] => [
-  // {
-  //   id: "select",
-  //   header: ({ table }) => <DataTableHeaderSelect table={table} />,
-  //   cell: ({ row }) => <DataTableRowSelect row={row} />,
-  //   enableSorting: false,
-  //   enableHiding: false,
-  // },
-
   {
     accessorFn: (row) => {
       const members = queryClient.getQueryData<PublicUserType[]>([

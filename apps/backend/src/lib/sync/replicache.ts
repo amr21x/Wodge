@@ -35,14 +35,14 @@ export interface PatcherParams {
   versions: Versions;
 }
 
-export interface PushProps {
+interface PushProps {
   req: HonoRequest;
   storage: ObjectSyncRepository;
   versions: Versions;
   runner: (params: RunnerParams) => Promise<void>;
 }
 
-export interface PullProps {
+interface PullProps {
   req: HonoRequest;
   storage: ObjectSyncRepository;
   versions: Versions;

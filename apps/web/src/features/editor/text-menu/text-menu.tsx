@@ -43,7 +43,7 @@ const MemoFontSizePicker = memo(FontSizePicker);
 
 const MemoContentTypePicker = memo(ContentTypePicker);
 
-export type TextMenuProps = {
+type TextMenuProps = {
   editor: Editor;
 };
 

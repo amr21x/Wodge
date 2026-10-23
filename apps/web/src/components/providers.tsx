@@ -10,7 +10,7 @@ import { createStore, Provider } from "jotai";
 import { SessionRecovery } from "@/features/auth/components/session-recovery";
 import { FeatureFlagsProvider } from "./feature-flags-provider";
 
-export const jotaiStore = createStore();
+const jotaiStore = createStore();
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (

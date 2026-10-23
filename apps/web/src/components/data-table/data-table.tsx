@@ -51,7 +51,6 @@ function DataTable<TData>({
   if (!table.options?.meta) {
     return null;
   }
-  // const [isEditing, setIsEditing] = React.useState(false);
 
   const { isEditing, setIsEditing, setEdited } = table.options.meta;
 

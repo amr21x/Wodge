@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils/index";
 import { memo, useCallback } from "react";
 
-export type ColorButtonProps = {
+type ColorButtonProps = {
   color?: string;
   active?: boolean;
   onColorChange?: (color: string) => void;
@@ -41,5 +41,3 @@ export const ColorButton = memo(
     );
   },
 );
-
-// ColorButton.displayName = "ColorButton";

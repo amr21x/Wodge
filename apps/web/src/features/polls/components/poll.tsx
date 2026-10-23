@@ -4,12 +4,6 @@ import type { ComponentProps } from "react";
 
 import { FeatureGate } from "@/components/feature-flags-provider";
 
-export type Poll = {
-  title: string;
-  options: string[];
-  votes?: number[];
-};
-
 import { useRoomAction } from "@/features/workspace/hooks/use-room-action";
 import { useMemo } from "react";
 import { PollOptions } from "./poll-options";

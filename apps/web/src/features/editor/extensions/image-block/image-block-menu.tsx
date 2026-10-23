@@ -13,10 +13,7 @@ import { useCallback, useRef } from "react";
 import { Instance, sticky } from "tippy.js";
 import { ImageBlockWidth } from "./image-block-width";
 
-export const ImageBlockMenu = ({
-  editor,
-  appendTo,
-}: MenuProps): JSX.Element => {
+const ImageBlockMenu = ({ editor, appendTo }: MenuProps): JSX.Element => {
   const menuRef = useRef<HTMLDivElement>(null);
   const tippyInstance = useRef<Instance | null>(null);
 

@@ -74,5 +74,3 @@ export const ImageUploader = ({
     </div>
   );
 };
-
-export default ImageUploader;

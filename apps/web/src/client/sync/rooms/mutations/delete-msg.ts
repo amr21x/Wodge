@@ -4,11 +4,7 @@ import { DrObj } from "@wodge/domain/types";
 import { produce } from "immer";
 
 interface deleteMsgArgs {
-  // message: Message;
-  // senderId: string;
   msg: Message;
-  // teamId: string;
-  // roomId: string;
   arr: Message[] | DrObj<Message[]>;
   userId: string;
   isPrivileged: boolean;

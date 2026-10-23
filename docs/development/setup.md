@@ -23,7 +23,6 @@ infrastructure.
 `pnpm init:app` applies local migrations; it does not generate a new migration.
 `pnpm generate` generates Drizzle migrations. `pnpm reset:app` deletes local
 Wrangler state and therefore local data; it is not a routine setup step.
-`pnpm livekit` starts the separate local call server.
 
 ## Verify
 

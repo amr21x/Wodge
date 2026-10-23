@@ -8,7 +8,7 @@ import { Toolbar } from "../ui/toolbar";
 import { Icon } from "../ui/icon";
 import { LinkEditorPanel } from "../link-editor-panel";
 
-export type EditLinkPopoverProps = {
+type EditLinkPopoverProps = {
   onSetLink: (link: string, openInNewTab?: boolean) => void;
 };
 

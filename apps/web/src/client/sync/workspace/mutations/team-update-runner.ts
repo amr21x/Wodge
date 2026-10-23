@@ -9,13 +9,11 @@ import { addTeamMembersMutation, removeTeamMembers } from "./team-members";
 import { WorkspaceTeamMutation } from "./types";
 import { DrObj } from "@wodge/domain/types";
 import type { WorkspaceInputs } from "@wodge/domain/workspace/dto";
-import { Team, WorkspaceStructure } from "@wodge/domain/workspace/models";
+import { WorkspaceStructure } from "@wodge/domain/workspace/models";
 
-export type UpdatableTeamFields = Omit<Team, "id" | "createdBy">;
+type TeamUpdate = WorkspaceInputs["updateTeam"]["teamUpdate"];
 
-export type TeamUpdate = WorkspaceInputs["updateTeam"]["teamUpdate"];
-
-export interface TeamUpdateRunnerArgs extends WorkspaceTeamMutation {
+interface TeamUpdateRunnerArgs extends WorkspaceTeamMutation {
   teamUpdate: TeamUpdate;
   curMembers?: string[];
 }

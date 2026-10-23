@@ -7,7 +7,7 @@ import { Link } from "../extensions/link/link";
 import { Figcaption } from "../extensions/fig-caption/fig-caption";
 import { TableOfContentsNode } from "../extensions/table-of-contents/table-of-contents";
 
-export const isTableGripSelected = (node: HTMLElement) => {
+const isTableGripSelected = (node: HTMLElement) => {
   let container = node;
 
   while (container && !["TD", "TH"].includes(container.tagName)) {

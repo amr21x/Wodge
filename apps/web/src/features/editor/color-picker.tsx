@@ -6,7 +6,7 @@ import { themeColors } from "@/lib/utils/constants";
 import { Toolbar } from "./ui/toolbar";
 import { Icon } from "./ui/icon";
 
-export type ColorPickerProps = {
+type ColorPickerProps = {
   color?: string;
   onChange?: (color: string) => void;
   onClear?: () => void;

@@ -83,7 +83,6 @@ const FormItem = React.forwardRef<
     </FormItemContext.Provider>
   );
 });
-// FormItem.displayName = "FormItem";
 
 const FormLabel = React.forwardRef<
   React.ElementRef<typeof LabelPrimitive.Root>,
@@ -100,7 +99,6 @@ const FormLabel = React.forwardRef<
     />
   );
 });
-// FormLabel.displayName = "FormLabel";
 
 const FormControl = React.forwardRef<
   React.ElementRef<typeof Slot>,
@@ -123,7 +121,6 @@ const FormControl = React.forwardRef<
     />
   );
 });
-// FormControl.displayName = "FormControl";
 
 /**
  * For collapsible description, corresponding input must have peer class
@@ -155,7 +152,6 @@ const FormDescription = React.forwardRef<
     </p>
   );
 });
-// FormDescription.displayName = "FormDescription";
 
 const FormMessage = React.forwardRef<
   HTMLParagraphElement,
@@ -179,7 +175,6 @@ const FormMessage = React.forwardRef<
     </p>
   );
 });
-// FormMessage.displayName = "FormMessage";
 
 export {
   useFormField,

@@ -4,7 +4,7 @@ import { EditorView } from "@tiptap/pm/view";
 import Table from "../table";
 import { isTableSelected } from "../utils";
 
-export const isColumnGripSelected = ({
+const isColumnGripSelected = ({
   editor,
   view,
   state,

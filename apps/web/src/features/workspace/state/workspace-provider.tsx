@@ -22,9 +22,9 @@ interface WorkspaceContextProps {
   isMembersPending: boolean;
 }
 
-export const WorkspaceContext = createContext<
-  WorkspaceContextProps | undefined
->(undefined);
+const WorkspaceContext = createContext<WorkspaceContextProps | undefined>(
+  undefined,
+);
 
 export function WorkspaceProvider({ children }: { children: React.ReactNode }) {
   const workspaceInfo = useWorkspaceSubscription();

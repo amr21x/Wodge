@@ -13,11 +13,7 @@ export const PushRequestSchema = z.object({
   mutations: z.array(MutationSchema),
 });
 
-export type PushRequest = z.infer<typeof PushRequestSchema>;
-
 export const PullRequestSchema = z.object({
   clientGroupID: z.string(),
   cookie: z.union([z.number(), z.null()]),
 });
-
-export type PullRequest = z.infer<typeof PullRequestSchema>;

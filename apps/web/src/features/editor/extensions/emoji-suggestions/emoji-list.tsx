@@ -119,6 +119,4 @@ const EmojiList = forwardRef((props: EmojiListProps, ref) => {
   );
 });
 
-// EmojiList.displayName = "EmojiList";
-
 export default EmojiList;

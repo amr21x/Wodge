@@ -175,7 +175,7 @@ interface DraggableProps {
   isMod: boolean;
 }
 
-export const Channel = React.forwardRef<
+const Channel = React.forwardRef<
   HTMLLIElement,
   { channel: DrObj<ChannelType> } & DraggableProps &
     React.HTMLAttributes<HTMLLIElement>
@@ -306,5 +306,3 @@ export const Channel = React.forwardRef<
     );
   },
 );
-
-// Channel.displayName = "Channel";

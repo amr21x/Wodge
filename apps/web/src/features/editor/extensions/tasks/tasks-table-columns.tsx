@@ -250,11 +250,9 @@ export function tasksColumns({
               {
                 label: "Delete task",
                 action: () => {
-                  // removeMember(member.id);
                   onDeleteTask(row.original);
                 },
                 destructive: true,
-                // disabled: member.role === "owner",
               },
             ]}
           />

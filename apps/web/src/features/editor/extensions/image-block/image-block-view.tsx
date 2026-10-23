@@ -38,5 +38,3 @@ export const ImageBlockView = (props: NodeViewProps) => {
     </NodeViewWrapper>
   );
 };
-
-export default ImageBlockView;

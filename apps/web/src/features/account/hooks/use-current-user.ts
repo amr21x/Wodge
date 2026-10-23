@@ -36,8 +36,6 @@ export function useCurrentUser() {
     enabled: !!session && pathname !== "/demo" && pathname !== "/login",
   });
 
-  // if (!isPending && !data) throw Error("Error loading user");
-
   useEffect(() => {
     if (!isPending && data) {
       if (session && !useAppStore.getState().userStore) {

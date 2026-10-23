@@ -33,7 +33,6 @@ export const TeamSchema = z.object({
   folders: z.array(FolderSchema),
   rooms: z.array(RoomSchema),
   threads: z.array(ThreadSchema),
-  // tags: z.array(TagSchema),
   default: z.boolean().default(false),
 });
 

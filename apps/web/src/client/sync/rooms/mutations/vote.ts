@@ -22,10 +22,6 @@ export function voteMutation({ option, curUserId, msgId, msgsArr }: VoteArgs) {
     const curVote = msg.pollVoters?.find((v) => v.voter === curUserId);
 
     if (curVote) {
-      // thread.pollVoters = thread.pollVoters?.filter(
-      //   (v) => v.voter !== curUserId
-      // );
-      // thread.votes![curVote.option]!--;
       throw roomsError("ROOM_CONFLICT", "User already voted");
     }
 

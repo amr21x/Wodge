@@ -92,7 +92,6 @@ function ColumnContainer({ column, tasks, rep, editor }: Props) {
               aria-label="Column name"
               tabIndex={0}
               ref={ref}
-              // contentEditable={editMode}
               suppressContentEditableWarning
               className={cn(
                 "max-h-32 overflow-hidden truncate break-words pr-1 font-medium focus:outline-none",

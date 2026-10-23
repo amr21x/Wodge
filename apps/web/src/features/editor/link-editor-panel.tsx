@@ -5,13 +5,13 @@ import { Toggle } from "./ui/Toggle/Toggle";
 import { Link } from "lucide-react";
 import { useState, useCallback, useMemo } from "react";
 
-export type LinkEditorPanelProps = {
+type LinkEditorPanelProps = {
   initialUrl?: string;
   initialOpenInNewTab?: boolean;
   onSetLink: (url: string, openInNewTab?: boolean) => void;
 };
 
-export const useLinkEditorState = ({
+const useLinkEditorState = ({
   initialUrl,
   initialOpenInNewTab,
   onSetLink,

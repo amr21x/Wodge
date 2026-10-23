@@ -26,7 +26,7 @@ export type ContentPickerOptions = Array<
   ContentTypePickerOption | ContentTypePickerCategory
 >;
 
-export type ContentTypePickerProps = {
+type ContentTypePickerProps = {
   options: ContentPickerOptions;
 };
 

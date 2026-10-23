@@ -46,9 +46,5 @@ export function useCurrentResources() {
 
   const files = levelItems?.filter((p) => !p.includes("/")) || [];
 
-  // if (isError) {
-  //   console.error("Failed to fetch resources");
-  // }
-
   return { files, dirs, curPath, curLevel };
 }

@@ -15,5 +15,3 @@ export const Heading = TiptapHeading.extend({
     ];
   },
 });
-
-export default Heading;

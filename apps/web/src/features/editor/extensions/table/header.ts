@@ -89,5 +89,3 @@ export const TableHeader = TiptapTableHeader.extend({
     ];
   },
 });
-
-export default TableHeader;

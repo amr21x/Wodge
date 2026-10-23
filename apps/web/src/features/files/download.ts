@@ -46,7 +46,6 @@ export async function download(url: string, name?: string) {
       if (name) {
         tempLink.setAttribute("download", name);
       } // This attribute triggers the download instead of navigation
-      // tempLink.download = name
 
       tempLink.style.display = "none"; // Hide the anchor element
       // Append the anchor element to the document body

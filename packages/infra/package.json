@@ -15,11 +15,9 @@
   "dependencies": {
     "@wodge/domain": "workspace:*",
     "drizzle-orm": "0.45.2",
-    "jose": "^5.4.1",
     "@aws-sdk/client-s3": "^3.554.0",
     "@aws-sdk/s3-request-presigner": "^3.554.0",
     "@polar-sh/sdk": "1.0.2",
-    "nanoid": "^5.0.6",
     "@smithy/fetch-http-handler": "2.5.0",
     "livekit-server-sdk": "^2.1.2",
     "@wodge/env": "workspace:*",

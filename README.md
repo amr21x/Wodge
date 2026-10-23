@@ -118,7 +118,6 @@ Wodge separates synchronized state by domain rather than treating the whole prod
 - Node.js 22.19 or newer (`.node-version` selects 24.19.0)
 - pnpm 12 (`packageManager` pins 12.15.0)
 - A Linux-based development environment is recommended
-- LiveKit Server for local audio/video development
 - Accounts or local substitutes for the external services configured in `.env.example`
 
 ### Installation
@@ -163,12 +162,6 @@ Initialize the local application state and database:
 
 ```bash
 pnpm init:app
-```
-
-Start LiveKit in a separate terminal when testing calls:
-
-```bash
-pnpm livekit
 ```
 
 Start the monorepo with backend secrets injected:

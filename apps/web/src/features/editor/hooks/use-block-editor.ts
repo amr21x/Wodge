@@ -21,10 +21,8 @@ export const useBlockEditor = ({
   provider: YPartyKitProvider;
   user: UserType;
 }) => {
-  // console.log({ canEdit })
   const editor = useEditor(
     {
-      // editable: canEdit,
       autofocus: true,
       extensions: [
         ...ExtensionKit({}),

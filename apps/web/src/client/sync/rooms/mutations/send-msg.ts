@@ -7,10 +7,7 @@ import { produce } from "immer";
 interface sendMsgArgs {
   message: Message;
   curUserId: string;
-  // teamId: string;
-  // roomId: string;
   arr: Message[] | DrObj<Message[]>;
-  // structure: WorkspaceStructure | DrObj<WorkspaceStructure>;
 }
 
 export function sendMessageMutation({ message, curUserId, arr }: sendMsgArgs) {
@@ -29,10 +26,6 @@ export function sendMessageMutation({ message, curUserId, arr }: sendMsgArgs) {
   if (arr.some((msg) => msg.id === newMessage.id)) {
     throw roomsError("ROOM_CONFLICT", "Message already exists");
   }
-
-  // const newStructure = produce(structure, (draft) => {
-  //   arr.push(newMessage);
-  // });
 
   const newArr = produce(arr, (draft) => {
     draft.push({

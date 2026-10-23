@@ -1,7 +1,6 @@
 import type { Room } from "livekit-client";
-import { toast } from "sonner";
 
-export interface ConnectionParams {
+interface ConnectionParams {
   workspaceId?: string;
   channelId?: string;
   teamId?: string;
@@ -14,13 +13,3 @@ export interface ConnectionParams {
 export interface RoomCall extends ConnectionParams {
   room: Room;
 }
-
-// Retain the entry point for callers while media restoration is deferred.
-export const connectToRoom = async (
-  _parameters: ConnectionParams,
-): Promise<RoomCall | undefined> => {
-  toast.info(
-    "Calls are disabled in this showcase. Room messaging remains available.",
-  );
-  return undefined;
-};

@@ -1,4 +1,3 @@
-import { atom } from "jotai";
 import { Message } from "./message";
 import { memo, useEffect, useRef } from "react";
 import { Message as MessageType } from "@wodge/domain/rooms/models";
@@ -8,8 +7,6 @@ import { useSubscribe } from "@/client/sync/use-subscribe";
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
 import { useParams } from "next/navigation";
 import { toast } from "sonner";
-
-export const lastSenderIdAtom = atom<string>("");
 
 export const MessageList = memo(
   ({ rep }: { rep?: Replicache<RoomMutators> }) => {

@@ -45,5 +45,3 @@ export const Link = TiptapLink.extend({
     ];
   },
 });
-
-export default Link;

@@ -7,7 +7,7 @@ import { Toolbar } from "@/features/editor/ui/toolbar";
 import * as PopoverMenu from "@/features/editor/ui/popover-menu";
 import { Icon } from "@/features/editor/ui/icon";
 
-export const TableColumnMenu = React.memo(
+const TableColumnMenu = React.memo(
   ({ editor, appendTo }: MenuProps): JSX.Element => {
     const shouldShow = useCallback(
       ({ view, state, from }: ShouldShowProps) => {
@@ -72,7 +72,5 @@ export const TableColumnMenu = React.memo(
     );
   },
 );
-
-// TableColumnMenu.displayName = "TableColumnMenu";
 
 export default TableColumnMenu;

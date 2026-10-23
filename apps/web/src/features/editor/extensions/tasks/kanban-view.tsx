@@ -36,9 +36,6 @@ export function KanbanView({ editor }: { editor: Editor }) {
         delay: 250,
       },
     }),
-    // useSensor(KeyboardSensor, {
-    //   coordinateGetter: sortableKeyboardCoordinates,
-    // }),
   );
 
   const priority = useAtomValue(priorityAtom);
@@ -131,7 +128,6 @@ export function KanbanView({ editor }: { editor: Editor }) {
         sensors={sensors}
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
-        // onDragOver={onDragOver}
         modifiers={activeColumn ? [restrictToHorizontalAxis] : []}
       >
         <div

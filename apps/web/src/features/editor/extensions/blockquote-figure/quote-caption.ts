@@ -54,5 +54,3 @@ export const QuoteCaption = Node.create({
     };
   },
 });
-
-export default QuoteCaption;

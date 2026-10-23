@@ -57,7 +57,6 @@ export function useMessageEditor({
       Emoji.configure({
         enableEmoticons: true,
         emojis: gitHubEmojis,
-        // suggestion: emojiSuggestion,
       }),
       MessageNewLine,
     ],

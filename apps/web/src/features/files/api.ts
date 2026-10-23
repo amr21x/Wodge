@@ -50,5 +50,3 @@ export class API {
     } catch {}
   };
 }
-
-export default API;

@@ -6,7 +6,7 @@ import type { TableOfContentsStorage } from "@tiptap/extension-table-of-contents
 import type { OutlineItem } from "./types";
 import { cn } from "@/lib/utils/index";
 
-export type TableOfContentsProps = {
+type TableOfContentsProps = {
   editor: CoreEditor;
   onItemClick?: () => void;
 };

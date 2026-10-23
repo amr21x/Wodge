@@ -24,7 +24,6 @@ export function TaskProvider({
   task: Task;
   isEditing: boolean;
   setIsEditing: (isEditing: boolean) => void;
-  // open: boolean;
 }) {
   const [title, setTitle] = useState(task?.title);
   const [open, setOpen] = useState(false);

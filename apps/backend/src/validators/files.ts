@@ -15,7 +15,7 @@ export const FileParams = z.object({
 export const AvatarKey = z
   .string()
   .regex(/^[\w=-]{1,80}$/, "Invalid avatar key");
-export const StoragePath = z
+const StoragePath = z
   .string()
   .min(1)
   .max(1024)

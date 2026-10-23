@@ -18,7 +18,7 @@ const FONT_SIZES = [
   { label: "Extra Large", value: "24px" },
 ];
 
-export type FontSizePickerProps = {
+type FontSizePickerProps = {
   onChange: (value: string) => void;
   value: string;
 };

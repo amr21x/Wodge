@@ -33,8 +33,6 @@ export function TeamGeneralForm({ team }: { team?: DrObj<Team> }) {
     },
   });
 
-  // const { toastId } = useSubmitToast(form, formRef);
-
   useEffect(() => {
     if (isAddition) {
       return form.reset({

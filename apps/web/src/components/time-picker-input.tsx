@@ -11,7 +11,7 @@ import {
 } from "@/lib/utils/time-utils";
 import { cn } from "@/lib/utils";
 
-export interface TimePickerInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface TimePickerInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   picker: TimePickerType;
   date: Date | undefined;
   setDate: (date: Date | undefined) => void;
@@ -131,7 +131,5 @@ const TimePickerInput = React.forwardRef<
     );
   },
 );
-
-// TimePickerInput.displayName = "TimePickerInput";
 
 export { TimePickerInput };

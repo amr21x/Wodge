@@ -5,7 +5,7 @@ import { Surface } from "./surface";
 import { Button, ButtonProps } from "./Button/Button";
 import Tooltip from "./Tooltip/index";
 
-export type ToolbarWrapperProps = {
+type ToolbarWrapperProps = {
   shouldShowContent?: boolean;
   isVertical?: boolean;
 } & HTMLProps<HTMLDivElement>;
@@ -37,9 +37,7 @@ const ToolbarWrapper = forwardRef<HTMLDivElement, ToolbarWrapperProps>(
   },
 );
 
-// ToolbarWrapper.displayName = "Toolbar";
-
-export type ToolbarDividerProps = {
+type ToolbarDividerProps = {
   horizontal?: boolean;
 } & HTMLProps<HTMLDivElement>;
 
@@ -57,9 +55,7 @@ const ToolbarDivider = forwardRef<HTMLDivElement, ToolbarDividerProps>(
   },
 );
 
-// ToolbarDivider.displayName = "Toolbar.Divider";
-
-export type ToolbarButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+type ToolbarButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   active?: boolean;
   activeClassname?: string;
   tooltip?: string;
@@ -108,8 +104,6 @@ const ToolbarButton = forwardRef<HTMLButtonElement, ToolbarButtonProps>(
     return content;
   },
 );
-
-// ToolbarButton.displayName = "ToolbarButton";
 
 export const Toolbar = {
   Wrapper: ToolbarWrapper,

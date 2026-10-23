@@ -180,5 +180,3 @@ export const GROUPS: Group[] = [
     ],
   },
 ];
-
-export default GROUPS;
