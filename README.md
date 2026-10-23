@@ -4,7 +4,7 @@
 
 Read the [repository documentation and feature index](docs/README.md) for the revival specifications, architecture, engineering guidance, and migration review status. The implementation and walkthrough below describe the capstone baseline; the revival targets are not claimed complete.
 
-[![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Replicache](https://img.shields.io/badge/Replicache-local--first-6E56CF)](https://replicache.dev/)
 [![PartyKit](https://img.shields.io/badge/PartyKit-realtime-FF5D01)](https://www.partykit.io/)
@@ -83,18 +83,18 @@ Wodge separates synchronized state by domain rather than treating the whole prod
 
 ## Technology
 
-| Area                    | Technologies                                              |
-| ----------------------- | --------------------------------------------------------- |
-| Web application         | Next.js, React, TypeScript, Tailwind CSS, Radix UI        |
-| Local-first data        | Replicache, shared mutation models, Zod validation        |
-| Real-time backend       | PartyServer, WebSockets, presence-aware services          |
-| Collaborative editing   | Tiptap, Yjs, y-partykit                                   |
-| Audio and video         | LiveKit                                                   |
-| Data layer              | Drizzle ORM, SQLite/Cloudflare D1                         |
-| Authentication          | Better Auth                                               |
-| State and data fetching | TanStack Query, Zustand, Jotai, Immer                     |
-| Tooling                 | Turborepo, pnpm, Vitest, ESLint, Prettier, Wrangler       |
-| Deployment              | Cloudflare Pages, Workers/Durable Objects, GitHub Actions |
+| Area                    | Technologies                                        |
+| ----------------------- | --------------------------------------------------- |
+| Web application         | Next.js, React, TypeScript, Tailwind CSS, Radix UI  |
+| Local-first data        | Replicache, shared mutation models, Zod validation  |
+| Real-time backend       | PartyServer, WebSockets, presence-aware services    |
+| Collaborative editing   | Tiptap, Yjs, y-partykit                             |
+| Audio and video         | LiveKit                                             |
+| Data layer              | Drizzle ORM, SQLite/Cloudflare D1                   |
+| Authentication          | Better Auth                                         |
+| State and data fetching | TanStack Query, Zustand, Jotai, Immer               |
+| Tooling                 | Turborepo, pnpm, Vitest, ESLint, Prettier, Wrangler |
+| Deployment              | Cloudflare Workers/Durable Objects, GitHub Actions  |
 
 ## Repository Structure
 
@@ -238,7 +238,7 @@ pnpm reset:app       # Reset local generated Wrangler state
 
 ## Project Status
 
-The public repository contains the capstone version of Wodge and is suitable for architecture review and local exploration. The codebase includes deployment automation for Cloudflare Pages and Workers, but a complete turnkey self-hosting guide is still being consolidated.
+The public repository contains the capstone version of Wodge and is suitable for architecture review and local exploration. The codebase includes deployment automation for Cloudflare Workers, but a complete turnkey self-hosting guide is still being consolidated.
 
 Some integrations require third-party credentials, including Google/GitHub OAuth providers, LiveKit, Cloudflare, and other optional services represented in `.env.example`.
 

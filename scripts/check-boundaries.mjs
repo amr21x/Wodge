@@ -39,9 +39,14 @@ let files = 0;
 async function inspect(directory, owner) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
     if (
-      ["node_modules", ".next", ".partykit", ".wrangler", "dist"].includes(
-        entry.name,
-      )
+      [
+        "node_modules",
+        ".next",
+        ".open-next",
+        ".partykit",
+        ".wrangler",
+        "dist",
+      ].includes(entry.name)
     )
       continue;
     const filename = path.join(directory, entry.name);
@@ -206,7 +211,7 @@ async function inspect(directory, owner) {
       if (
         owner.manifest.name === "@wodge/core" &&
         filename.startsWith(path.join(owner.directory, "src") + path.sep) &&
-        /^(?:hono(?:\/|$)|partykit(?:\/|$)|partyserver(?:\/|$)|next(?:\/|$)|react(?:\/|$)|replicache(?:\/|$)|@cloudflare\/next-on-pages(?:\/|$)|@wodge\/env(?:\/|$))/.test(
+        /^(?:hono(?:\/|$)|partykit(?:\/|$)|partyserver(?:\/|$)|next(?:\/|$)|react(?:\/|$)|replicache(?:\/|$)|@cloudflare\/next-on-pages(?:\/|$)|@opennextjs\/cloudflare(?:\/|$)|@wodge\/env(?:\/|$))/.test(
           specifier,
         )
       ) {

@@ -5,6 +5,13 @@ import { middleware } from "../src/middleware";
 vi.mock("@wodge/env/client", () => ({
   env: { NEXT_PUBLIC_BACKEND_DOMAIN: "http://backend.test" },
 }));
+vi.mock("@opennextjs/cloudflare", () => ({
+  getCloudflareContext: () => ({
+    env: {
+      BACKEND: { fetch: (...args: Parameters<typeof fetch>) => fetch(...args) },
+    },
+  }),
+}));
 afterEach(() => {
   vi.unstubAllGlobals();
 });

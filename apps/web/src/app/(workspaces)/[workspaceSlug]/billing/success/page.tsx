@@ -2,14 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 import { useQueryClient } from "@tanstack/react-query";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function Component({
-  params: { workspaceSlug },
-}: {
-  params: { workspaceSlug: string };
-}) {
+export default function Component() {
+  const { workspaceSlug } = useParams<{ workspaceSlug: string }>();
   const [countdown, setCountdown] = useState(5);
   useState(false);
 

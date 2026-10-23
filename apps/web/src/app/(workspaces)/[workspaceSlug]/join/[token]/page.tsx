@@ -8,21 +8,22 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { cookies } from "next/headers";
-import { env } from "@wodge/env/client";
+import { fetchBackend } from "@/lib/backend";
 import { loginPath } from "@/features/auth/redirect";
 
 import { AcceptButton } from "../../../../../features/workspace/components/accept-button";
 import { redirect } from "next/navigation";
 
 async function JoinWorkspacePage({
-  params,
+  params: routeParams,
 }: {
-  params: { token: string; workspaceSlug: string };
+  params: Promise<{ token: string; workspaceSlug: string }>;
 }) {
-  const response = await fetch(
-    `${env.NEXT_PUBLIC_BACKEND_DOMAIN}/api/workspaces/preview/${encodeURIComponent(params.workspaceSlug)}/${encodeURIComponent(params.token)}`,
+  const params = await routeParams;
+  const response = await fetchBackend(
+    `/api/workspaces/preview/${encodeURIComponent(params.workspaceSlug)}/${encodeURIComponent(params.token)}`,
     {
-      headers: { cookie: cookies().toString() },
+      headers: { cookie: (await cookies()).toString() },
       cache: "no-store",
     },
   );

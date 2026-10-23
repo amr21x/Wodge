@@ -15,12 +15,14 @@ One public origin, `https://wodge.amr21.dev`, serves both applications:
 | ---------------------- | ---------------------------------------------------------------------- |
 | `/api/*`, `/parties/*` | Worker `wodge-backend` through routes in `apps/backend/wrangler.jsonc` |
 | `/health`              | Worker `wodge-backend` (JSON liveness check)                           |
-| Everything else        | Pages project `wodge` (Next-on-Pages build of `apps/web`)              |
+| Everything else        | Worker `wodge-web` (OpenNext build of `apps/web`)                      |
 
-Worker routes run before the Pages custom domain, so auth cookies, OAuth callbacks
+Backend routes run before the frontend Worker custom domain, so auth cookies, OAuth callbacks
 and WebSockets stay first-party. The web middleware fetches `/api/users/me` on the
-same hostname; `global_fetch_strictly_public` in `apps/web/wrangler.toml` sends that
-subrequest through the zone so the Worker route handles it. `workers_dev` is off.
+same hostname in the browser. Server-side middleware and invite rendering use the
+`BACKEND` service binding to `wodge-backend`: same-zone Worker routes cannot be
+reached using ordinary `fetch`. Local Next.js development uses HTTP to the backend.
+`workers_dev` is off for both production Workers.
 
 Avatars are public objects in the R2 bucket `avatars`, served from the R2 custom
 domain `https://wodge-avatars.amr21.dev`. Workspace files use private per-workspace
@@ -44,7 +46,7 @@ UPDATE feature_flags SET enabled = 1 WHERE key IN ('attachments', 'avatars');
 | D1 database (binding `DB`) | `wodge`; its ID is checked into `apps/backend/wrangler.jsonc`                                |
 | SQLite Durable Objects     | `UserServer`, `WorkspaceServer`, `RoomServer`, `ThreadServer`, `PageServer` (migration `v1`) |
 | R2                         | `avatars` (public custom domain) plus backend-created workspace buckets                      |
-| Pages project              | `wodge`, production branch `main`, custom domain `wodge.amr21.dev`                           |
+| Frontend Worker            | `wodge-web`, production branch `main`, custom domain `wodge.amr21.dev`                       |
 
 The production database and objects started empty. No data was migrated from the
 earlier PartyKit or Supabase deployment.
@@ -87,12 +89,12 @@ run waits for approval before builds, migrations or deployment. Public origin va
 may be set at repository scope for CI and in the production environment for deployment.
 If unset, the workflows use the production URLs listed above.
 
-| Kind     | Name                                          | Value                                                           |
-| -------- | --------------------------------------------- | --------------------------------------------------------------- |
-| Secret   | `CLOUDFLARE_ACCOUNT_ID`                       | Cloudflare account ID                                           |
-| Secret   | `CLOUDFLARE_API_TOKEN`                        | Workers Scripts/Routes, D1, Pages: Edit; Account Settings: Read |
-| Secret   | `BACKEND_SECRETS`                             | JSON object holding the Worker secrets listed above             |
-| Variable | `APP_DOMAIN`, `BACKEND_DOMAIN`, `AVATARS_URL` | Production values above                                         |
+| Kind     | Name                                          | Value                                                    |
+| -------- | --------------------------------------------- | -------------------------------------------------------- |
+| Secret   | `CLOUDFLARE_ACCOUNT_ID`                       | Cloudflare account ID                                    |
+| Secret   | `CLOUDFLARE_API_TOKEN`                        | Workers Scripts/Routes, D1: Edit; Account Settings: Read |
+| Secret   | `BACKEND_SECRETS`                             | JSON object holding the Worker secrets listed above      |
+| Variable | `APP_DOMAIN`, `BACKEND_DOMAIN`, `AVATARS_URL` | Production values above                                  |
 
 ## Continuous integration
 
@@ -102,7 +104,7 @@ If unset, the workflows use the production URLs listed above.
 - `validate`: detects documentation-only changes and always runs lint and formatting.
   For application changes it also runs boundaries, type checks, API contract tests,
   Vitest suites (including feature flags), and local Worker runtime checks.
-- `build`: builds the backend Worker and Pages frontend after validation, with cached
+- `build`: builds the backend and frontend Workers after validation, with cached
   pnpm downloads and Next.js build data. Skipped for documentation-only changes.
 - `quality` (job ID `result`): preserves the existing required check name. Validation must pass; builds must
   pass for application changes and be skipped for documentation-only changes.
@@ -113,9 +115,9 @@ still run the full checks. Detection is a step in `validate`, not a separate job
 
 The manual deploy workflow calls these same jobs for the selected ref, always
 running full validation and builds even if that ref only changes documentation.
-After production approval, deployment builds Pages using the production variables,
+After production approval, deployment builds the frontend Worker using the production variables,
 applies D1 migrations, configures Worker secrets, builds and deploys the Worker
-through Wrangler, deploys Pages, then checks `/health` and `/login`. Deployment
+through Wrangler, deploys the frontend Worker, then checks `/health` and `/login`. Deployment
 repeats builds deliberately so there are no artifact archives, transfers or workflow
 outputs to coordinate.
 
@@ -123,13 +125,32 @@ outputs to coordinate.
 
 The owner-preferred setup builds both units in Cloudflare from the production branch.
 
-**Pages** (`Workers & Pages → Create → Pages → Connect to Git`): project `wodge`, root
-directory `apps/web`, build command `pnpm pages:build`, output `.vercel/output/static`,
-and production variables `NEXT_PUBLIC_APP_DOMAIN`, `NEXT_PUBLIC_BACKEND_DOMAIN`,
-`NEXT_PUBLIC_AVATARS_URL`, `NODE_VERSION=24.19.0` and `PNPM_VERSION=12.15.0`. Add the
-custom domain `wodge.amr21.dev` after the first successful build.
+**Frontend Worker** (`Workers & Pages → Create → Import a repository`): name
+`wodge-web`, repository `amr21x/Wodge`, production branch `main`, root directory
+`apps/web`, build command `pnpm workers:build`, deploy command
+`pnpm exec opennextjs-cloudflare deploy`. There is no dashboard output directory.
+Set these **build variables**:
 
-**Worker** (`Workers & Pages → Create → Workers → Import a repository`): name
+```text
+NODE_VERSION=24.19.0
+PNPM_VERSION=12.15.0
+NEXT_PUBLIC_APP_DOMAIN=https://wodge.amr21.dev
+NEXT_PUBLIC_BACKEND_DOMAIN=https://wodge.amr21.dev
+NEXT_PUBLIC_AVATARS_URL=https://wodge-avatars.amr21.dev
+```
+
+Deploy the backend first so the `BACKEND` service binding can resolve. The frontend
+Wrangler configuration declares its custom domain, assets and service bindings.
+Authentication-driven pages remain dynamic; no R2 cache bucket is required for
+this deployment. Existing PWA/service-worker behavior is retained.
+
+If a Pages project already owns `wodge.amr21.dev`, first validate the Worker build,
+then detach that custom domain from Pages and remove its existing CNAME before
+attaching the Worker custom domain. Cloudflare cannot attach a Worker custom domain
+over an existing CNAME. Disable the old Pages project's automatic deployments after
+cutover. Keep the old project available for rollback until the Worker is verified.
+
+**Backend Worker** (`Workers & Pages → Create → Import a repository`): name
 `wodge-backend`, root directory `apps/backend`, no build command, build variables
 `NODE_VERSION=24.19.0` and `PNPM_VERSION=12.15.0`, and this deploy command:
 
@@ -157,16 +178,13 @@ pnpm exec wrangler deploy \
   --var AVATARS_URL:https://wodge-avatars.amr21.dev --var INTEGRATION_MODE:partial
 cd ../web
 NEXT_PUBLIC_APP_DOMAIN=https://wodge.amr21.dev NEXT_PUBLIC_BACKEND_DOMAIN=https://wodge.amr21.dev \
-  NEXT_PUBLIC_AVATARS_URL=https://wodge-avatars.amr21.dev pnpm pages:build
-pnpm exec wrangler pages deploy .vercel/output/static --project-name wodge --branch main
+  NEXT_PUBLIC_AVATARS_URL=https://wodge-avatars.amr21.dev pnpm workers:build
+pnpm exec opennextjs-cloudflare deploy
 ```
 
-Delete `secrets.json` afterwards. Run the web build from a regular clone: Vercel CLI
-33 cannot read a git worktree's `.git` file. `pages:build` runs the installed Pages
-adapter through `npm exec`, which lets it find the pinned Vercel CLI. The declarative
-`apps/web/vercel.json` selects `pnpm run build` and disables Vercel's dependency
-installation; dependencies must already be installed. Neither application uses a
-custom build script.
+Delete `secrets.json` afterwards. The frontend uses standard Next.js and OpenNext
+CLI commands. It no longer depends on Pages, Vercel CLI, placeholder Vercel project
+settings or custom build scripts. Builds work from normal clones and git worktrees.
 
 ## Smoke checks
 
@@ -179,8 +197,8 @@ custom build script.
 
 ## Recovery
 
-- **Web:** in Pages → `wodge` → Deployments, roll back to the previous production
-  deployment. Static output has no state.
+- **Web:** in Workers & Pages → `wodge-web` → Deployments, roll back the frontend
+  Worker. Its asset versions deploy with the Worker.
 - **Worker:** `pnpm exec wrangler rollback` from `apps/backend` (or Workers → `wodge-backend` → Deployments). A code rollback does
   not reverse D1 migrations or Durable Object state.
 - **D1:** migrations are forward-only. Before a risky migration, note the time; Time
@@ -191,5 +209,6 @@ custom build script.
   Deploy a fix forward instead of rolling back past a storage format change.
 - **Secrets:** rotate with `wrangler secret put <NAME>`. Rotating `BETTER_AUTH_SECRET`
   signs everyone out; rotating `SECRET_KEY` invalidates outstanding realtime tickets.
-- **Routing outage:** delete the Worker routes to fall back to Pages only (the app
-  then shows its unavailable page) while the backend is fixed.
+- **Backend routing outage:** removing the backend routes sends traffic to the
+  frontend Worker, which has no backend API. Restore the routes or roll back the
+  backend; route removal does not restore application functionality.

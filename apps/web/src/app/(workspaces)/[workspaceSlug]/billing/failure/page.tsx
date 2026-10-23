@@ -1,14 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function Component({
-  params: { workspaceSlug },
-}: {
-  params: { workspaceSlug: string };
-}) {
+export default function Component() {
+  const { workspaceSlug } = useParams<{ workspaceSlug: string }>();
   const [countdown, setCountdown] = useState(5);
 
   const router = useRouter();

@@ -3,12 +3,10 @@
 import { TeamSettings } from "@/features/workspace/settings/teams/team-settings";
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
 import { useMemo } from "react";
+import { useParams } from "next/navigation";
 
-function TeamSettingsPage({
-  params: { teamId },
-}: {
-  params: { workspaceSlug: string; teamId: string };
-}) {
+function TeamSettingsPage() {
+  const { teamId } = useParams<{ teamId: string }>();
   const { structure } = useCurrentWorkspace();
 
   const team = useMemo(
