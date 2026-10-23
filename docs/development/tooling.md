@@ -40,9 +40,11 @@ workflow checks lint and formatting on pushes and pull requests, including docs-
 changes; these are source checks, not application build/test jobs. The manual Worker
 deploy workflow runs both checks before configuring secrets or deploying.
 
-The quality job skips dependency lifecycle scripts because it only runs source
-checks. The Oxc tools use their installed platform bindings; application native
-modules do not need to be built for linting or formatting.
+The validation job also detects documentation-only changes. Lint and formatting
+always run; application checks and builds are skipped when every changed path is
+under `docs/`. Dependencies are installed once per job, with the pnpm store cached.
+See the [CI and deployment runbook](../operations/runbooks/production-deployment.md#continuous-integration)
+for build artifacts and manual deployment.
 
 `.oxlintrc.json` enables native TypeScript, React, Hooks, Next.js, accessibility,
 import and general correctness rules. Correctness findings are warnings; Rules of
@@ -64,7 +66,8 @@ For VS Code, install the `oxc.oxc-vscode` extension. Workspace language settings
 it as the formatter; its lint integration reads the same root configuration.
 
 `pnpm --filter backend build` compiles the production Worker through Wrangler's
-dry run. `pnpm --filter backend test:foundation` builds and runs the retained
+dry run, writing deployable output to `apps/backend/dist/worker`.
+`pnpm --filter backend test:foundation` builds and runs the retained
 compatibility fixture, import-boundary checks and local Worker/D1 checks. These do not deploy or validate all product journeys.
 The evidence records explicit backend, protocol, and shared-data type commands.
 

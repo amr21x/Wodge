@@ -82,7 +82,12 @@ value returns errors naming the setting, never its value.
 ### GitHub Actions
 
 `Production Deploy` (`.github/workflows/deploy.yml`) runs from the `production`
-environment. Configure required reviewers on it so each run waits for approval.
+environment for deployment credentials. Configure required reviewers on it so each
+run waits for approval before migrations or deployment. Set the three public origin
+variables at **repository** scope (Settings → Secrets and variables → Actions →
+Variables), not on the environment: CI must use those same values when building.
+If unset, the workflows use the production URLs listed above. Deployment uses the
+origins returned by the build; environment copies of these variables are unused.
 
 | Kind     | Name                                          | Value                                                           |
 | -------- | --------------------------------------------- | --------------------------------------------------------------- |
@@ -96,19 +101,27 @@ environment. Configure required reviewers on it so each run waits for approval.
 `Code Quality` (`.github/workflows/quality.yml`) runs on pull requests and pushes to
 `main`/`dev`:
 
-- `quality`: lint and format checks on every change, including documentation.
-- `scope`: decides whether the change is documentation-only (every path, including
-  both sides of a rename, under `docs/`).
-- `application`: boundaries, type checks, API contract, Vitest suites (including the
-  feature-flag suite), local Worker
-  runtime checks, the backend dry-run build and the Pages build. Skipped for
-  documentation-only changes.
-- `result`: the stable required check; it passes when the jobs above pass or are
-  skipped.
+- `validate`: detects documentation-only changes and always runs lint and formatting.
+  For application changes it also runs boundaries, type checks, API contract tests,
+  Vitest suites (including feature flags), and local Worker runtime checks.
+- `build`: builds the backend Worker and Pages frontend after validation, with cached
+  pnpm downloads and Next.js build data. Skipped for documentation-only changes.
+- `result`: preserves the stable required check. Validation must pass; builds must
+  pass for application changes and be skipped for documentation-only changes.
 
-The deploy workflow calls the same workflow first, then applies D1 migrations, sets
-Worker secrets, deploys the Worker, builds and deploys Pages, and checks `/health`
-and `/login`.
+A documentation-only change means every changed path is under `docs/`, including
+both sides of renames. Root Markdown, workflow changes and moves out of `docs/`
+still run the full checks. Detection is a step in `validate`, not a separate job.
+
+The manual deploy workflow calls these same jobs for the selected ref, always
+running full validation and builds even if that ref only changes documentation.
+The build job archives `apps/backend/dist/worker` and
+`apps/web/.vercel/output/static` as the `deployment` artifact, retained for seven
+days. The deployment job downloads that artifact from its own workflow run before
+applying D1 migrations and configuring secrets. It deploys the bundled Worker with
+`--no-bundle` and the Pages output directly, then checks `/health` and `/login`.
+Neither application is rebuilt during deployment. PR and push runs check builds
+without uploading deployment artifacts.
 
 ## Cloudflare Git integration (dashboard)
 

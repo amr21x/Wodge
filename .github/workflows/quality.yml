@@ -6,27 +6,22 @@ on:
       - main
       - dev
   pull_request:
-  # The production deploy workflow runs the same gates before deploying.
+  # Deployment builds the reviewed ref once and consumes its artifacts in the same run.
   workflow_call:
+    inputs:
+      deployment:
+        type: boolean
+        default: false
+    outputs:
+      app_domain:
+        value: ${{ jobs.build.outputs.app_domain }}
+      backend_domain:
+        value: ${{ jobs.build.outputs.backend_domain }}
+      avatars_url:
+        value: ${{ jobs.build.outputs.avatars_url }}
 
 jobs:
-  # Source checks also cover documentation formatting, so they run for every change.
-  quality:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .node-version
-      # Uses the version pinned by packageManager in package.json.
-      - uses: pnpm/action-setup@v4
-      - run: pnpm install --frozen-lockfile --ignore-scripts
-      - run: pnpm lint
-      - run: pnpm format:check
-
-  # Documentation-only changes skip the application gates. A path filter cannot be
-  # used because GitHub leaves skipped required workflows pending.
-  scope:
+  validate:
     runs-on: ubuntu-latest
     outputs:
       application: ${{ steps.scope.outputs.application }}
@@ -36,11 +31,13 @@ jobs:
           fetch-depth: 0
       - id: scope
         env:
+          DEPLOYMENT: ${{ inputs.deployment || false }}
           BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
           HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
+          # Manual deployment always validates and builds, including a docs-only ref.
           # New branches have no previous commit to compare; run everything.
-          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
+          if [ "$DEPLOYMENT" = true ] || [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
             echo "application=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -52,52 +49,93 @@ jobs:
           else
             echo "application=true" >> "$GITHUB_OUTPUT"
           fi
-
-  application:
-    needs: scope
-    if: needs.scope.outputs.application == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+      # Uses the pnpm version pinned by packageManager; setup-node caches its store.
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
-      # Uses the version pinned by packageManager in package.json.
-      - uses: pnpm/action-setup@v4
+          cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm check:boundaries
+      - run: pnpm lint
+      - run: pnpm format:check
+      - if: steps.scope.outputs.application == 'true'
+        run: pnpm check:boundaries
       - name: Type check
+        if: steps.scope.outputs.application == 'true'
         run: |
           pnpm -r --if-present typecheck
           pnpm exec tsc -p apps/backend/tsconfig.json --noEmit --incremental false --pretty false
           pnpm --filter backend test:api
       - name: Tests
+        if: steps.scope.outputs.application == 'true'
         run: |
           pnpm exec vitest run --maxWorkers=2 --minWorkers=1
           pnpm test:feature-flags
       - name: Worker runtime checks
+        if: steps.scope.outputs.application == 'true'
         run: |
           pnpm --filter backend test:foundation
           pnpm --filter backend test:runtime
+
+  build:
+    needs: validate
+    if: needs.validate.outputs.application == 'true'
+    runs-on: ubuntu-latest
+    # Return the actual build settings so deployment cannot use different origins.
+    env:
+      NEXT_PUBLIC_APP_DOMAIN: ${{ vars.APP_DOMAIN || 'https://wodge.amr21.dev' }}
+      NEXT_PUBLIC_BACKEND_DOMAIN: ${{ vars.BACKEND_DOMAIN || 'https://wodge.amr21.dev' }}
+      NEXT_PUBLIC_AVATARS_URL: ${{ vars.AVATARS_URL || 'https://wodge-avatars.amr21.dev' }}
+    outputs:
+      app_domain: ${{ env.NEXT_PUBLIC_APP_DOMAIN }}
+      backend_domain: ${{ env.NEXT_PUBLIC_BACKEND_DOMAIN }}
+      avatars_url: ${{ env.NEXT_PUBLIC_AVATARS_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
       - name: Build backend Worker
         run: pnpm --filter backend build
+      - uses: actions/cache@v4
+        with:
+          path: apps/web/.next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
       - name: Build web for Cloudflare Pages
         env:
           NEXT_TELEMETRY_DISABLED: 1
-          NEXT_PUBLIC_APP_DOMAIN: ${{ vars.APP_DOMAIN || 'https://wodge.amr21.dev' }}
-          NEXT_PUBLIC_BACKEND_DOMAIN: ${{ vars.BACKEND_DOMAIN || 'https://wodge.amr21.dev' }}
-          NEXT_PUBLIC_AVATARS_URL: ${{ vars.AVATARS_URL || 'https://wodge-avatars.amr21.dev' }}
         run: pnpm --filter web pages:build
+      # Archive only deployable output, preserving hidden files such as .assetsignore.
+      - name: Package deployment
+        if: inputs.deployment
+        run: tar -czf deployment.tar.gz apps/backend/dist/worker apps/web/.vercel/output/static
+      - uses: actions/upload-artifact@v4
+        if: inputs.deployment
+        with:
+          name: deployment
+          path: deployment.tar.gz
+          if-no-files-found: error
+          retention-days: 7
 
-  # Stable required check: passes when the application gates pass or are skipped as docs-only.
+  # Keep the existing required check green for docs-only changes, but fail closed.
   result:
-    needs: [quality, scope, application]
+    needs: [validate, build]
     if: always()
     runs-on: ubuntu-latest
     steps:
       - env:
-          RESULTS: ${{ join(needs.*.result, ' ') }}
+          VALIDATE: ${{ needs.validate.result }}
+          BUILD: ${{ needs.build.result }}
+          APPLICATION: ${{ needs.validate.outputs.application }}
         run: |
-          for result in $RESULTS; do
-            case $result in success | skipped) ;; *) exit 1 ;; esac
-          done
+          test "$VALIDATE" = success
+          if [ "$APPLICATION" = true ]; then
+            test "$BUILD" = success
+          else
+            test "$APPLICATION" = false
+            test "$BUILD" = skipped
+          fi

@@ -12,7 +12,7 @@
     "db:migration:cloud": "wrangler d1 migrations apply wodge --remote",
     "db:studio": "pnpm --filter @wodge/infra exec drizzle-kit studio --config database/drizzle.local.config.ts",
     "test:runtime": "node tests/runtime/verify.mjs",
-    "build": "pnpm run build:api && wrangler deploy --dry-run",
+    "build": "pnpm run build:api && wrangler deploy --dry-run --outdir dist/worker",
     "build:api": "node scripts/build-api.mjs",
     "dev:api": "node scripts/build-api.mjs --watch",
     "test:api": "pnpm run build:api && tsc -p tests/types/client/tsconfig.json --pretty false"
