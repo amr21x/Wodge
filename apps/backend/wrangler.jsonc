@@ -4,7 +4,7 @@
   "main": "src/server.ts",
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat"],
-  // Production shares the web origin: these paths go to the Worker and Pages serves
+  // Production shares the web origin: these paths go to the Worker and the frontend Worker serves
   // everything else. `wrangler dev` ignores routes; deploys override the local vars.
   "workers_dev": false,
   "routes": [

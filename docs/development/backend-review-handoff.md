@@ -37,9 +37,8 @@ auth. Generic email delivery is an infrastructure integration.
 ## Frontend contract
 
 [types/api-types.ts](../../apps/backend/src/types/api-types.ts) selects the actual
-Hono HTTP schema without its Worker environment. `build:api` generates a portable
-`dist/api-types.d.ts` containing Hono types and the resolved wire contract only.
-`backend/api` exposes this file through a types-only package export. The web
+Hono HTTP schema without its Worker environment. `backend/api` exposes that source
+file through a types-only package export; no generation step is required. The web
 [client](../../apps/web/src/client/api.ts) imports that type and constructs `hc`.
 
 Routes and handlers remain constructor-injected classes. Static route definitions
@@ -48,8 +47,9 @@ body/status types. JSON validators connect shared schemas to Hono input inferenc
 Forwarded authorization and token endpoints derive their contracts from their
 owning object routes; those proxy assertions are deliberate transport boundaries.
 
-The isolated consumer configuration under `apps/backend/tests/types/client` has no
-Worker globals or backend source files. Positive and negative frontend checks
+The consumer configuration under `apps/backend/tests/types/client` uses the backend
+compiler settings because TypeScript follows the source contract's dependencies.
+Positive and negative frontend checks
 verify methods, paths, required parameters, request bodies, permissions and response
 DTOs. Dependency declaration checking retains the repository's `skipLibCheck` setting.
 Browser bundle verification includes the actual typed frontend client.

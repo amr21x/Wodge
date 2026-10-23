@@ -35,13 +35,13 @@ Backend flow: **route → handler → core service → repository → persistenc
 
 - Compose request validators from domain schemas; validate relevant body/path/query/header inputs once. Handlers provide authorized, validated input; services enforce business invariants.
 - Enforce permissions on backend and direct object/realtime entry points. Coordinate organization synchronization in handlers, not lifecycle hooks. Never trust caller-supplied identity headers.
-- Preserve Hono route inference and the generated types-only `backend/api` contract. Return typed DTOs; use existing global error handling. Avoid `any` and casts that conceal broken contracts.
+- Preserve Hono route inference and the types-only `backend/api` contract. Return typed DTOs; use existing global error handling. Avoid `any` and casts that conceal broken contracts.
 - Services persist through repositories; no manual handler save/commit step. Preserve restoration, sync acknowledgements and Yjs persistence. Durable Objects do not make arbitrary awaits, D1 writes or cross-object calls one rollback transaction.
 - Use UUIDv7 for new entity IDs, retain existing IDs, and reserve Nano ID for short URL-safe identifiers and public asset keys.
 
 ## Readability and verification
 
-- Use direct `@wodge` imports. No barrels, forwarding-only re-exports, browser stubs or dependency bags. Required Worker object exports and the generated API entry are exceptions.
+- Use direct `@wodge` imports. No barrels, forwarding-only re-exports, browser stubs or dependency bags. Required Worker object exports and the API type entry are exceptions.
 - Keep routes explicit and readable; avoid long fluent chains without losing Hono types. Format changed files and comment non-obvious intent/constraints.
 - Never expose secrets. Document environment settings and their purpose in `.dev.vars.example`. Missing optional providers must fail clearly, never fake success or bypass authentication.
 - Code quality checks and formatting are required validation. Run `pnpm lint` and `pnpm format:check` from the repository root; use `pnpm format` to apply formatting and resolve lint findings before finishing.

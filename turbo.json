@@ -6,14 +6,6 @@
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
-    "pages:build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**"]
-    },
-    "pages:preview": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**"]
-    },
     "dev": {
       "cache": false,
       "persistent": true
@@ -39,13 +31,13 @@
     "deploy:app": {
       "cache": false
     },
-    "dev:api": {
-      "cache": false,
-      "persistent": true
-    },
     "backend#build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/api-types.d.ts"]
+      "outputs": []
+    },
+    "workers:build": {
+      "dependsOn": ["^build"],
+      "outputs": [".open-next/**", ".next/**", "!.next/cache/**"]
     }
   }
 }
