@@ -153,8 +153,8 @@ pnpm exec wrangler pages deploy .vercel/output/static --project-name wodge --bra
 ```
 
 Delete `secrets.json` afterwards. Run the web build from a regular clone: Vercel CLI
-33 cannot read a git worktree's `.git` file. The web app pins `vercel` so
-next-on-pages does not download a newer, incompatible CLI.
+33 cannot read a git worktree's `.git` file. `apps/web/scripts/build-pages.mjs` runs the
+pinned `vercel` CLI itself, so next-on-pages does not download a newer, incompatible one.
 
 ## Smoke checks
 
