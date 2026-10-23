@@ -3,13 +3,9 @@ name: Code Quality
 on:
   push:
     branches:
+      - main
       - dev
   pull_request:
-  workflow_call:
-    outputs:
-      application:
-        description: Whether the change needs application checks and deployment
-        value: ${{ jobs.validate.outputs.application }}
 
 jobs:
   validate:
@@ -22,13 +18,11 @@ jobs:
           fetch-depth: 0
       - id: scope
         env:
-          EVENT: ${{ github.event_name }}
           BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
           HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
-          # Manual deployment always validates and builds, including a docs-only ref.
           # New branches have no previous commit to compare; run everything.
-          if [ "$EVENT" = workflow_dispatch ] || [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
             echo "application=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
