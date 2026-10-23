@@ -3,18 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "pnpm run api:types && next dev",
-    "build": "pnpm run api:types && next build",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start",
     "lint": "pnpm -w lint",
-    "pages:build": "node scripts/build-pages.mjs",
+    "pages:build": "env -u npm_config_user_agent npm exec --no -- next-on-pages",
     "pages:start": "wrangler pages dev .vercel/output/static --compatibility-date=2024-01-29 --compatibility-flag=nodejs_compat --port 3000",
     "pages:preview": "pnpm pages:build && wrangler pages dev .vercel/output/static --compatibility-date=2024-01-29 --compatibility-flag=nodejs_compat --port 3000",
     "deploy:app": "pnpm pages:build && wrangler pages deploy .vercel/output/static",
     "add:comp": "pnpm dlx shadcn-ui add",
     "test": "vitest run",
-    "api:types": "pnpm --filter backend build:api",
-    "typecheck": "pnpm run api:types && tsc --noEmit --incremental false --pretty false"
+    "typecheck": "tsc --noEmit --incremental false --pretty false"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.1.0",

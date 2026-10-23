@@ -4,7 +4,7 @@ import { hc, type InferRequestType, type InferResponseType } from "hono/client";
 const client = hc<ApiType>("/");
 const workspace = client.api.workspaces[":workspaceId"];
 
-// Consumer-only compile checks: no backend source or Worker types are imported.
+// Compile checks for the frontend Hono client against the backend route types.
 const profile: InferRequestType<typeof client.api.users.update.$post> = {
   json: { username: "reader", displayName: "Reader" },
 };

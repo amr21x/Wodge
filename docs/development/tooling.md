@@ -44,7 +44,7 @@ The validation job also detects documentation-only changes. Lint and formatting
 always run; application checks and builds are skipped when every changed path is
 under `docs/`. Dependencies are installed once per job, with the pnpm store cached.
 See the [CI and deployment runbook](../operations/runbooks/production-deployment.md#continuous-integration)
-for build artifacts and manual deployment.
+for build checks and manual deployment.
 
 `.oxlintrc.json` enables native TypeScript, React, Hooks, Next.js, accessibility,
 import and general correctness rules. Correctness findings are warnings; Rules of
@@ -66,7 +66,11 @@ For VS Code, install the `oxc.oxc-vscode` extension. Workspace language settings
 it as the formatter; its lint integration reads the same root configuration.
 
 `pnpm --filter backend build` compiles the production Worker through Wrangler's
-dry run, writing deployable output to `apps/backend/dist/worker`.
+dry run. The frontend uses the source `backend/api` type export, without a generator.
+`pnpm --filter web pages:build` invokes the Pages adapter through `npm exec` so its
+Vercel invocation uses the installed CLI rather than pnpm's incompatible package
+lookup. The command clears pnpm's inherited user-agent before invoking npm. `apps/web/vercel.json` selects the Next.js build command and skips dependency
+installation inside Vercel; run `pnpm install` first. No custom build scripts run.
 `pnpm --filter backend test:foundation` builds and runs the retained
 compatibility fixture, import-boundary checks and local Worker/D1 checks. These do not deploy or validate all product journeys.
 The evidence records explicit backend, protocol, and shared-data type commands.

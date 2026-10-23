@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "turbo build",
-    "dev": "turbo dev dev:api --env-mode=loose",
+    "dev": "turbo dev --env-mode=loose",
     "secrets": "bash scripts/secrets.sh",
     "studio": "turbo db:studio",
     "generate": "turbo db:generate",

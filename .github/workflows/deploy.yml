@@ -22,16 +22,17 @@ concurrency:
 jobs:
   checks:
     uses: ./.github/workflows/quality.yml
-    with:
-      deployment: true
 
   deploy:
     needs: checks
     runs-on: ubuntu-latest
     environment:
       name: production
-      url: ${{ needs.checks.outputs.app_domain }}
+      url: ${{ vars.APP_DOMAIN || 'https://wodge.amr21.dev' }}
     env:
+      APP_DOMAIN: ${{ vars.APP_DOMAIN || 'https://wodge.amr21.dev' }}
+      BACKEND_DOMAIN: ${{ vars.BACKEND_DOMAIN || 'https://wodge.amr21.dev' }}
+      AVATARS_URL: ${{ vars.AVATARS_URL || 'https://wodge-avatars.amr21.dev' }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
     steps:
@@ -42,11 +43,13 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - uses: actions/download-artifact@v4
-        with:
-          name: deployment
-      - name: Restore validated builds
-        run: tar -xzf deployment.tar.gz
+      - name: Build web for Cloudflare Pages
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+          NEXT_PUBLIC_APP_DOMAIN: ${{ env.APP_DOMAIN }}
+          NEXT_PUBLIC_BACKEND_DOMAIN: ${{ env.BACKEND_DOMAIN }}
+          NEXT_PUBLIC_AVATARS_URL: ${{ env.AVATARS_URL }}
+        run: pnpm --filter web pages:build
       # Migrations are forward-only and run before the Worker that depends on them.
       - name: Apply D1 migrations
         run: pnpm --filter backend db:migration:cloud
@@ -58,12 +61,9 @@ jobs:
       - name: Deploy backend Worker
         working-directory: apps/backend
         env:
-          APP_DOMAIN: ${{ needs.checks.outputs.app_domain }}
-          BACKEND_DOMAIN: ${{ needs.checks.outputs.backend_domain }}
-          AVATARS_URL: ${{ needs.checks.outputs.avatars_url }}
           INTEGRATION_MODE: ${{ inputs.integration_mode }}
         run: >-
-          pnpm exec wrangler deploy dist/worker/server.js --no-bundle
+          pnpm exec wrangler deploy
           --var "APP_DOMAIN:$APP_DOMAIN"
           --var "BACKEND_DOMAIN:$BACKEND_DOMAIN"
           --var "AVATARS_URL:$AVATARS_URL"
@@ -76,8 +76,6 @@ jobs:
           --project-name wodge --branch main
           --commit-hash "$GITHUB_SHA" --commit-dirty=false
       - name: Smoke check
-        env:
-          APP_DOMAIN: ${{ needs.checks.outputs.app_domain }}
         run: |
           curl -fsS --retry 5 --retry-delay 5 "$APP_DOMAIN/health"
           curl -fsS --retry 5 --retry-delay 5 -o /dev/null "$APP_DOMAIN/login"

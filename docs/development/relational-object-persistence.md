@@ -34,7 +34,7 @@ self-reference. No commit, push, remote migration or deployment was performed.
   production/fixture bundles, local D1 migrations and all object feature fixtures pass.
   The core bundle permits the Drizzle connection, migrations and generic SQL primitive
   while excluding providers/hosts.
-- **Pass:** `pnpm --filter backend test:api`; the generated types-only contract retains
+- **Pass:** `pnpm --filter backend test:api`; the types-only contract retains
   32 route paths and its isolated consumer compiles.
 - **Pass:** backend, web, core, auth, infrastructure and domain TypeScript checks.
 - **Pass:** core tests (45), auth tests (2) and web tests (22), including page session

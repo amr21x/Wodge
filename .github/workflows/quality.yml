@@ -6,19 +6,7 @@ on:
       - main
       - dev
   pull_request:
-  # Deployment builds the reviewed ref once and consumes its artifacts in the same run.
   workflow_call:
-    inputs:
-      deployment:
-        type: boolean
-        default: false
-    outputs:
-      app_domain:
-        value: ${{ jobs.build.outputs.app_domain }}
-      backend_domain:
-        value: ${{ jobs.build.outputs.backend_domain }}
-      avatars_url:
-        value: ${{ jobs.build.outputs.avatars_url }}
 
 jobs:
   validate:
@@ -31,13 +19,13 @@ jobs:
           fetch-depth: 0
       - id: scope
         env:
-          DEPLOYMENT: ${{ inputs.deployment || false }}
+          EVENT: ${{ github.event_name }}
           BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
           HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           # Manual deployment always validates and builds, including a docs-only ref.
           # New branches have no previous commit to compare; run everything.
-          if [ "$DEPLOYMENT" = true ] || [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
+          if [ "$EVENT" = workflow_dispatch ] || [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
             echo "application=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -81,15 +69,10 @@ jobs:
     needs: validate
     if: needs.validate.outputs.application == 'true'
     runs-on: ubuntu-latest
-    # Return the actual build settings so deployment cannot use different origins.
     env:
       NEXT_PUBLIC_APP_DOMAIN: ${{ vars.APP_DOMAIN || 'https://wodge.amr21.dev' }}
       NEXT_PUBLIC_BACKEND_DOMAIN: ${{ vars.BACKEND_DOMAIN || 'https://wodge.amr21.dev' }}
       NEXT_PUBLIC_AVATARS_URL: ${{ vars.AVATARS_URL || 'https://wodge-avatars.amr21.dev' }}
-    outputs:
-      app_domain: ${{ env.NEXT_PUBLIC_APP_DOMAIN }}
-      backend_domain: ${{ env.NEXT_PUBLIC_BACKEND_DOMAIN }}
-      avatars_url: ${{ env.NEXT_PUBLIC_AVATARS_URL }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -109,20 +92,10 @@ jobs:
         env:
           NEXT_TELEMETRY_DISABLED: 1
         run: pnpm --filter web pages:build
-      # Archive only deployable output, preserving hidden files such as .assetsignore.
-      - name: Package deployment
-        if: inputs.deployment
-        run: tar -czf deployment.tar.gz apps/backend/dist/worker apps/web/.vercel/output/static
-      - uses: actions/upload-artifact@v4
-        if: inputs.deployment
-        with:
-          name: deployment
-          path: deployment.tar.gz
-          if-no-files-found: error
-          retention-days: 7
 
   # Keep the existing required check green for docs-only changes, but fail closed.
   result:
+    name: quality
     needs: [validate, build]
     if: always()
     runs-on: ubuntu-latest

@@ -83,11 +83,9 @@ value returns errors naming the setting, never its value.
 
 `Production Deploy` (`.github/workflows/deploy.yml`) runs from the `production`
 environment for deployment credentials. Configure required reviewers on it so each
-run waits for approval before migrations or deployment. Set the three public origin
-variables at **repository** scope (Settings → Secrets and variables → Actions →
-Variables), not on the environment: CI must use those same values when building.
-If unset, the workflows use the production URLs listed above. Deployment uses the
-origins returned by the build; environment copies of these variables are unused.
+run waits for approval before builds, migrations or deployment. Public origin variables
+may be set at repository scope for CI and in the production environment for deployment.
+If unset, the workflows use the production URLs listed above.
 
 | Kind     | Name                                          | Value                                                           |
 | -------- | --------------------------------------------- | --------------------------------------------------------------- |
@@ -106,7 +104,7 @@ origins returned by the build; environment copies of these variables are unused.
   Vitest suites (including feature flags), and local Worker runtime checks.
 - `build`: builds the backend Worker and Pages frontend after validation, with cached
   pnpm downloads and Next.js build data. Skipped for documentation-only changes.
-- `result`: preserves the stable required check. Validation must pass; builds must
+- `quality` (job ID `result`): preserves the existing required check name. Validation must pass; builds must
   pass for application changes and be skipped for documentation-only changes.
 
 A documentation-only change means every changed path is under `docs/`, including
@@ -115,13 +113,11 @@ still run the full checks. Detection is a step in `validate`, not a separate job
 
 The manual deploy workflow calls these same jobs for the selected ref, always
 running full validation and builds even if that ref only changes documentation.
-The build job archives `apps/backend/dist/worker` and
-`apps/web/.vercel/output/static` as the `deployment` artifact, retained for seven
-days. The deployment job downloads that artifact from its own workflow run before
-applying D1 migrations and configuring secrets. It deploys the bundled Worker with
-`--no-bundle` and the Pages output directly, then checks `/health` and `/login`.
-Neither application is rebuilt during deployment. PR and push runs check builds
-without uploading deployment artifacts.
+After production approval, deployment builds Pages using the production variables,
+applies D1 migrations, configures Worker secrets, builds and deploys the Worker
+through Wrangler, deploys Pages, then checks `/health` and `/login`. Deployment
+repeats builds deliberately so there are no artifact archives, transfers or workflow
+outputs to coordinate.
 
 ## Cloudflare Git integration (dashboard)
 
@@ -166,8 +162,11 @@ pnpm exec wrangler pages deploy .vercel/output/static --project-name wodge --bra
 ```
 
 Delete `secrets.json` afterwards. Run the web build from a regular clone: Vercel CLI
-33 cannot read a git worktree's `.git` file. `apps/web/scripts/build-pages.mjs` runs the
-pinned `vercel` CLI itself, so next-on-pages does not download a newer, incompatible one.
+33 cannot read a git worktree's `.git` file. `pages:build` runs the installed Pages
+adapter through `npm exec`, which lets it find the pinned Vercel CLI. The declarative
+`apps/web/vercel.json` selects `pnpm run build` and disables Vercel's dependency
+installation; dependencies must already be installed. Neither application uses a
+custom build script.
 
 ## Smoke checks
 

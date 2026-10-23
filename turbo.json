@@ -39,13 +39,9 @@
     "deploy:app": {
       "cache": false
     },
-    "dev:api": {
-      "cache": false,
-      "persistent": true
-    },
     "backend#build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/api-types.d.ts"]
+      "outputs": []
     }
   }
 }

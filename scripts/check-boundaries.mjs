@@ -450,7 +450,7 @@ async function inspect(directory, owner) {
           !node.importClause?.isTypeOnly
         )
           fail(
-            "Web may import only the declaration-only backend/api contract with import type",
+            "Web may import only the type-only backend/api contract with import type",
           );
       }
 

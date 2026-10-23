@@ -30,9 +30,10 @@ KV reads only import legacy records once; normal operations never write them.
 
 ## Typed frontend API
 
-The source contract is [src/types/api-types.ts](src/types/api-types.ts). Run
-`pnpm --filter backend build:api` to generate the declaration-only `backend/api`
-entry. The frontend client lives in `apps/web/src/client/api.ts`:
+[src/types/api-types.ts](src/types/api-types.ts) exports the inferred Hono route
+schema as `backend/api`. The frontend imports it with `import type`, so backend
+implementation code is erased from browser bundles. No generated contract or
+watcher is needed. The frontend client lives in `apps/web/src/client/api.ts`:
 
 ```ts
 const response = await api.api.users.me.$get();
@@ -42,13 +43,10 @@ const user = await response.json();
 DI still constructs route classes and handlers. Each route class retains the
 inferred return type of its static route definition; parent mounts retain their
 returned types too. JSON validators expose wire inputs and parsed handler inputs.
-The contract generator resolves the HTTP schema and strips Worker environments
-and implementation imports. It never constructs services or executes backend code.
-
-Frontend dev/build/typecheck scripts generate the contract first. Root `pnpm dev`
-also watches backend types; for a standalone watcher, run
-`pnpm --filter backend dev:api`. Verify consumer compile checks with
-`pnpm --filter backend test:api`.
+The exported Hono schema omits Worker environment bindings. TypeScript follows
+backend source dependencies when checking the frontend; its configuration enables
+the backend's decorator syntax. No backend modules execute through a type import.
+Verify consumer compile checks with `pnpm --filter backend test:api`.
 
 Workspace authorization and room-token forwarding derive contracts from the owning
 object routes, with public path parameters applied at the Worker boundary. Binary
