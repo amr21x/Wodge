@@ -117,7 +117,7 @@ delivery needs a public tunnel to the backend, for example
 
 ## Deployment
 
-The deployment workflow offers `partial` (the temporary default) and `ready` integration modes.
+The backend supports `partial` (the temporary default) and `ready` integration modes.
 Both modes require the two signing secrets, Google and GitHub OAuth credentials,
 origins and D1/DO bindings. Ready mode additionally requires complete storage and
 Polar sandbox settings before serving requests. Email sign-in is disabled; Resend
@@ -143,13 +143,12 @@ base URL is `APP_DOMAIN`; register Google/GitHub callbacks under
 `<APP_DOMAIN>/api/auth/callback/<provider>`. Configure the Worker
 secrets listed in `.dev.vars.example`.
 
-The deployment workflow is manually triggered while namespace cutover remains
-unverified. It uses Cloudflare credentials, a `BACKEND_SECRETS` JSON secret and
-`APP_DOMAIN`, `BACKEND_DOMAIN`, `AVATARS_URL` repository variables. The initial Worker
-must exist before bulk secret configuration. The workflow applies remote D1 migrations
-and deploys the backend routes declared in `wrangler.jsonc`, then deploys the OpenNext
-frontend Worker. DNS, OAuth registrations, initial resource provisioning and Cloudflare
-Git-build controls remain operator setup; see the [production runbook](../../docs/operations/runbooks/production-deployment.md).
+Cloudflare Workers Builds owns automatic deployment from `main`; GitHub Actions
+runs CI only. Production Worker secrets stay in Cloudflare. The backend deploy
+command applies remote D1 migrations before Wrangler publishes the Worker and its
+routes. The frontend deploys independently through OpenNext. See the
+[production runbook](../../docs/operations/runbooks/production-deployment.md) for
+Git connections, branch/watch filters, commands and required variables.
 
 The structural/type review handoff is in
 [backend-review-handoff.md](../../docs/development/backend-review-handoff.md).

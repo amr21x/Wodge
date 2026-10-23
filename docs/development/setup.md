@@ -99,6 +99,6 @@ These are commands to run, not a claim they all passed at this revision. Runtime
 
 ## Deployment boundary
 
-Follow the [production runbook](../operations/runbooks/production-deployment.md) for authorized deployment. The manual GitHub workflow validates/builds, applies remote D1 migrations, configures Worker secrets, deploys backend/frontend Workers and performs liveness checks. Local setup never performs those production actions.
+Follow the [production runbook](../operations/runbooks/production-deployment.md) for authorized deployment. Cloudflare Workers Builds deploys the application from `main`; GitHub Actions runs CI only. Backend deployment applies remote D1 migrations before publishing. Production secrets stay in Cloudflare. The docs Worker has its own build/watch settings. Local setup never performs those production actions.
 
 Cloudflare Git integration can deploy independently of GitHub Actions. Use the supported `[skip ci]` commit prefix or confirm automatic builds are paused before a push that must not deploy; see [CI/CD skip controls](../operations/ci-cd.md#pushes-without-cicd). Arbitrary external automation still needs its own verification. There is no live demo link here until deployment verification is recorded. Historical baseline/browser records retain their original revision-specific limits.

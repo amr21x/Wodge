@@ -2,23 +2,20 @@
 
 [Docs home](../../README.md) · [Operate Wodge](../README.md)
 
-The configured showcase topology targets Cloudflare under the `amr21.dev` zone.
-Live readiness at the currently reviewed source revision is Unverified; see the
-[source verification record](../../development/documentation-verification.md). Every deployment still
-needs owner approval for the exact reviewed commit; see
+The showcase runs on Cloudflare under the `amr21.dev` zone. Merges into `main` authorize automatic deployment through Cloudflare Workers Builds; see
 [deployment authorization](revival-deployment.md). Calls stay disabled and do not
 need LiveKit settings.
 
 ## Topology
 
-One public origin, `https://wodge.amr21.dev`, serves the application and independent docs site:
+One public origin, `https://wodge.amr21.dev`, serves the application and independent documentation site:
 
-| Path                   | Served by                                                                          |
-| ---------------------- | ---------------------------------------------------------------------------------- |
-| `/api/*`, `/parties/*` | Worker `wodge-backend` through routes in `apps/backend/wrangler.jsonc`             |
-| `/health`              | Worker `wodge-backend` (JSON liveness check)                                       |
-| `/docs`, `/docs/*`     | Static Worker `wodge-docs`; see [docs publication](../../development/docs-site.md) |
-| Everything else        | Worker `wodge-web` (OpenNext build of `apps/web`)                                  |
+| Path                   | Served by                                                                      |
+| ---------------------- | ------------------------------------------------------------------------------ |
+| `/api/*`, `/parties/*` | Worker `wodge-backend` through routes in `apps/backend/wrangler.jsonc`         |
+| `/health`              | Worker `wodge-backend` (JSON liveness check)                                   |
+| `/docs`, `/docs/*`     | Worker `wodge-docs`; [publication and routing](../../development/docs-site.md) |
+| Everything else        | Worker `wodge-web` (OpenNext build of `apps/web`)                              |
 
 Backend routes run before the frontend Worker custom domain, so auth cookies, OAuth callbacks
 and WebSockets stay first-party. The web middleware fetches `/api/users/me` on the
@@ -84,26 +81,16 @@ Worker secrets (names and purposes are in `apps/backend/.dev.vars.example`):
 The Worker validates this configuration on its first request. A missing or malformed
 value returns errors naming the setting, never its value.
 
-### GitHub Actions
+### Deployment ownership
 
-`Production Deploy` (`.github/workflows/deploy.yml`) runs from the `production`
-environment for deployment credentials. Configure required reviewers on it so each
-deploy job waits for approval before remote migrations or deployment. The reusable
-checks job runs validation/builds before this approval. Public origin variables
-may be set at repository scope for CI and in the production environment for deployment.
-If unset, the workflows use the production URLs listed above.
-
-| Kind     | Name                                          | Value                                                    |
-| -------- | --------------------------------------------- | -------------------------------------------------------- |
-| Secret   | `CLOUDFLARE_ACCOUNT_ID`                       | Cloudflare account ID                                    |
-| Secret   | `CLOUDFLARE_API_TOKEN`                        | Workers Scripts/Routes, D1: Edit; Account Settings: Read |
-| Secret   | `BACKEND_SECRETS`                             | JSON object holding the Worker secrets listed above      |
-| Variable | `APP_DOMAIN`, `BACKEND_DOMAIN`, `AVATARS_URL` | Production values above                                  |
+Cloudflare Workers Builds owns automatic deployment through its GitHub app. GitHub
+Actions runs CI only; no Cloudflare API token or Worker secret bundle is needed in
+GitHub. Keep application secrets on the existing Cloudflare backend Worker.
 
 ## Continuous integration
 
 `Code Quality` (`.github/workflows/quality.yml`) runs on pull requests and pushes to
-`main`/`dev`:
+`main` and `dev`:
 
 - `validate`: detects documentation-only changes and always runs lint and formatting.
   For application changes it also runs boundaries, type checks, API contract tests,
@@ -113,23 +100,40 @@ If unset, the workflows use the production URLs listed above.
 - `quality` (job ID `result`): preserves the existing required check name. Validation must pass; builds must
   pass for application changes and be skipped for documentation-only changes.
 
-A documentation-only change means every changed path is under `docs/`, including
-both sides of renames. Root Markdown, workflow changes and moves out of `docs/`
-still run the full checks. Detection is a step in `validate`, not a separate job.
-
-The manual deploy workflow calls these same jobs for the selected ref, always
-running full validation and builds even if that ref only changes documentation.
-After production approval, deployment builds the frontend Worker using the production variables,
-applies D1 migrations, configures Worker secrets, builds and deploys the Worker
-through Wrangler, deploys the frontend Worker, then checks `/health` and `/login`. Deployment
-repeats builds deliberately so there are no artifact archives, transfers or workflow
-outputs to coordinate.
+A documentation-only change means every changed path is under `docs/` or ends in
+`.md`, including both sides of renames. Such changes still run lint and formatting,
+but skip application checks, builds and deployment. Mixed code and documentation
+changes deploy normally. Detection lives in `validate` and is shared with deployment.
 
 ## Cloudflare Git integration (dashboard)
 
-The owner-preferred setup builds both units in Cloudflare from the production branch.
+Install the Cloudflare GitHub app with access to `amr21x/Wodge`. Then connect the
+repository separately on each **existing** Worker: Workers & Pages → `wodge-web`
+or `wodge-backend` → Settings → Build → Connect. Installing the app alone does not
+create build triggers. Do not create duplicate Workers.
 
-**Frontend Worker** (`Workers & Pages → Create → Import a repository`): name
+For **both application** Workers:
+
+- Repository: `amr21x/Wodge`; production branch: `main`.
+- Disable non-production branch builds so `dev` and pull requests do not deploy.
+- Under Settings → Build → Build watch paths, include `*` and exclude `docs/*`, `apps/docs/*` and
+  `*.md`. Cloudflare's wildcards cover nested paths. Documentation-only pushes skip
+  the build; mixed code/documentation pushes still build.
+- Use Cloudflare's generated deployment token. The backend token also needs D1 Edit
+  for migrations; add that permission if the generated token lacks it.
+
+Cloudflare builds start on pushes independently of GitHub Actions. Keep required PR
+checks and branch protection on `main` so changes pass CI before merging. Each Worker
+builds independently. Cloudflare's documented exceptions can still trigger builds for
+empty pushes, pushes with 20+ commits, or pushes changing 3000+ files.
+
+See [Cloudflare build watch paths](https://developers.cloudflare.com/workers/ci-cd/builds/build-watch-paths/).
+
+The independent docs Worker uses different watch paths: include `docs/*` and
+`apps/docs/*` plus root dependency/toolchain inputs, without excluding Markdown.
+Its [publication guide](../../development/docs-site.md) lists the full settings.
+
+**Frontend Worker** (`wodge-web → Settings → Build`): name
 `wodge-web`, repository `amr21x/Wodge`, production branch `main`, root directory
 `apps/web`, build command `pnpm workers:build`, deploy command
 `pnpm exec opennextjs-cloudflare deploy`. There is no dashboard output directory.
@@ -154,7 +158,7 @@ attaching the Worker custom domain. Cloudflare cannot attach a Worker custom dom
 over an existing CNAME. Disable the old Pages project's automatic deployments after
 cutover. Keep the old project available for rollback until the Worker is verified.
 
-**Backend Worker** (`Workers & Pages → Create → Import a repository`): name
+**Backend Worker** (`wodge-backend → Settings → Build`): name
 `wodge-backend`, root directory `apps/backend`, no build command, build variables
 `NODE_VERSION=24.19.0` and `PNPM_VERSION=12.15.0`, and this deploy command:
 
@@ -195,8 +199,8 @@ settings or custom build scripts. Builds work from normal clones and git worktre
 1. `curl https://wodge.amr21.dev/health` returns `{"ok":true}`.
 2. Sign in with Google and with GitHub; complete onboarding.
 3. Create a workspace, open a room and a page in two browsers, and confirm live updates.
-4. In partial mode, verify upload controls report disabled. Only after storage and
-   flags are configured, upload an avatar and verify the configured public origin.
+4. In partial mode, verify uploads report disabled. After storage and flags are
+   configured, upload an avatar and verify the configured public origin.
 5. With Polar sandbox configured, start a sandbox checkout, use test payment data,
    and confirm the webhook
    delivery succeeds and the workspace shows the Pro plan.

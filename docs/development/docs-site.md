@@ -68,11 +68,14 @@ custom hostname must already resolve through Cloudflare for the app.
 
 For an independent Cloudflare Git-connected project, select repository
 `amr21x/Wodge`, Worker name `wodge-docs`, root `apps/docs`, production branch
-`main`, build command `pnpm build`, and deploy command `pnpm exec wrangler deploy`.
+`main`, build command `pnpm test && pnpm typecheck && pnpm build`, and deploy command `pnpm exec wrangler deploy`.
 Use Node 24.19.0 and pnpm 12.15.0. The checkout must include the whole repository
 because content lives in `../../docs`. No secrets or build-time application
-variables are required. Review automatic build/branch controls before connecting;
-a manual deployment does not configure Git integration.
+variables are required. Disable non-production branch builds. Include `docs/*`,
+`apps/docs/*`, `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml` and
+`.node-version` in build watch paths, with no Markdown exclusion. The application
+Workers exclude docs/Markdown changes, but the docs Worker must rebuild them.
+A manual deployment does not configure Git integration. See [deployment ownership](../operations/ci-cd.md).
 
 The owner-requested initial publication is performed manually, without running
 CI/CD. Subsequent source pushes that must skip automation use the supported

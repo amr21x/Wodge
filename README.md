@@ -59,7 +59,7 @@ pnpm lint
 pnpm format:check
 ```
 
-See [testing guidance](docs/development/testing-strategy.md) for application checks and [the showcase walkthrough](docs/development/showcase-walkthrough.md) for manual acceptance. [Deployment instructions](docs/operations/runbooks/production-deployment.md) cover the two Workers, same-origin API routes, D1 migrations and secrets. Deployment is a separate authorized action; a push does not authorize production changes. Cloudflare Git builds have independent skip/branch controls; verify those controls when a push must not deploy.
+See [testing guidance](docs/development/testing-strategy.md) for application checks and [the showcase walkthrough](docs/development/showcase-walkthrough.md) for manual acceptance. [Deployment instructions](docs/operations/runbooks/production-deployment.md) cover the two Workers, same-origin API routes, D1 migrations and secrets. The owner has authorized Cloudflare Git deployment from `main`; task-branch pushes do not authorize separate production actions. Cloudflare Git builds have independent skip/branch controls; verify those controls when a push must not deploy.
 
 The showcase has no verified monetary spending cap. Free/Pro membership limits are 10/50, not infrastructure budget controls. Calls/generation remain unavailable, billing uses test payments, and storage quotas remain incomplete. Read [operational limits and recovery](docs/development/setup.md#limits-and-recovery) before hosting a public instance.
 
