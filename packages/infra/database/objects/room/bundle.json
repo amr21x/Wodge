@@ -1,0 +1,42 @@
+{
+  "journal": {
+    "version": "7",
+    "dialect": "sqlite",
+    "entries": [
+      {
+        "idx": 0,
+        "version": "6",
+        "when": 1792445545274,
+        "tag": "0000_baseline",
+        "breakpoints": true
+      },
+      {
+        "idx": 1,
+        "version": "6",
+        "when": 1792450368393,
+        "tag": "0001_majestic_toad",
+        "breakpoints": true
+      },
+      {
+        "idx": 2,
+        "version": "6",
+        "when": 1792450512065,
+        "tag": "0002_open_true_believers",
+        "breakpoints": true
+      },
+      {
+        "idx": 3,
+        "version": "6",
+        "when": 1792450731844,
+        "tag": "0003_fat_scarlet_spider",
+        "breakpoints": true
+      }
+    ]
+  },
+  "migrations": {
+    "m0000": "CREATE TABLE IF NOT EXISTS `room_messages` (\n\t`id` text PRIMARY KEY NOT NULL,\n\t`position` integer NOT NULL,\n\t`sender` text NOT NULL,\n\t`content` text NOT NULL,\n\t`date` text NOT NULL,\n\t`type` text NOT NULL,\n\t`is_edited` integer,\n\t`is_vote_open` integer\n);\n--> statement-breakpoint\nCREATE INDEX IF NOT EXISTS `room_messages_order` ON `room_messages` (`position`);--> statement-breakpoint\nCREATE TABLE IF NOT EXISTS `record_metadata` (\n\t`name` text PRIMARY KEY NOT NULL,\n\t`revision` integer NOT NULL,\n\t`deleted` integer NOT NULL\n);\n--> statement-breakpoint\nCREATE TABLE IF NOT EXISTS `poll_counts` (\n\t`parent_id` text NOT NULL,\n\t`position` integer NOT NULL,\n\t`votes` integer NOT NULL,\n\tPRIMARY KEY(`parent_id`, `position`)\n);\n--> statement-breakpoint\nCREATE TABLE IF NOT EXISTS `poll_options` (\n\t`parent_id` text NOT NULL,\n\t`position` integer NOT NULL,\n\t`label` text NOT NULL,\n\tPRIMARY KEY(`parent_id`, `position`)\n);\n--> statement-breakpoint\nCREATE TABLE IF NOT EXISTS `poll_voters` (\n\t`parent_id` text NOT NULL,\n\t`position` integer NOT NULL,\n\t`voter` text NOT NULL,\n\t`option` integer NOT NULL,\n\tPRIMARY KEY(`parent_id`, `position`)\n);\n",
+    "m0001": "CREATE TABLE `sync_client_groups` (\n\t`key` text PRIMARY KEY NOT NULL,\n\t`id` text NOT NULL,\n\t`user_id` text NOT NULL,\n\t`client_version` integer\n);\n--> statement-breakpoint\nCREATE TABLE `sync_clients` (\n\t`key` text PRIMARY KEY NOT NULL,\n\t`id` text NOT NULL,\n\t`group_id` text NOT NULL,\n\t`last_mutation_id` integer NOT NULL,\n\t`last_modified_version` integer NOT NULL\n);\n--> statement-breakpoint\nCREATE TABLE `sync_import` (\n\t`id` integer PRIMARY KEY NOT NULL\n);\n--> statement-breakpoint\nCREATE TABLE `sync_versions` (\n\t`name` text PRIMARY KEY NOT NULL,\n\t`revision` integer NOT NULL\n);\n--> statement-breakpoint\nCREATE TABLE `room_scope` (\n\t`id` integer PRIMARY KEY NOT NULL,\n\t`workspace_id` text,\n\t`team_id` text,\n\t`room_id` text\n);\n",
+    "m0002": "ALTER TABLE `sync_import` ADD `legacy_versions` integer DEFAULT 0 NOT NULL;",
+    "m0003": "ALTER TABLE `room_scope` ADD `legacy_records` integer DEFAULT 0 NOT NULL;"
+  }
+}

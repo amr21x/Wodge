@@ -1,30 +1,22 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { WorkspaceSchema } from "@wodge/domain/workspace/validation";
-import { Workspace } from "@wodge/domain/workspace/models";
-
 import {
   SettingsContentDescription,
   SettingsContentHeader,
   SettingsContentSection,
 } from "./settings";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
 import { WorkspaceDangerZone } from "./workspace-danger-zone";
 import { WorkspaceGeneralForm } from "./workspace-general-form";
 import { useIsOwnerOrAdmin } from "@/features/workspace/hooks/use-is-owner-or-admin";
 import { AvatarBtn } from "@/components/avatar-btn";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { env } from "@wodge/env/client";
-import { toast } from "@/components/ui/toast";
-import { useAvatarUrl } from "@/features/account/hooks/use-avatar-url";
+
 import { useUpload } from "@/features/files/hooks/use-upload";
 import { useDelete } from "@/features/files/hooks/use-delete";
 
 export function WorkspaceSettings() {
-  const { workspace, workspaceRep } = useCurrentWorkspace();
+  const { workspace } = useCurrentWorkspace();
 
   const isManager = useIsOwnerOrAdmin();
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { failureMessage, requireOk } from "@/client/errors";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -88,7 +89,7 @@ const PricingCard = ({
       <Button
         isPending={isLoading}
         disabled={!!disabled}
-        className="relative inline-flex w-full items-center justify-center rounded-md bg-black px-6 font-medium text-white transition-colors  focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50 dark:bg-white dark:text-black"
+        className="relative inline-flex w-full items-center justify-center rounded-md bg-black px-6 font-medium text-white transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50 dark:bg-white dark:text-black"
         onClick={() => action()}
       >
         {/* <div className="absolute -inset-0.5 -z-10 rounded-lg bg-gradient-to-b from-[#c7d2fe] to-[#8678f9] opacity-75 blur" /> */}
@@ -114,17 +115,15 @@ function UpgradePage() {
         `/api/workspaces/${workspace?.id}/billing/checkout`,
       );
 
-      if (!res.ok) {
-        throw new Error("Failed to upgrade");
-      }
+      await requireOk(res);
 
       const data = await res.json<{ url: string }>();
 
       router.push(data.url);
     },
 
-    onError: (e) => {
-      toast.error("Failed to upgrade");
+    onError: (_e) => {
+      toast.error(failureMessage(_e));
     },
   });
 
@@ -134,17 +133,15 @@ function UpgradePage() {
         `/api/workspaces/${workspace?.id}/billing/portal`,
       );
 
-      if (!res.ok) {
-        throw new Error("Failed to revert");
-      }
+      await requireOk(res);
 
       const data = await res.json<{ url: string }>();
 
       router.push(data.url);
     },
 
-    onError: (e) => {
-      toast.error("Failed to revert");
+    onError: (_e) => {
+      toast.error(failureMessage(_e));
     },
   });
 
@@ -170,7 +167,7 @@ function UpgradePage() {
       monthlyPrice: 50,
       description: "Perfect for owners of small & medium businesses",
       features: ["Storage up to 100GB", "Up to 50 members"],
-      actionLabel: workspace?.isPremium! ? "Current Plan" : "Upgrade",
+      actionLabel: workspace?.isPremium ? "Current Plan" : "Upgrade",
       exclusive: true,
       disabled: workspace?.isPremium,
       action: upgrade,

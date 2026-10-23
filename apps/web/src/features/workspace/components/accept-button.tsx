@@ -1,7 +1,8 @@
 "use client";
 
+import { failureMessage, requireOk } from "@/client/errors";
 import { Button } from "@/components/ui/button";
-import { env } from "@wodge/env/client";
+
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -21,11 +22,9 @@ export function AcceptButton({ slug }: { slug: string }) {
         method: "POST",
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to join workspace");
-      }
+      await requireOk(res);
     },
-    onSuccess: (data) => {
+    onSuccess: (_data) => {
       queryClient.invalidateQueries({
         queryKey: ["user-workspaces"],
       });
@@ -33,7 +32,7 @@ export function AcceptButton({ slug }: { slug: string }) {
       router.push(`/${slug}`);
     },
     onError: (e) => {
-      toast.error(e.message);
+      toast.error(failureMessage(e));
     },
   });
 

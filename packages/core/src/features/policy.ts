@@ -1,11 +1,5 @@
+import { CHANNEL_FEATURES } from "@wodge/domain/features/models";
 import type { Feature } from "@wodge/domain/features/models";
-export const CHANNEL_FEATURES = {
-  page: "pages",
-  room: "messaging",
-  thread: "discussions",
-  resources: "resources",
-} as const;
-
 /** undefined means unregistered: new endpoints must make an explicit choice. */
 export function httpFeatures(
   path: string,
@@ -14,7 +8,6 @@ export function httpFeatures(
   if (
     [
       "/api/feature-flags",
-      "/api/billing/webhook",
       "/api/users/token",
       "/api/users/me",
       "/api/users/workspaces",
@@ -24,11 +17,12 @@ export function httpFeatures(
     ].includes(path)
   )
     return [];
-  if (/^\/api\/users\/(?:[^/]+\/)?avatar$/.test(path)) return ["profiles"];
+  if (/^\/api\/users\/(?:[^/]+\/)?avatar$/.test(path))
+    return ["profiles", "avatars"];
   if (/^\/api\/rooms\/[^/]+\/token$/.test(path)) return [];
   if (/^\/api\/mcp(?:\/|$)/.test(path)) return ["agentAccess"];
   if (path === "/api/workspaces/new") return ["workspaceCreation"];
-  if (/^\/api\/workspaces\/preview\//.test(path)) return ["membership"];
+  if (path.startsWith("/api/workspaces/preview/")) return ["membership"];
   const match = path.match(/^\/api\/workspaces\/[^/]+(.*)$/);
   if (!match) return undefined;
   const tail = match[1];
@@ -39,39 +33,14 @@ export function httpFeatures(
     /^\/(invite|join\/[^/]+|leave|members(?:\/[^/]+(?:\/role)?)?)$/.test(tail!)
   )
     return ["membership"];
-  if (/^\/files\//.test(tail!)) return ["resources"];
+  if (tail!.startsWith("/files/")) return ["resources"];
   // This legacy route accesses the standalone team bucket, not page attachments.
-  if (/^\/file\//.test(tail!)) return ["resources"];
-  if (tail === "/update" || tail === "/avatar") return ["workspaceSettings"];
+  if (tail!.startsWith("/file/")) return ["resources"];
+  if (tail === "/avatar") return ["workspaceSettings", "avatars"];
+  if (tail === "/update") return ["workspaceSettings"];
   if (tail === "" || tail === "/")
     return method === "GET" ? [] : ["workspaceSettings"];
   return undefined;
-}
-
-export function pageFeatures(path: string): Feature[] {
-  const parts = path.split("/").filter(Boolean);
-  if (parts[0] === "new") return ["workspaceCreation"];
-  if (parts[1] === "join") return ["membership"];
-  if (parts[0] === "settings") return []; // account/recovery shell
-  const channel = CHANNEL_FEATURES[parts[1] as keyof typeof CHANNEL_FEATURES];
-  if (channel) return [channel];
-  if (parts[1] === "settings") {
-    switch (parts[2]) {
-      case "account":
-        return ["profiles"];
-      case "members":
-        return ["membership"];
-      case "teams":
-        return ["teamManagement"];
-      case "groups":
-        return ["groups"];
-      case "upgrade":
-        return ["billing"];
-      default:
-        return ["workspaceSettings"];
-    }
-  }
-  return [];
 }
 
 const WORKSPACE_MUTATIONS: Record<string, Feature[]> = {
@@ -80,9 +49,6 @@ const WORKSPACE_MUTATIONS: Record<string, Feature[]> = {
   createTeam: ["teamManagement"],
   updateTeam: ["teamManagement"],
   deleteTeam: ["teamManagement"],
-  createGroup: ["groups"],
-  updateGroup: ["groups"],
-  deleteGroup: ["groups"],
   createPage: ["pages"],
   updatePage: ["pages"],
   updateFolder: ["pages"],
@@ -174,7 +140,7 @@ export function partyFeatures(
   if (domain === "room")
     return path === "/token" ? ["messaging", "calls"] : ["messaging"];
   if (domain === "user") {
-    if (path === "/avatar") return ["profiles"];
+    if (path === "/avatar") return ["profiles", "avatars"];
     if (path === "/update") return []; // profile change notification, not a profile write
     if (path.startsWith("/replicache-") || path.startsWith("/service/"))
       return [];
@@ -185,8 +151,8 @@ export function partyFeatures(
       return [];
     if (path === "/create") return ["workspaceCreation"];
     if (["/join", "/leave"].includes(path)) return ["membership"];
-    if (["/update", "/avatar", "/"].includes(path))
-      return ["workspaceSettings"];
+    if (path === "/avatar") return ["workspaceSettings", "avatars"];
+    if (["/update", "/"].includes(path)) return ["workspaceSettings"];
     if (path.startsWith("/files/")) return ["resources"];
     if (path.startsWith("/file/")) {
       // Channel file routes have team/channel/path; legacy team files have team/path.

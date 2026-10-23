@@ -27,19 +27,18 @@ call the DI initialization boundary once to receive ready routes and lifecycle
 dependencies. Startup restoration uses record repositories inside that boundary, before
 services can observe object state; request handlers use services only.
 
-Core features contain `services/`, `repositories/` and pure `mutations/` as needed.
+Core features contain business `services/` and relational `repositories/`.
 Infrastructure owns technical clients and primitives, with database configuration
 under `packages/infra/database/`. Domain owns DTOs, schemas and declarative types.
-The web reuses pure optimistic transformations, not backend services or repositories.
+Web owns its optimistic transformations and has no imports or dependency on core.
 Better Auth configuration, tokens, membership APIs and custom authorization are in
 auth. Generic email delivery is an infrastructure integration.
 
 ## Frontend contract
 
 [types/api-types.ts](../../apps/backend/src/types/api-types.ts) selects the actual
-Hono HTTP schema without its Worker environment. `build:api` generates a portable
-`dist/api-types.d.ts` containing Hono types and the resolved wire contract only.
-`backend/api` exposes this file through a types-only package export. The web
+Hono HTTP schema without its Worker environment. `backend/api` exposes that source
+file through a types-only package export; no generation step is required. The web
 [client](../../apps/web/src/client/api.ts) imports that type and constructs `hc`.
 
 Routes and handlers remain constructor-injected classes. Static route definitions
@@ -48,8 +47,9 @@ body/status types. JSON validators connect shared schemas to Hono input inferenc
 Forwarded authorization and token endpoints derive their contracts from their
 owning object routes; those proxy assertions are deliberate transport boundaries.
 
-The isolated consumer configuration under `apps/backend/tests/types/client` has no
-Worker globals or backend source files. Positive and negative frontend checks
+The consumer configuration under `apps/backend/tests/types/client` uses the backend
+compiler settings because TypeScript follows the source contract's dependencies.
+Positive and negative frontend checks
 verify methods, paths, required parameters, request bodies, permissions and response
 DTOs. Dependency declaration checking retains the repository's `skipLibCheck` setting.
 Browser bundle verification includes the actual typed frontend client.
@@ -59,7 +59,7 @@ Browser bundle verification includes the actual typed frontend client.
 - Backend unit/integration tests cover DI reuse and isolation, concurrent identities,
   constructor-injected handlers, SDK disposal, authorization, sync dispatch, validation,
   object persistence, membership synchronization, application errors and provider boundaries.
-- Core tests cover pure mutations, identifiers, profiles and input contracts. Auth tests
+- Core tests cover identifiers, profiles and input contracts; web tests cover optimistic mutations. Auth tests
   cover access rules. The package test configurations discover these suites directly.
 - Typechecks cover backend, core, auth, infrastructure, domain, environment and web.
 - `node scripts/check-boundaries.mjs` checks package exports, dependency declarations,
@@ -76,20 +76,26 @@ Browser bundle verification includes the actual typed frontend client.
   helper cannot create a media session. Billing upgrades and provider credentials cannot enable calls.
 - Billing uses a conditional D1 batch for its subscription cursor and plan update. Native tests
   exercise duplicates, stale/replaced subscriptions, concurrent events, rollback and retry.
-  Each delivery reads the current Stripe subscription; a stale in-flight snapshot cannot overwrite
-  a newer database change. Ambiguous same-second replacement subscriptions return 503;
-  automated Stripe reconciliation remains follow-up work.
+  Polar webhooks are verified by Better Auth's Polar plugin; each delivery re-reads the current
+  Polar subscription, and a stale in-flight snapshot cannot overwrite a newer database change.
+  Ambiguous same-millisecond replacement subscriptions fail for retry; automated reconciliation
+  remains follow-up work. Checkout and portal are only reachable through the authorizing
+  workspace billing API.
 - Worker configuration is validated once per environment. Partial local mode retains unavailable
   integrations; deployment ready mode requires email, storage and test billing. Neither permits
-  missing/weak/shared signing secrets or live Stripe keys.
+  missing/weak/shared signing secrets or malformed Polar tokens; billing always uses the Polar sandbox.
 - Malformed object identifiers and upload bodies return client errors before provider access.
 
 ## Known limits for behavior review
 
-- The role/permission rollout is complete for the documented room slice. Page,
-  thread and legacy file/group paths still have compatibility authorization.
-- Durable Object storage uses KV records on SQLite-backed objects. Relational SQL
-  tables and deployed namespace/data migration remain separate work.
+- Access groups are removed. Room, page and thread access uses scoped custom roles;
+  Yjs connections recheck page access. Browser role-management screens and legacy
+  standalone file authorization remain separate follow-up work.
+- Structural object data and binary Yjs snapshots/update journals use Drizzle SQLite
+  tables with per-object migrations and one-time KV imports. D1 has its own Drizzle
+  connection and migrations. Sync metadata, authorization, presence and room bindings
+  also use relational tables. Deployed namespace transfer remains separate work; see
+  [persistence boundaries](../architecture/data-model.md).
 - D1 organization writes and object synchronization cannot share one transaction.
   Handlers coordinate them and some operations reconcile idempotently; durable
   recovery for every partial failure still needs a reconciliation/queue design.

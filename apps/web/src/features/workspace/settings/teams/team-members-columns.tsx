@@ -29,7 +29,6 @@ interface MembersColumnsProps {
 }
 
 export const teamMembersColumns = ({
-  creatorId,
   removeMember,
   changeTeamMemberRole,
   moderatorsIds,
@@ -56,7 +55,7 @@ export const teamMembersColumns = ({
     },
     id: "member",
     header: () => <Header>Member</Header>,
-    cell: ({ row }) => {
+    cell: function Cell({ row }) {
       const memberId = row.original;
       const { member, isMembersPending } = useMember(memberId);
 
@@ -89,7 +88,7 @@ export const teamMembersColumns = ({
 
     header: () => <Header>Username</Header>,
 
-    cell: ({ row }) => {
+    cell: function Cell({ row }) {
       const { member, isMembersPending } = useMember(row.original);
 
       if (isMembersPending) {
@@ -102,9 +101,9 @@ export const teamMembersColumns = ({
   {
     id: "role",
     header: () => <Header className="pl-3">Role</Header>,
-    cell: ({ row }) => {
+    cell: function Cell({ row }) {
       const isModerator = moderatorsIds?.includes(row.original);
-      const [value, setValue] = useState<string>(
+      const [value] = useState<string>(
         isModerator ? "moderator" : "teamMember",
       );
 

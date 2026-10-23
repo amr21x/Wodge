@@ -1,13 +1,7 @@
 import * as React from "react";
 
 import { SidebarItem } from "./sidebar-item";
-import {
-  ChevronRight,
-  Component,
-  FileText,
-  GripVertical,
-  MoreHorizontal,
-} from "lucide-react";
+import { FileText, MoreHorizontal } from "lucide-react";
 import { SidebarItemBtn } from "./sidebar-item-btn";
 import { DrObj } from "@wodge/domain/types";
 import type { Channel as ChannelType } from "@wodge/domain/channels/index";
@@ -16,7 +10,7 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+
 import { useMemo } from "react";
 
 import { cn } from "@/lib/utils/index";
@@ -75,8 +69,6 @@ function SortablePage({
     attributes,
     listeners,
     setNodeRef,
-    transform,
-    transition,
     isDragging,
     activeIndex,
     index,
@@ -97,11 +89,6 @@ function SortablePage({
 
   const isAbove = activeIndex > overIndex;
   const isBelow = activeIndex < overIndex;
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
 
   return (
     <div
@@ -132,7 +119,7 @@ export const Page = React.forwardRef<
   HTMLLIElement,
   { channel: DrObj<ChannelType> } & DraggableProps &
     React.HTMLAttributes<HTMLLIElement>
->(({ channel, activeIndex, isDragging, ...props }, ref) => {
+>(({ channel, isDragging, activeIndex: _activeIndex, ...props }, ref) => {
   const { workspaceId } = useCurrentWorkspace();
 
   return (

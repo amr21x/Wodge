@@ -5,7 +5,7 @@
 Wodge is the existing local-first collaborative workspace. The current project
 restores it as a reliable portfolio showcase with bounded operating cost.
 
-Retain the existing product, frontend UI, Replicache/Yjs, and Stripe test billing.
+Retain the existing product, frontend UI, Replicache/Yjs, and test billing, now provided by the Polar sandbox.
 Migrate backend realtime services to PartyServer/SQLite Durable Objects and auth
 to Better Auth/D1. Add minimal member-controlled MCP discovery, page reading, and
 task creation/update. Temporarily disable calls and hosted generation in UI and backend.

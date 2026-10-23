@@ -1,5 +1,8 @@
 "use client";
 
+import { failureMessage, requireOk } from "@/client/errors";
+import { refreshPermissions } from "@/client/permissions";
+
 import { SettingsContentHeader, SettingsContentSection } from "../settings";
 
 import { InviteLink } from "./invite-sections";
@@ -11,12 +14,10 @@ import { Member } from "@wodge/domain/workspace/models";
 import { SettingsSearchInput } from "../settings-search-input";
 import { DataTable } from "@/components/data-table/data-table";
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
-import { authClient } from "@wodge/auth/client";
+
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { env } from "@wodge/env/client";
-import { useMembersInfo } from "@/features/workspace/hooks/use-members-info";
 
 export function MembersSettings() {
   const { members, workspaceId, workspace } = useCurrentWorkspace();
@@ -24,11 +25,13 @@ export function MembersSettings() {
   const queryClient = useQueryClient();
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async (c: boolean) => {
-      await fetch(`/api/workspaces/${workspaceId}/invite`, {
+    mutationFn: async (_c: boolean) => {
+      const response = await fetch(`/api/workspaces/${workspaceId}/invite`, {
         method: "PATCH",
       });
+      await requireOk(response);
     },
+    onError: (error) => toast.error(failureMessage(error)),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["user-workspaces"],
@@ -49,9 +52,13 @@ export function MembersSettings() {
         `/api/workspaces/${workspaceId}/members/${memberId}`,
         { method: "DELETE" },
       );
-      if (!response.ok) throw new Error("Remove member failed");
-    } catch {
-      toast.error("Remove member failed");
+      await requireOk(response);
+      refreshPermissions({ revoke: true });
+      void queryClient.invalidateQueries({
+        queryKey: [workspaceId, "members"],
+      });
+    } catch (error) {
+      toast.error(failureMessage(error));
     }
   }
 
@@ -65,9 +72,10 @@ export function MembersSettings() {
           body: JSON.stringify({ role }),
         },
       );
-      if (!response.ok) throw new Error("Change member role failed");
-    } catch {
-      toast.error("Change member role failed");
+      await requireOk(response);
+      refreshPermissions({ revoke: true });
+    } catch (error) {
+      toast.error(failureMessage(error));
     }
   }
 
@@ -90,7 +98,7 @@ export function MembersSettings() {
             onCheckedChange={mutate}
             checked={workspace?.isInviteLinkEnabled || false}
             disabled={isPending}
-            className="disabled:cursor-progress "
+            className="disabled:cursor-progress"
           />
         }
       >

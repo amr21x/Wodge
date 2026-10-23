@@ -18,7 +18,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export function AddThreadForm({
-  folderId,
   teamId,
   thread,
 }: {
@@ -26,7 +25,7 @@ export function AddThreadForm({
   teamId: string;
   thread?: Thread;
 }) {
-  const { workspaceRep, structure } = useCurrentWorkspace();
+  const { workspaceRep } = useCurrentWorkspace();
   const form = useForm<Thread>({
     resolver: zodResolver(ThreadSchema),
     defaultValues: {

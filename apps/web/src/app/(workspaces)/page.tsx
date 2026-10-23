@@ -17,8 +17,8 @@ function WorkspacesPage() {
   // if (!isCached) return null;
 
   return (
-    <div className="relative flex h-full  w-full flex-col  items-center justify-center overflow-hidden   bg-background  bg-grid-black/[0.2] dark:bg-grid-white/[0.2] ">
-      <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-background  opacity-85 [mask-image:radial-gradient(ellipse_at_center)]" />
+    <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-background bg-grid-black/[0.2] dark:bg-grid-white/[0.2]">
+      <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-background opacity-85 [mask-image:radial-gradient(ellipse_at_center)]" />
       <UserCard className="absolute right-10 top-10 z-20" />
       <Button
         className="group absolute left-10 top-10 z-20 items-center text-sm"

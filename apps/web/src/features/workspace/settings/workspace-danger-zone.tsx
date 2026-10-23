@@ -1,14 +1,15 @@
+import { failureMessage, requireOk } from "@/client/errors";
 import { useIsOwnerOrAdmin } from "@/features/workspace/hooks/use-is-owner-or-admin";
 import { SettingsContentAction } from "./settings";
 import { useIsOwner } from "@/features/workspace/hooks/use-is-owner";
-import { env } from "@wodge/env/client";
+
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
 import { toast } from "@/components/ui/toast";
 import { useRouter } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function WorkspaceDangerZone() {
-  const isManager = useIsOwnerOrAdmin();
+  useIsOwnerOrAdmin();
   const isOwner = useIsOwner();
   const { workspaceId } = useCurrentWorkspace();
   const router = useRouter();
@@ -20,9 +21,7 @@ export function WorkspaceDangerZone() {
         method: "POST",
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to leave workspace");
-      }
+      await requireOk(res);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -30,8 +29,8 @@ export function WorkspaceDangerZone() {
       });
       router.push("/");
     },
-    onError: () => {
-      toast.error("Failed to leave workspace");
+    onError: (error) => {
+      toast.error(failureMessage(error));
     },
   });
 
@@ -41,20 +40,18 @@ export function WorkspaceDangerZone() {
         method: "DELETE",
       });
 
-      if (!res.ok) {
-        throw new Error("Failed to delete workspace");
-      }
+      await requireOk(res);
     },
     onSuccess: () => {
       router.push("/");
     },
-    onError: () => {
-      toast.error("Failed to delete workspace");
+    onError: (error) => {
+      toast.error(failureMessage(error));
     },
   });
 
   return (
-    <div className="flex gap-4 ">
+    <div className="flex gap-4">
       {!isOwner && (
         <SettingsContentAction
           variant="destructive"

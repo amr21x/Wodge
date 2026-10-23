@@ -13,7 +13,6 @@
   "devDependencies": {
     "@wodge/ts": "workspace:*",
     "@types/node": "^20.11.20",
-    "eslint": "^8",
     "typescript": "^5",
     "@cloudflare/workers-types": "4.20260424.1"
   },

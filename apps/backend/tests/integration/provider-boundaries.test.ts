@@ -1,10 +1,9 @@
 // @vitest-environment node
 import { signToken, verifyToken } from "@wodge/auth/tokens";
 import { LiveKitCallTokens } from "@wodge/infra/calls/livekit";
-import { StripePayments } from "@wodge/infra/payments/payments";
+import { PolarPayments } from "@wodge/infra/payments/polar";
 import { S3ObjectStorage } from "@wodge/infra/storage/object-storage";
-import { createHmac } from "node:crypto";
-import { expect, test } from "vitest";
+import { expect, test, vi } from "vitest";
 import { createTestEnvironment } from "../helpers/environment";
 
 test("JWT provider preserves actor claims and rejects wrong keys and expired tokens", async () => {
@@ -76,25 +75,36 @@ test("object provider preserves endpoint, object key and signed URL expiry", asy
   expect(url.hostname).toContain("objects.example.test");
 });
 
-test("payment provider verifies raw webhook signatures before returning events", async () => {
-  const payments = new StripePayments(createTestEnvironment());
-  const body = JSON.stringify({
-    id: "evt_local",
-    object: "event",
-    type: "customer.subscription.deleted",
-    data: { object: { metadata: { workspaceId: "workspace" } } },
-  });
-  const timestamp = Math.floor(Date.now() / 1000);
-  const secret = "whsec_local_only";
-  const signature = createHmac("sha256", secret)
-    .update(`${timestamp}.${body}`)
-    .digest("hex");
-
-  expect(
-    await payments.verifyEvent(body, `t=${timestamp},v1=${signature}`, secret),
-  ).toMatchObject({ id: "evt_local", type: "customer.subscription.deleted" });
-
-  await expect(
-    payments.verifyEvent(body + " ", `t=${timestamp},v1=${signature}`, secret),
-  ).rejects.toThrow();
+test("payment provider reads sandbox subscriptions and normalizes provider state", async () => {
+  const payments = new PolarPayments(createTestEnvironment());
+  const fetch = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+    Response.json({
+      id: "subscription",
+      created_at: "2026-10-01T00:00:00Z",
+      modified_at: "2026-10-02T00:00:00Z",
+      status: "active",
+      product_id: "product_local",
+      metadata: { referenceId: "workspace" },
+      customer: { external_id: "owner" },
+    }),
+  );
+  try {
+    expect(await payments.subscription("subscription")).toEqual({
+      id: "subscription",
+      created: Date.parse("2026-10-01T00:00:00Z"),
+      modified: Date.parse("2026-10-02T00:00:00Z"),
+      status: "active",
+      productId: "product_local",
+      metadata: { referenceId: "workspace" },
+      customerExternalId: "owner",
+    });
+    const [request] = fetch.mock.calls[0]!;
+    const url = new URL(
+      request instanceof Request ? request.url : String(request),
+    );
+    expect(url.origin).toBe("https://sandbox-api.polar.sh");
+    expect(url.pathname).toBe("/v1/subscriptions/subscription");
+  } finally {
+    fetch.mockRestore();
+  }
 });

@@ -11,6 +11,7 @@ export function PollOptions({
   setVote,
   removeVote,
   isRoom = false,
+  disabled = false,
 }: {
   options?: string[];
   votes?: number[];
@@ -18,6 +19,7 @@ export function PollOptions({
   setVote: (option: number) => void;
   removeVote: () => void;
   isRoom?: boolean;
+  disabled?: boolean;
 }) {
   const totalVotes = votes?.reduce((a, b) => a + b, 0) || 0;
 
@@ -29,10 +31,12 @@ export function PollOptions({
         !isRoom && "pl-9",
       )}
     >
-      <ul className="flex w-full flex-col gap-2 ">
+      <ul className="flex w-full flex-col gap-2">
         {options?.map((option, i) => (
           <li key={i}>
-            <div
+            <button
+              disabled={disabled}
+              type="button"
               className={cn(
                 buttonVariants({
                   variant: "outline",
@@ -61,7 +65,7 @@ export function PollOptions({
                     vote === i && "visible",
                   )}
                 />
-                <span className="overflow-hidden overflow-y-auto truncate ">
+                <span className="overflow-hidden overflow-y-auto truncate">
                   {option}
                 </span>
 
@@ -69,7 +73,7 @@ export function PollOptions({
                   <span className="ml-auto">{`${((votes?.[i] ?? 0) / totalVotes) * 100}%`}</span>
                 )}
               </div>
-            </div>
+            </button>
           </li>
         ))}
       </ul>
@@ -79,7 +83,7 @@ export function PollOptions({
           {totalVotes} vote{totalVotes === 1 ? "" : "s"}
         </span>
         {vote !== undefined && (
-          <Button size="sm" onClick={removeVote}>
+          <Button disabled={disabled} size="sm" onClick={removeVote}>
             Remove vote
           </Button>
         )}

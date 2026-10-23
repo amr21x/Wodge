@@ -41,7 +41,7 @@ const FONT_FAMILIES = FONT_FAMILY_GROUPS.flatMap((group) => [
 ]).flat();
 
 export type FontFamilyPickerProps = {
-  onChange: (value: string) => void; // eslint-disable-line no-unused-vars
+  onChange: (value: string) => void;
   value: string;
 };
 

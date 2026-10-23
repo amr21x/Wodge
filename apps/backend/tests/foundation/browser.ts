@@ -1,4 +1,4 @@
-import { canView } from "@wodge/auth/authorization/access";
+import { isTeamMember } from "@wodge/auth/authorization/access";
 import { discussionInputSchemas } from "@wodge/domain/discussions/validation";
 import { createEntityId } from "@wodge/domain/identifiers";
 import { pageInputSchemas } from "@wodge/domain/pages/validation";
@@ -10,5 +10,5 @@ export const browserContracts = {
   roomInputSchemas,
   pageInputSchemas,
   discussionInputSchemas,
-  canView,
+  isTeamMember,
 };

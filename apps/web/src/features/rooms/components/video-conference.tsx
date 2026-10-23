@@ -27,11 +27,10 @@ import * as React from "react";
 import { ParticipantTile } from "./participant-tile";
 import { FocusLayout } from "./focus-layout";
 import { cn } from "@/lib/utils/index";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom } from "jotai";
 import { isCarouselOpenAtom } from "../state/atoms";
 
-export interface VideoConferenceProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+export interface VideoConferenceProps extends React.HTMLAttributes<HTMLDivElement> {
   chatMessageFormatter?: MessageFormatter;
   chatMessageEncoder?: MessageEncoder;
   chatMessageDecoder?: MessageDecoder;
@@ -40,14 +39,14 @@ export interface VideoConferenceProps
 }
 
 export function VideoConference({
-  chatMessageFormatter,
-  chatMessageDecoder,
-  chatMessageEncoder,
-  SettingsComponent,
   className,
+  chatMessageFormatter: _chatMessageFormatter,
+  chatMessageDecoder: _chatMessageDecoder,
+  chatMessageEncoder: _chatMessageEncoder,
+  SettingsComponent: _SettingsComponent,
   ...props
 }: VideoConferenceProps) {
-  const [widgetState, setWidgetState] = React.useState<WidgetState>({
+  const [, setWidgetState] = React.useState<WidgetState>({
     showChat: false,
     unreadMessages: 0,
     showSettings: false,
@@ -81,6 +80,7 @@ export function VideoConference({
 
   const [isCarouselOpen, setIsCarouselOpen] = useAtom(isCarouselOpenAtom);
 
+  /* oxlint-disable react-hooks/exhaustive-deps -- LiveKit publications mutate in place; subscription keys and pinned track IDs control synchronization. */
   React.useEffect(() => {
     if (!focusTrack) {
       setIsCarouselOpen(false);
@@ -123,6 +123,7 @@ export function VideoConference({
       .join(),
     focusTrack?.publication?.trackSid,
   ]);
+  /* oxlint-enable react-hooks/exhaustive-deps */
 
   // useWarnAboutMissingStyles();
 

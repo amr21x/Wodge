@@ -2,7 +2,7 @@ import { useMember } from "@/features/workspace/hooks/use-member";
 import { differenceInMinutes, format } from "date-fns";
 import { DrObj } from "@wodge/domain/types";
 import { Message as MessageType } from "@wodge/domain/rooms/models";
-import React, { memo, useRef } from "react";
+import React, { memo } from "react";
 import { SafeAvatar } from "@/components/safe-avatar";
 import { SafeDiv } from "@/components/safe-div";
 import { ImageMessage } from "./image-message";
@@ -11,7 +11,7 @@ import { FileMessage } from "./file-message";
 import { VideoMessage } from "./video-message";
 import { MessageDropDown } from "./message-dropdown";
 import { useCurrentUser } from "@/features/account/hooks/use-current-user";
-import { useIsTeamModerator } from "@/features/workspace/hooks/use-is-team-moderator";
+import { useRoomAction } from "@/features/workspace/hooks/use-room-action";
 import { useEditEditor } from "../../discussions/components/use-edit-editor";
 import { EditEditor } from "./edit-editor";
 import { cn } from "@/lib/utils/index";
@@ -35,9 +35,15 @@ export const Message = memo(
 
     const { user } = useCurrentUser();
 
-    const isTeamModerator = useIsTeamModerator();
+    const canEditOwn = useRoomAction("editOwn");
+    const canDeleteOwn = useRoomAction("deleteOwn");
+    const canModerate = useRoomAction("moderate");
+    const canEdit =
+      canEditOwn && user?.id === message.sender && message.type === "text";
+    const canDelete =
+      canModerate || (canDeleteOwn && user?.id === message.sender);
 
-    const { isEditing, onCancelEdit, onEdit, setIsEditing } = useEditEditor();
+    const { isEditing, onCancelEdit, setIsEditing } = useEditEditor();
 
     if (isMembersPending) {
       return null;
@@ -64,6 +70,7 @@ export const Message = memo(
             <div className="MessageEditor w-full overflow-hidden text-balance break-words pl-9">
               {isEditing ? (
                 <EditEditor
+                  canEdit={canEdit}
                   content={message as MessageType}
                   onCancelEdit={() => onCancelEdit()}
                   onSuccessEdit={(newContent) => {
@@ -77,8 +84,8 @@ export const Message = memo(
             </div>
 
             <MessageDropDown
-              canEdit={user?.id === message.sender && message.type === "text"}
-              canDelete={isTeamModerator || user?.id === message.sender}
+              canEdit={canEdit}
+              canDelete={canDelete}
               onDelete={() => {
                 onDelete?.(message as MessageType);
               }}
@@ -93,7 +100,7 @@ export const Message = memo(
     }
 
     return (
-      <div className="group rounded-md p-1.5 transition-all hover:bg-secondary/40 ">
+      <div className="group rounded-md p-1.5 transition-all hover:bg-secondary/40">
         <div className="flex items-start gap-2">
           <SafeAvatar
             className="h-7 w-7"
@@ -109,8 +116,8 @@ export const Message = memo(
           </div>
 
           <MessageDropDown
-            canEdit={user?.id === message.sender && message.type === "text"}
-            canDelete={isTeamModerator || user?.id === message.sender}
+            canEdit={canEdit}
+            canDelete={canDelete}
             onDelete={() => {
               onDelete?.(message as MessageType);
             }}
@@ -123,6 +130,7 @@ export const Message = memo(
         <div className="pl-9">
           {isEditing ? (
             <EditEditor
+              canEdit={canEdit}
               content={message as MessageType}
               onCancelEdit={() => onCancelEdit()}
               onSuccessEdit={(newContent) => {

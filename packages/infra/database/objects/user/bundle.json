@@ -1,0 +1,34 @@
+{
+  "journal": {
+    "version": "7",
+    "dialect": "sqlite",
+    "entries": [
+      {
+        "idx": 0,
+        "version": "6",
+        "when": 1792445542078,
+        "tag": "0000_baseline",
+        "breakpoints": true
+      },
+      {
+        "idx": 1,
+        "version": "6",
+        "when": 1792450365379,
+        "tag": "0001_gifted_doctor_octopus",
+        "breakpoints": true
+      },
+      {
+        "idx": 2,
+        "version": "6",
+        "when": 1792450508992,
+        "tag": "0002_gifted_morlun",
+        "breakpoints": true
+      }
+    ]
+  },
+  "migrations": {
+    "m0000": "CREATE TABLE IF NOT EXISTS `user_structure_import` (\n\t`id` integer PRIMARY KEY NOT NULL,\n\tCONSTRAINT \"user_structure_import_singleton\" CHECK(\"user_structure_import\".\"id\" = 1)\n);\n--> statement-breakpoint\nCREATE TABLE IF NOT EXISTS `user_workspaces` (\n\t`workspace_id` text PRIMARY KEY NOT NULL,\n\t`position` integer NOT NULL\n);\n",
+    "m0001": "CREATE TABLE `sync_client_groups` (\n\t`key` text PRIMARY KEY NOT NULL,\n\t`id` text NOT NULL,\n\t`user_id` text NOT NULL,\n\t`client_version` integer\n);\n--> statement-breakpoint\nCREATE TABLE `sync_clients` (\n\t`key` text PRIMARY KEY NOT NULL,\n\t`id` text NOT NULL,\n\t`group_id` text NOT NULL,\n\t`last_mutation_id` integer NOT NULL,\n\t`last_modified_version` integer NOT NULL\n);\n--> statement-breakpoint\nCREATE TABLE `sync_import` (\n\t`id` integer PRIMARY KEY NOT NULL\n);\n--> statement-breakpoint\nCREATE TABLE `sync_versions` (\n\t`name` text PRIMARY KEY NOT NULL,\n\t`revision` integer NOT NULL\n);\n",
+    "m0002": "ALTER TABLE `sync_import` ADD `legacy_versions` integer DEFAULT 0 NOT NULL;"
+  }
+}

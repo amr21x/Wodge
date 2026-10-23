@@ -4,6 +4,7 @@ import type { ComponentProps } from "react";
 
 import { FeatureGate } from "@/components/feature-flags-provider";
 
+import { useRoomAction } from "@/features/workspace/hooks/use-room-action";
 import { Button } from "@/components/ui/button";
 import { DialogClose } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -21,10 +22,11 @@ import { toast } from "sonner";
 import { SidebarItemBtn } from "../../workspace/components/sidebar-item-btn";
 
 function PollMakerContent({ isRoom }: { isRoom: boolean }) {
+  const roomSendAllowed = useRoomAction("send", isRoom);
   const [newOption, setNewOption] = useState<string>("");
   const [question, setQuestion] = useState("");
 
-  const { workspaceRep } = useCurrentWorkspace();
+  useCurrentWorkspace();
   const closeRef = useRef<HTMLButtonElement>(null);
   const [options, setOptions] = useState<string[]>([]);
   const newOptionRef = useRef<HTMLInputElement>(null);
@@ -45,7 +47,9 @@ function PollMakerContent({ isRoom }: { isRoom: boolean }) {
     setOptions(arr);
   };
 
-  const { teamId } = useParams<{ teamId: string }>();
+  useParams<{
+    teamId: string;
+  }>();
 
   const { user } = useCurrentUser();
 
@@ -133,10 +137,10 @@ function PollMakerContent({ isRoom }: { isRoom: boolean }) {
         variant="secondary"
         className="mt-2 w-full gap-2"
         size="sm"
-        disabled={!canSubmit}
+        disabled={!canSubmit || (isRoom && !roomSendAllowed)}
         onClick={async () => {
           try {
-            if (!user) {
+            if (!user || (isRoom && !roomSendAllowed)) {
               return;
             }
 

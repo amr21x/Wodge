@@ -1,3 +1,4 @@
+import { attachSql } from "../helpers/sqlite";
 import { WorkspaceAuthorization } from "@wodge/auth/authorization/service";
 import { BetterAuthMembership } from "@wodge/auth/membership";
 import { PageService } from "@wodge/core/pages/services/page";
@@ -23,7 +24,13 @@ function page(name: string) {
   return {
     name,
     env: createTestEnvironment(),
-    ctx: { storage: { put: vi.fn(async () => {}) } },
+    ctx: {
+      storage: attachSql({
+        get: vi.fn(async () => undefined),
+        list: vi.fn(async () => new Map()),
+        put: vi.fn(async () => {}),
+      }),
+    },
     versions: new Map([["globalVersion", 0]]),
     state: {
       record: {
@@ -45,6 +52,12 @@ test("one activation reuses its service, sync adapter, router and handler graph"
     const router = container.resolve(PageRoutes).router;
     expect(container.resolve(PageRoutes).router).toBe(router);
     expect(container.resolve(PageService)).toBe(container.resolve(PageService));
+    expect(container.resolve("objectDatabase")).toBe(
+      container.resolve("objectDatabase"),
+    );
+    expect(container.resolve("objectDatabase")).not.toBe(
+      container.resolve("database"),
+    );
     expect(container.resolve(PageSync)).toBe(container.resolve(PageSync));
     for (const revision of [2, 7])
       await container.resolve(PageSync).run(
@@ -88,6 +101,9 @@ test("different objects never share object-bound instances or mutation revisions
   });
   try {
     expect(first.resolve(PageService)).not.toBe(second.resolve(PageService));
+    expect(first.resolve("objectDatabase")).not.toBe(
+      second.resolve("objectDatabase"),
+    );
     await Promise.all([
       first
         .resolve(PageService)
@@ -111,7 +127,7 @@ test("one authorization instance accepts concurrent identities without capturing
     env: createTestEnvironment(),
     ctx: { storage: {} },
     workspaceMembers: { data: { createdBy: "owner", members: [] } },
-    workspaceStructure: { data: { teams: [], groups: [] } },
+    workspaceStructure: { data: { teams: [] } },
   } as unknown as WorkspaceServer;
   const container = createRuntimeContainer(object.env, {
     type: "workspace",

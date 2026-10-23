@@ -31,7 +31,7 @@ export const disconnectFromRoom = async () => {
     jotaiStore.set(isCarouselOpenAtom, true);
     jotaiStore.set(isFullScreenAtom, false);
     jotaiStore.set(isCallWindowOpenAtom, false);
-  } catch (e) {
+  } catch {
     toast.error("Failed to disconnect from room");
   }
 };

@@ -7,6 +7,7 @@ import { NewWorkspaceSchema } from "@wodge/domain/workspace/validation";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 
+import { failureMessage, requireOk } from "@/client/errors";
 import { Button } from "@/components/ui/button";
 import { DialogClose } from "@/components/ui/dialog";
 import {
@@ -39,9 +40,7 @@ function CreateWorkspaceFormContent() {
     mutationFn: async (data: NewWorkspace) => {
       const res = await api.api.workspaces.new.$post({ json: data });
 
-      if (!res.ok) {
-        throw new Error("Failed to create workspace");
-      }
+      await requireOk(res);
 
       return data.slug;
     },
@@ -52,7 +51,7 @@ function CreateWorkspaceFormContent() {
       router.push("/" + slug);
     },
     onError: (e) => {
-      toast.error(e.message);
+      toast.error(failureMessage(e));
     },
   });
 

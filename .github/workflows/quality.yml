@@ -1,0 +1,114 @@
+name: Code Quality
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+  workflow_call:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      application: ${{ steps.scope.outputs.application }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: scope
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          # Manual deployment always validates and builds, including a docs-only ref.
+          # New branches have no previous commit to compare; run everything.
+          if [ "$EVENT" = workflow_dispatch ] || [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
+            echo "application=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Without rename detection a move lists both paths, so moves in or out of docs/ count.
+          changed=$(git diff --no-renames --name-only "$BASE...$HEAD")
+          if [ -n "$changed" ] && ! printf '%s\n' "$changed" | grep -qv '^docs/'; then
+            echo "Documentation-only change; skipping application gates."
+            echo "application=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "application=true" >> "$GITHUB_OUTPUT"
+          fi
+      # Uses the pnpm version pinned by packageManager; setup-node caches its store.
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm format:check
+      - if: steps.scope.outputs.application == 'true'
+        run: pnpm check:boundaries
+      - name: Type check
+        if: steps.scope.outputs.application == 'true'
+        run: |
+          pnpm -r --if-present typecheck
+          pnpm exec tsc -p apps/backend/tsconfig.json --noEmit --incremental false --pretty false
+          pnpm --filter backend test:api
+      - name: Tests
+        if: steps.scope.outputs.application == 'true'
+        run: |
+          pnpm exec vitest run --maxWorkers=2 --minWorkers=1
+          pnpm test:feature-flags
+      - name: Worker runtime checks
+        if: steps.scope.outputs.application == 'true'
+        run: |
+          pnpm --filter backend test:foundation
+          pnpm --filter backend test:runtime
+
+  build:
+    needs: validate
+    if: needs.validate.outputs.application == 'true'
+    runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_APP_DOMAIN: ${{ vars.APP_DOMAIN || 'https://wodge.amr21.dev' }}
+      NEXT_PUBLIC_BACKEND_DOMAIN: ${{ vars.BACKEND_DOMAIN || 'https://wodge.amr21.dev' }}
+      NEXT_PUBLIC_AVATARS_URL: ${{ vars.AVATARS_URL || 'https://wodge-avatars.amr21.dev' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Build backend Worker
+        run: pnpm --filter backend build
+      - uses: actions/cache@v4
+        with:
+          path: apps/web/.next/cache
+          key: nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
+          restore-keys: nextjs-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+      - name: Build web for Cloudflare Pages
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+        run: pnpm --filter web pages:build
+
+  # Keep the existing required check green for docs-only changes, but fail closed.
+  result:
+    name: quality
+    needs: [validate, build]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          VALIDATE: ${{ needs.validate.result }}
+          BUILD: ${{ needs.build.result }}
+          APPLICATION: ${{ needs.validate.outputs.application }}
+        run: |
+          test "$VALIDATE" = success
+          if [ "$APPLICATION" = true ]; then
+            test "$BUILD" = success
+          else
+            test "$APPLICATION" = false
+            test "$BUILD" = skipped
+          fi

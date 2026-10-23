@@ -1,5 +1,5 @@
 import { useParams } from "next/navigation";
-import { useActionState, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Replicache } from "replicache";
 import type { ThreadMutators } from "@/client/sync/discussions/mutators";
 import { createThreadRep } from "@/client/sync/discussions/create-thread-rep";
@@ -32,19 +32,26 @@ export function useCurrentThreadRep() {
     return team?.threads.find((r) => r.id === channelId);
   }, [team, channelId]);
 
+  const userId = user?.id;
+  const exists = !!team && !!channel;
   useEffect(() => {
-    if (workspaceId && team && channel && user && !rep) {
-      const repTemp = createThreadRep({
-        channelId: channel.id,
-        workspaceId,
-        teamId: team.id,
-        userId: user.id,
-      });
+    setRep(undefined);
+    if (!workspaceId || !exists || !userId) return;
+    const instance = createThreadRep({
+      channelId,
+      workspaceId,
+      teamId,
+      userId,
+    });
+    setRep(instance);
+    const unregister = setChannelRep(instance);
+    return () => {
+      unregister();
+      void instance.close();
+    };
+  }, [workspaceId, teamId, channelId, userId, exists, setChannelRep]);
 
-      setRep(repTemp);
-      setChannelRep(repTemp);
-    }
-  }, [workspaceId, team, channel, structure.teams, user]);
-
-  return rep;
+  return userId && exists && rep?.name === `${userId}-${channelId}`
+    ? rep
+    : undefined;
 }

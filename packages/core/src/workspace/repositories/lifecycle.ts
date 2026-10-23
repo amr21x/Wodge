@@ -1,21 +1,19 @@
+import { ObjectSyncRepository } from "@wodge/core/sync/repositories/state";
+import type { ObjectDatabase } from "@wodge/infra/database/object-database";
+import { WorkspaceRecordRepository } from "@wodge/core/workspace/repositories/records";
 import { WorkspaceStateRepository } from "@wodge/core/workspace/repositories/state";
-import {
-  REPLICACHE_VERSIONS_KEY,
-  WORKSPACE_PRESENCE_KEY,
-  makeWorkspaceMembersKey,
-  makeWorkspaceStructureKey,
-} from "@wodge/domain/sync/index";
 import type { WorkspacePartyInterface } from "@wodge/domain/sync/state";
-import type { RecordStorage } from "@wodge/infra/durable-objects/storage";
 import { inject, injectable } from "tsyringe";
 
 @injectable()
 export class WorkspaceLifecycleRepository extends WorkspaceStateRepository {
   constructor(
-    @inject("storage") storage: Pick<RecordStorage, "put">,
+    @inject(WorkspaceRecordRepository) records: WorkspaceRecordRepository,
+    @inject(ObjectSyncRepository) private readonly sync: ObjectSyncRepository,
     @inject("workspace") state: WorkspacePartyInterface,
+    @inject("objectDatabase") db: ObjectDatabase,
   ) {
-    super(storage, state);
+    super(records, state, db);
   }
 
   get presence() {
@@ -46,11 +44,14 @@ export class WorkspaceLifecycleRepository extends WorkspaceStateRepository {
     }
   }
 
-  private records() {
-    return {
-      [makeWorkspaceMembersKey()]: this.state.workspaceMembers,
-      [makeWorkspaceStructureKey()]: this.state.workspaceStructure,
-    };
+  private async saveRecords() {
+    await this.records.initialize();
+    this.db.transaction(() => {
+      this.records.writeMembers(this.state.workspaceMembers);
+      this.records.writeStructure(this.state.workspaceStructure);
+      this.sync.saveVersions(this.state.versions);
+      this.records.writePresence(this.state.presenceMap);
+    });
   }
 
   async saveCreatedWorkspace() {
@@ -60,22 +61,14 @@ export class WorkspaceLifecycleRepository extends WorkspaceStateRepository {
     this.state.versions.set("globalVersion", revision);
     this.state.versions.set("workspaceInfo", revision);
 
-    await this.storage.put({
-      ...this.records(),
-      [REPLICACHE_VERSIONS_KEY]: this.state.versions,
-      [WORKSPACE_PRESENCE_KEY]: this.state.presenceMap,
-    });
+    await this.saveRecords();
   }
 
   async saveMembershipProjection() {
     const revision = this.next();
     this.mark(revision);
     this.state.versions.set("globalVersion", revision);
-    await this.storage.put({
-      ...this.records(),
-      [REPLICACHE_VERSIONS_KEY]: this.state.versions,
-      [WORKSPACE_PRESENCE_KEY]: this.state.presenceMap,
-    });
+    await this.saveRecords();
   }
 
   async saveDeletedWorkspace() {
@@ -93,11 +86,7 @@ export class WorkspaceLifecycleRepository extends WorkspaceStateRepository {
       ["workspaceInfo", 0],
     ]);
 
-    await this.storage.put({
-      ...this.records(),
-      REPLICACHE_VERSIONS_KEY: this.state.versions,
-      WORKSPACE_PRESENCE_KEY: this.state.presenceMap,
-    });
+    await this.saveRecords();
   }
 
   async saveMemberUpdate() {
@@ -106,10 +95,8 @@ export class WorkspaceLifecycleRepository extends WorkspaceStateRepository {
     this.mark(revision, true, false);
     this.state.versions.set("globalVersion", revision);
 
-    await this.storage.put({
-      [makeWorkspaceMembersKey()]: this.state.workspaceMembers,
-      REPLICACHE_VERSIONS_KEY: this.state.versions,
-    });
+    await this.records.saveMembers(this.state.workspaceMembers);
+    await this.sync.acknowledge(this.state.versions, new Map());
   }
 
   async saveWorkspaceUpdate() {
@@ -118,10 +105,11 @@ export class WorkspaceLifecycleRepository extends WorkspaceStateRepository {
     this.state.versions.set("globalVersion", revision);
     this.state.versions.set("workspaceInfo", revision);
 
-    await this.storage.put(REPLICACHE_VERSIONS_KEY, this.state.versions);
+    await this.sync.acknowledge(this.state.versions, new Map());
   }
 
   async savePresence() {
-    await this.storage.put(WORKSPACE_PRESENCE_KEY, this.state.presenceMap);
+    await this.records.initialize();
+    this.records.writePresence(this.state.presenceMap);
   }
 }

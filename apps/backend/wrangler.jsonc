@@ -1,9 +1,17 @@
 {
-  "$schema": "../../config/workers/node_modules/wrangler/config-schema.json",
+  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "wodge-backend",
   "main": "src/server.ts",
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat"],
+  // Production shares the web origin: these paths go to the Worker and Pages serves
+  // everything else. `wrangler dev` ignores routes; deploys override the local vars.
+  "workers_dev": false,
+  "routes": [
+    { "pattern": "wodge.amr21.dev/api/*", "zone_name": "amr21.dev" },
+    { "pattern": "wodge.amr21.dev/parties/*", "zone_name": "amr21.dev" },
+    { "pattern": "wodge.amr21.dev/health", "zone_name": "amr21.dev" },
+  ],
   "vars": {
     "INTEGRATION_MODE": "partial",
     "APP_DOMAIN": "http://localhost:3000",
@@ -14,7 +22,7 @@
     {
       "binding": "DB",
       "database_name": "wodge",
-      "database_id": "f17da2ae-c255-422f-99ad-b8b93733b758",
+      "database_id": "640d47d7-e804-4224-a71c-250c5b5dd1fe",
       "migrations_dir": "../../packages/domain/migrations",
     },
   ],

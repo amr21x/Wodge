@@ -134,7 +134,7 @@
   @apply flex flex-col gap-1;
 }
 .uppy-u-reset.uppy-c-btn.uppy-DashboardTab-btn {
-  @apply flex w-full items-center justify-start gap-1 rounded-md  bg-transparent pl-1 pr-2 font-medium text-muted-foreground transition-all hover:bg-accent hover:text-foreground;
+  @apply flex w-full items-center justify-start gap-1 rounded-md bg-transparent pl-1 pr-2 font-medium text-muted-foreground transition-all hover:bg-accent hover:text-foreground;
 
   &:hover {
     & > .uppy-DashboardTab-inner > svg,
@@ -188,7 +188,7 @@
 .uppy-u-reset.uppy-c-btn.uppy-Audio-button,
 .uppy-u-reset.uppy-c-btn.uppy-Webcam-button.uppy-Webcam-button--picture,
 .uppy-u-reset.uppy-c-btn.uppy-Webcam-button {
-  @apply rounded-md bg-accent  p-1.5 text-muted-foreground;
+  @apply rounded-md bg-accent p-1.5 text-muted-foreground;
 
   &:hover {
     & > svg > path {

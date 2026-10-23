@@ -1,26 +1,10 @@
 "use client";
 
-import { Invite, Invites } from "@wodge/domain/workspace/models";
-import { env } from "@wodge/env/client";
+import { Invite } from "@wodge/domain/workspace/models";
+
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
 import { useQuery } from "@tanstack/react-query";
-import { toast } from "sonner";
-
-function getInviteLink(invites?: Invites): Invite | undefined {
-  if (!invites) {
-    return;
-  }
-
-  const invite: [string, Invite] | undefined = Object.entries(invites).find(
-    ([k, v]) => v.method === "link",
-  );
-
-  if (!invite) {
-    return;
-  }
-
-  return invite[1];
-}
+import { requireOk } from "@/client/errors";
 
 export function useInvites() {
   const { workspaceId } = useCurrentWorkspace();
@@ -28,12 +12,13 @@ export function useInvites() {
   const {
     data: invites,
     isPending,
-    isError,
+    error,
   } = useQuery<Invite[]>({
     queryKey: ["invites", workspaceId],
     queryFn: async () => {
       const res = await fetch(`/api/workspaces/${workspaceId}/invite`);
 
+      await requireOk(res);
       const data = await res.json<{ invites?: Invite[] }>();
 
       return data?.invites || [];
@@ -42,11 +27,5 @@ export function useInvites() {
     staleTime: 0,
   });
 
-  if (isError) {
-    toast.error("Failed to fetch invites");
-  }
-
-  // const inviteLink = getInviteLink(invites);
-
-  return { invites, isLinkLoading: isPending };
+  return { invites, error, isLinkLoading: isPending };
 }

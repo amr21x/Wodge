@@ -1,4 +1,3 @@
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { WorkspaceItem } from "./workspace-item";
 import { useUserWorkspaces } from "@/features/workspace/hooks/use-user-workspaces";
 

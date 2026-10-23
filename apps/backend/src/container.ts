@@ -29,6 +29,7 @@ export function createRuntimeContainer(
   if (object) {
     container.registerInstance("storage", object.instance.ctx.storage);
     container.registerInstance("objectId", object.instance.name);
+    container.registerInstance("objectKind", object.type);
     container.registerInstance(object.type, object.instance);
   }
   return container;

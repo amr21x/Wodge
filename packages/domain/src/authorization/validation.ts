@@ -27,7 +27,11 @@ export const AuthorizationScopeSchema = z
 
 export const CreateRoleSchema = z
   .object({
-    name: z.string().trim().min(1).max(80),
+    name: z
+      .string()
+      .trim()
+      .min(1, "Role name is required")
+      .max(80, "Role name must be 80 characters or fewer"),
     permissions: PermissionsSchema,
   })
   .strict();

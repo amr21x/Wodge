@@ -3,14 +3,13 @@ import { Room } from "@wodge/domain/rooms/models";
 import { Thread } from "@wodge/domain/discussions/models";
 import { Page } from "@wodge/domain/pages/models";
 import { useFeatureFlags } from "@/components/feature-flags-provider";
-import { CHANNEL_FEATURES } from "@wodge/core/features/policy";
+import { CHANNEL_FEATURES } from "@wodge/domain/features/models";
 import { format } from "date-fns";
 import { useSetAtom } from "jotai";
 import {
   Database,
   GanttChart,
   MessageCircle,
-  Newspaper,
   NotebookText,
 } from "lucide-react";
 import Link from "next/link";
@@ -72,7 +71,7 @@ export function RecentItem({ item }: { item: RecentlyVisitedItem }) {
       }}
     >
       <div className="group/item rounded-md border border-border bg-background">
-        <div className="relative h-6 bg-secondary/40 px-3 ">
+        <div className="relative h-6 bg-secondary/40 px-3">
           <Icon className="absolute bottom-0 h-5 w-5 translate-y-1/2 opacity-50 transition-all group-hover/item:opacity-100" />
         </div>
         <div className="px-3 pb-2 pt-4">

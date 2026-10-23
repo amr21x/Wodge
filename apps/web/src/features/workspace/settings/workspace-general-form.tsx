@@ -1,3 +1,4 @@
+import { failureMessage, requireOk } from "@/client/errors";
 import { api } from "@/client/api";
 import {
   Form,
@@ -7,24 +8,24 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { SettingsContentAction, SettingsContentSection } from "./settings";
+
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { Workspace } from "@wodge/domain/workspace/models";
 import { WorkspaceSchema } from "@wodge/domain/workspace/validation";
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils/index";
+
 import { toast } from "@/components/ui/toast";
-import { Info } from "lucide-react";
+
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { env } from "@wodge/env/client";
+
 import { useRouter } from "next/navigation";
 
 export function WorkspaceGeneralForm() {
-  const { workspace, workspaceRep, workspaceId } = useCurrentWorkspace();
+  const { workspace, workspaceId } = useCurrentWorkspace();
   const queryClient = useQueryClient();
 
   const form = useForm<Workspace>({
@@ -40,10 +41,10 @@ export function WorkspaceGeneralForm() {
   const router = useRouter();
 
   useEffect(() => {
-    if (workspace) {
+    if (workspace && !form.formState.isDirty) {
       form.reset(workspace);
     }
-  }, [workspace]);
+  }, [workspace, form]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (data: Pick<Workspace, "name" | "slug">) => {
@@ -52,26 +53,25 @@ export function WorkspaceGeneralForm() {
         param: { workspaceId },
         json: data,
       });
-      if (!response.ok) throw new Error("Workspace update failed");
+      await requireOk(response);
 
       return data;
     },
-    onSuccess: (data) => {
+    onSuccess: (_data) => {
       toast.success("Workspace updated");
       queryClient.invalidateQueries({
         queryKey: ["user-workspaces"],
       });
-      // }
+      form.reset(_data);
+      router.push(`/${_data.slug}/settings`);
     },
-    onError() {
-      toast.error("Workspace update failed");
+    onError(error) {
+      toast.error(failureMessage(error));
     },
   });
 
   async function onSubmit(data: Pick<Workspace, "name" | "slug">) {
     mutate(data);
-    router.push(`/${data.slug}/settings`);
-    form.reset(data);
   }
 
   return (

@@ -8,40 +8,52 @@ export async function verifyBilling({
   database,
   workspace,
   structure,
+  ownerId,
   memberCookie,
-  stripeSubscriptions,
+  polar,
 }) {
-  let sequence = 0;
+  /** Polar's current subscription state, returned by the mocked sandbox API. */
   /** @param {Record<string, any>} [changes] */
-  const event = (changes = {}) => ({
-    id: `evt_runtime_${++sequence}`,
-    created: 100,
-    type: "customer.subscription.created",
-    data: {
-      object: {
-        id: "sub_runtime",
-        created: 10,
-        status: "active",
-        metadata: { workspaceId: workspace.id },
-        customer: "cus_runtime",
-      },
-    },
+  const subscription = (changes = {}) => ({
+    id: "sub_runtime",
+    created_at: "2026-10-01T00:00:00.000Z",
+    modified_at: "2026-10-01T00:00:01.000Z",
+    status: "active",
+    product_id: "product_runtime",
+    metadata: { referenceId: workspace.id },
+    customer: { id: "cus_runtime", external_id: ownerId },
     ...changes,
   });
-  /** @param {any} value @param {boolean} [valid] */
-  const deliver = (value, valid = true) => {
+  let sequence = 0;
+  /** Payload contents are untrusted; only the subscription ID and reference are used. */
+  /** @param {Record<string, any>} [data] */
+  const event = (data = subscription(), type = "subscription.updated") => ({
+    type,
+    timestamp: new Date().toISOString(),
+    data,
+  });
+  /** @param {any} value @param {boolean} [valid] @param {string} [id] */
+  const deliver = (value, valid = true, id = `msg_runtime_${++sequence}`) => {
     const body = JSON.stringify(value);
     const timestamp = Math.floor(Date.now() / 1000);
-    const signature = createHmac("sha256", "whsec_runtime")
-      .update(`${timestamp}.${body}`)
-      .digest("hex");
-    return request("/api/billing/webhook", {
-      method: "POST",
-      body,
-      headers: {
-        "stripe-signature": `t=${timestamp},v1=${valid ? signature : "invalid"}`,
+    const signature = createHmac("sha256", "polar_whs_runtime")
+      .update(`${id}.${timestamp}.${body}`)
+      .digest("base64");
+    // Polar deliveries carry no session cookie.
+    return request(
+      "/api/auth/polar/webhooks",
+      {
+        method: "POST",
+        body,
+        headers: {
+          "content-type": "application/json",
+          "webhook-id": id,
+          "webhook-timestamp": String(timestamp),
+          "webhook-signature": `v1,${valid ? signature : "aW52YWxpZA=="}`,
+        },
       },
-    });
+      false,
+    );
   };
   const state = () =>
     database
@@ -79,83 +91,159 @@ export async function verifyBilling({
     assert.equal(pull.status, 200, await pull.clone().text());
   };
   await assertCallsDisabled();
-  assert.equal((await request("/api/billing/webhook", json({}))).status, 400);
-  const first = event();
-  stripeSubscriptions.set("sub_runtime", {
-    ...first.data.object,
-    object: "subscription",
-  });
-  assert.equal((await deliver(first, false)).status, 400);
+
+  // Direct browser access to the plugin's checkout and customer endpoints is blocked.
+  for (const path of [
+    "/api/auth/checkout",
+    "/api/auth/customer/portal",
+    "/api/auth/customer/state",
+    "/api/auth/usage/ingest",
+  ]) {
+    const response = await request(path, json({ reference_id: workspace.id }));
+    assert.equal(response.status, 403, await response.clone().text());
+  }
+  assert.equal(
+    (
+      await request(`/api/workspaces/${workspace.id}/billing/checkout`, {
+        headers: { cookie: memberCookie },
+      })
+    ).status,
+    403,
+  );
+  assert.equal(polar.checkouts.length, 0);
+  const checkout = await request(
+    `/api/workspaces/${workspace.id}/billing/checkout`,
+  );
+  assert.equal(checkout.status, 200, await checkout.clone().text());
+  assert.equal(
+    (await checkout.json()).url,
+    "https://sandbox.polar.sh/checkout",
+  );
+  assert.equal(polar.checkouts.length, 1);
+  assert.equal(polar.checkouts[0].external_customer_id, ownerId);
+  assert.deepEqual(polar.checkouts[0].products, ["product_runtime"]);
+  assert.deepEqual(polar.checkouts[0].metadata, { referenceId: workspace.id });
+  assert.match(
+    polar.checkouts[0].success_url,
+    /\/billing\/success\?checkout_id=\{CHECKOUT_ID\}$/,
+  );
+  // The checkout redirect is not payment evidence.
+  assert.equal((await state()).is_premium, 0);
+  assert.equal(
+    (await request(`/api/workspaces/${workspace.id}/billing/portal`)).status,
+    400,
+  );
+
+  assert.equal(
+    (await request("/api/auth/polar/webhooks", json({}), false)).status,
+    403,
+  );
+  polar.subscriptions.set("sub_runtime", subscription());
+  assert.equal((await deliver(event(), false)).status, 403);
   assert.equal(await cursor(), null);
-  assert.equal((await deliver({ ...first, created: -1 })).status, 400);
-  assert.equal((await deliver(first)).status, 200);
-  assert.equal((await state()).is_premium, 1);
+  // An untrusted payload claiming a canceled subscription still yields Polar's active state.
+  const created = await deliver(
+    event(subscription({ status: "canceled" }), "subscription.created"),
+  );
+  assert.equal(created.status, 200, await created.clone().text());
+  assert.deepEqual(await state(), { is_premium: 1, customer_id: ownerId });
   await assertCallsDisabled();
   const beforeDuplicate = await cursor();
-  assert.equal((await deliver(first)).status, 200);
+  // Redelivery of the same message and a different event for the same state are idempotent.
+  assert.equal((await deliver(event(), true, "msg_runtime_1")).status, 200);
+  assert.equal((await deliver(event(), true)).status, 200);
   assert.equal((await cursor()).event_id, beforeDuplicate.event_id);
   assert.equal((await state()).is_premium, 1);
-  assert.equal(
-    (
-      await deliver(
-        event({ created: 99, type: "customer.subscription.deleted" }),
-      )
-    ).status,
-    200,
-  );
-  assert.equal((await state()).is_premium, 1);
-  const canceled = event({
-    created: 101,
-    type: "customer.subscription.deleted",
-  });
-  stripeSubscriptions.set("sub_runtime", {
-    ...canceled.data.object,
-    object: "subscription",
-    status: "canceled",
-  });
-  assert.equal((await deliver(canceled)).status, 200);
-  assert.equal((await state()).is_premium, 0);
-  assert.equal((await state()).customer_id, null);
-  assert.equal((await deliver(first)).status, 200);
-  assert.equal((await state()).is_premium, 0);
 
-  const replacement = event({ created: 200 });
-  replacement.data.object.id = "sub_replacement";
-  replacement.data.object.created = 20;
-  stripeSubscriptions.set("sub_replacement", {
-    ...replacement.data.object,
-    object: "subscription",
-  });
-  assert.equal((await deliver(replacement)).status, 200);
-  assert.equal(
-    (
-      await deliver(
-        event({ created: 300, type: "customer.subscription.deleted" }),
-      )
-    ).status,
-    200,
+  const portal = await request(
+    `/api/workspaces/${workspace.id}/billing/portal`,
   );
-  assert.equal((await state()).is_premium, 1);
+  assert.equal(portal.status, 200, await portal.clone().text());
+  assert.equal((await portal.json()).url, "https://sandbox.polar.sh/portal");
+  assert.equal(polar.portals.at(-1).external_customer_id, ownerId);
 
-  const updates = [201, 202].map((created) =>
-    event({
-      ...replacement,
-      id: `evt_concurrent_${created}`,
-      created,
-      type: "customer.subscription.updated",
+  // Foreign products and mismatched references never change entitlements.
+  polar.subscriptions.set(
+    "sub_foreign",
+    subscription({
+      id: "sub_foreign",
+      product_id: "another_product",
+      status: "canceled",
     }),
   );
-  const responses = await Promise.all(updates.map((update) => deliver(update)));
-  for (let index = 0; index < responses.length; index++) {
-    const response = responses[index];
+  assert.equal(
+    (await deliver(event(subscription({ id: "sub_foreign" })))).status,
+    200,
+  );
+  polar.subscriptions.set(
+    "sub_other",
+    subscription({
+      id: "sub_other",
+      metadata: { referenceId: "another" },
+      status: "canceled",
+    }),
+  );
+  assert.equal(
+    (await deliver(event(subscription({ id: "sub_other" })))).status,
+    200,
+  );
+  assert.equal((await state()).is_premium, 1);
+
+  // Scheduled cancellation keeps access until Polar reports the subscription as canceled.
+  polar.subscriptions.set(
+    "sub_runtime",
+    subscription({
+      modified_at: "2026-10-02T00:00:00.000Z",
+      cancel_at_period_end: true,
+    }),
+  );
+  assert.equal((await deliver(event(), true)).status, 200);
+  assert.equal((await state()).is_premium, 1);
+  polar.subscriptions.set(
+    "sub_runtime",
+    subscription({
+      modified_at: "2026-10-03T00:00:00.000Z",
+      status: "canceled",
+    }),
+  );
+  assert.equal((await deliver(event(), true)).status, 200);
+  assert.deepEqual(await state(), { is_premium: 0, customer_id: null });
+  // A canceled subscription is never restored.
+  polar.subscriptions.set("sub_runtime", subscription());
+  assert.equal((await deliver(event())).status, 500);
+  assert.equal((await state()).is_premium, 0);
+
+  // A newer subscription replaces the ended one; events for the older one are ignored.
+  const replacement = subscription({
+    id: "sub_replacement",
+    created_at: "2026-10-05T00:00:00.000Z",
+    modified_at: "2026-10-05T00:00:01.000Z",
+  });
+  polar.subscriptions.set("sub_replacement", replacement);
+  assert.equal((await deliver(event(replacement))).status, 200);
+  assert.equal((await state()).is_premium, 1);
+  polar.subscriptions.set(
+    "sub_runtime",
+    subscription({
+      modified_at: "2026-10-06T00:00:00.000Z",
+      status: "canceled",
+    }),
+  );
+  assert.equal((await deliver(event())).status, 200);
+  assert.equal((await state()).is_premium, 1);
+
+  const responses = await Promise.all(
+    [1, 2].map(() => deliver(event(replacement))),
+  );
+  for (const response of responses)
     assert.ok(
-      [200, 503].includes(response.status),
+      [200, 500].includes(response.status),
       await response.clone().text(),
     );
-    if (response.status === 503)
-      assert.equal((await deliver(updates[index])).status, 200);
-  }
+  if (responses.some((response) => response.status === 500))
+    assert.equal((await deliver(event(replacement))).status, 200);
   assert.equal((await state()).is_premium, 1);
+
   // A response fetched before a newer change must not overwrite the newer plan.
   let releaseStale = () => {};
   let signalStarted = () => {};
@@ -166,48 +254,36 @@ export async function verifyBilling({
     releaseStale = () => resolve(undefined);
   });
   let firstRead = true;
-  stripeSubscriptions.set("sub_replacement", async () => {
+  const pastDue = {
+    ...replacement,
+    modified_at: "2026-10-07T00:00:00.000Z",
+    status: "past_due",
+  };
+  polar.subscriptions.set("sub_replacement", async () => {
     if (firstRead) {
       firstRead = false;
       signalStarted();
       await released;
-      return { ...replacement.data.object, object: "subscription" };
+      return replacement;
     }
-    return {
-      ...replacement.data.object,
-      object: "subscription",
-      status: "past_due",
-    };
+    return pastDue;
   });
-  const stale = event({
-    ...replacement,
-    id: "evt_stale_snapshot",
-    created: 205,
-  });
-  const slowDelivery = deliver(stale);
+  const slowDelivery = deliver(event(replacement));
   await started;
-  const newer = await deliver(
-    event({ ...replacement, id: "evt_new_snapshot", created: 206 }),
-  );
+  const newer = await deliver(event(replacement));
   assert.equal(newer.status, 200, await newer.clone().text());
   assert.equal((await state()).is_premium, 0);
   releaseStale();
-  assert.equal((await slowDelivery).status, 503);
+  assert.equal((await slowDelivery).status, 500);
   assert.equal((await state()).is_premium, 0);
-  assert.equal((await deliver(stale)).status, 200);
+  assert.equal((await deliver(event(replacement))).status, 200);
   assert.equal((await state()).is_premium, 0);
-  stripeSubscriptions.set("sub_replacement", {
-    ...replacement.data.object,
-    object: "subscription",
-  });
-  assert.equal(
-    (
-      await deliver(
-        event({ ...replacement, id: "evt_active_again", created: 207 }),
-      )
-    ).status,
-    200,
-  );
+  const activeAgain = {
+    ...replacement,
+    modified_at: "2026-10-08T00:00:00.000Z",
+  };
+  polar.subscriptions.set("sub_replacement", activeAgain);
+  assert.equal((await deliver(event(replacement))).status, 200);
   assert.equal((await state()).is_premium, 1);
   const beforeFailure = await cursor();
 
@@ -217,42 +293,40 @@ export async function verifyBilling({
       "CREATE TRIGGER fail_billing_plan BEFORE UPDATE OF is_premium ON auth_organizations BEGIN SELECT RAISE(ABORT, 'test plan failure'); END",
     )
     .run();
-  const failed = event({
+  polar.subscriptions.set("sub_replacement", {
     ...replacement,
-    id: "evt_retry",
-    created: 203,
-    type: "customer.subscription.deleted",
-  });
-  stripeSubscriptions.set("sub_replacement", {
-    ...replacement.data.object,
-    object: "subscription",
+    modified_at: "2026-10-09T00:00:00.000Z",
     status: "canceled",
   });
-  assert.equal((await deliver(failed)).status, 500);
+  assert.equal(
+    (await deliver(event(replacement), true, "msg_retry")).status,
+    500,
+  );
   assert.deepEqual(await cursor(), beforeFailure);
   assert.equal((await state()).is_premium, 1);
   await database.prepare("DROP TRIGGER fail_billing_plan").run();
-  assert.equal((await deliver(failed)).status, 200);
-  assert.equal((await state()).is_premium, 0);
-  assert.equal((await deliver(failed)).status, 200);
-  assert.equal((await cursor()).event_id, "evt_retry");
   assert.equal(
-    (await request(`/api/workspaces/${workspace.id}/members`)).status,
+    (await deliver(event(replacement), true, "msg_retry")).status,
+    200,
+  );
+  assert.equal((await state()).is_premium, 0);
+  assert.equal(
+    (await deliver(event(replacement), true, "msg_retry")).status,
     200,
   );
   assert.equal(
-    (
-      await request(`/api/workspaces/${workspace.id}/billing/checkout`, {
-        headers: { cookie: memberCookie },
-      })
-    ).status,
-    403,
+    (await cursor()).event_id,
+    `sub_replacement@${Date.parse("2026-10-09T00:00:00.000Z")}`,
+  );
+  assert.equal(
+    (await request(`/api/workspaces/${workspace.id}/members`)).status,
+    200,
   );
 
   // Invalid URL encodings and malformed multipart input are client errors, not leaked runtime exceptions.
   assert.equal((await request("/parties/user/%E0%A4%A")).status, 400);
   const badUpload = await request(
-    `/parties/workspace/${workspace.id}/file/${team.id}/channel/file`,
+    `/parties/workspace/${workspace.id}/file/${team.id}/${team.rooms[0].id}/file`,
     {
       method: "POST",
       headers: { "content-type": "multipart/form-data; boundary=broken" },

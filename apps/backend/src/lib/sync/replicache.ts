@@ -1,9 +1,7 @@
+import type { SyncClient } from "@wodge/domain/sync/models";
+import type { ObjectSyncRepository } from "@wodge/core/sync/repositories/state";
 import { ApplicationError } from "@wodge/core/errors";
 import {
-  JOINER,
-  REPLICACHE_CLIENT_GROUP_PREFIX,
-  REPLICACHE_CLIENT_PREFIX,
-  REPLICACHE_VERSIONS_KEY,
   extractClientId,
   makeClientGroupKey,
   makeClientKey,
@@ -26,26 +24,6 @@ import {
   type MutationSchema,
 } from "./validation";
 
-type Storage = Pick<DurableObjectStorage, "get" | "put" | "list">;
-
-export type ReplicacheSpace = {
-  id: string;
-  version: number;
-};
-
-export type ReplicacheClientGroup = {
-  id: string;
-  userID: string;
-  clientVersion: number;
-};
-
-export type ReplicacheClient = {
-  id: string;
-  clientGroupID: string;
-  lastMutationID: number;
-  lastModifiedVersion: number;
-};
-
 export interface RunnerParams {
   mutation: z.infer<typeof MutationSchema>;
   nextVersion: number;
@@ -59,14 +37,14 @@ export interface PatcherParams {
 
 export interface PushProps {
   req: HonoRequest;
-  storage: Storage;
+  storage: ObjectSyncRepository;
   versions: Versions;
   runner: (params: RunnerParams) => Promise<void>;
 }
 
 export interface PullProps {
   req: HonoRequest;
-  storage: Storage;
+  storage: ObjectSyncRepository;
   versions: Versions;
   patcher: (params: PatcherParams) => Promise<PatchOperation[]>;
 }
@@ -103,17 +81,12 @@ export async function repPull({ req, storage, versions, patcher }: PullProps) {
 
     // Return acknowledgements changed since the client's cookie, alongside the same pull patch.
 
-    [
-      ...(
-        await storage.list<ReplicacheClient>({
-          prefix: `${REPLICACHE_CLIENT_GROUP_PREFIX}${clientGroupId}${JOINER}${REPLICACHE_CLIENT_PREFIX}`,
-        })
-      ).values(),
-    ].forEach((c) => {
-      if (c.lastModifiedVersion > fromVersion) {
-        lastMutationIDChanges[extractClientId(c.id)!] = c.lastMutationID;
-      }
-    });
+    for (const client of await storage.changedClients(
+      makeClientGroupKey(clientGroupId),
+      fromVersion,
+    ))
+      lastMutationIDChanges[extractClientId(client.id)!] =
+        client.lastMutationID;
 
     const patch = await patcher({ fromVersion, versions });
 
@@ -167,7 +140,7 @@ export async function repPush({ req, storage, versions, runner }: PushProps) {
     let nextVersion = globalVersion + 1;
     // Cache client records only for this batch; each client must still belong to the group.
 
-    const clients = new Map<string, ReplicacheClient>();
+    const clients = new Map<string, SyncClient>();
 
     for (let i = 0; i < mutations.length; i++) {
       const mutation = mutations[i]!;
@@ -216,10 +189,7 @@ export async function repPush({ req, storage, versions, runner }: PushProps) {
 
     // Publish acknowledgements after dispatch succeeds; earlier application writes are not rolled back on failure.
 
-    await storage.put({
-      [REPLICACHE_VERSIONS_KEY]: versions,
-      ...Object.fromEntries(clients),
-    });
+    await storage.acknowledge(versions, clients);
 
     return ok();
   } catch (e) {
@@ -242,11 +212,11 @@ async function getClient(
   clientGroupID: string,
   lastModifiedVersion: number,
   mutationId: number,
-  storage: Storage,
+  storage: ObjectSyncRepository,
 ) {
   const key = makeClientKey(id, clientGroupID);
 
-  const client = await storage.get<ReplicacheClient>(key);
+  const client = await storage.client(key);
 
   // If client exists, check if it belongs to the client group and returns it if it does
 
@@ -267,7 +237,7 @@ async function getClient(
 
   // Client does not exist, create it and return it
 
-  await storage.put(key, {
+  storage.saveClient(key, {
     id: key,
     clientGroupID: clientGroupID,
     lastMutationID: 0,
@@ -280,13 +250,13 @@ async function getClient(
 async function getClientGroup(
   clientGroupId: string,
   userId: string,
-  storage: Storage,
+  storage: ObjectSyncRepository,
   withCreate = true,
 ) {
   const key = makeClientGroupKey(clientGroupId);
 
   // Check for existent client group
-  const clientGroup = await storage.get<ReplicacheClientGroup>(key);
+  const clientGroup = await storage.group(key);
 
   // If client group exists, check if it belongs to the user and returns it if it does
 
@@ -303,7 +273,7 @@ async function getClientGroup(
   }
   // Client group does not exist, create it and return it
 
-  await storage.put(key, {
+  storage.saveGroup(key, {
     id: key,
     userID: userId,
   });

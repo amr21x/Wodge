@@ -1,4 +1,3 @@
-import { TEAM_MEMBERS_ROLE } from "@wodge/domain/constants";
 import { Thread } from "@wodge/domain/discussions/models";
 import { createEntityId } from "@wodge/domain/identifiers";
 import { Page } from "@wodge/domain/pages/models";
@@ -12,24 +11,18 @@ import {
 
 export const createWelcomePage = (): Page => ({
   id: createEntityId(),
-  editGroups: [TEAM_MEMBERS_ROLE],
-  viewGroups: [TEAM_MEMBERS_ROLE],
   name: "Welcome",
   avatar: "",
 });
 
 export const createWelcomeRoom = (): Room => ({
   id: createEntityId(),
-  editGroups: [TEAM_MEMBERS_ROLE],
-  viewGroups: [TEAM_MEMBERS_ROLE],
   name: "Welcome",
   avatar: "",
 });
 
 export const createWelcomeThread = (): Thread => ({
   id: createEntityId(),
-  editGroups: [TEAM_MEMBERS_ROLE],
-  viewGroups: [TEAM_MEMBERS_ROLE],
   name: "Welcome",
   avatar: "",
 });
@@ -68,6 +61,5 @@ export function defaultWorkspaceMembers(): WorkspaceMembers {
 export function defaultWorkspaceStructure(): WorkspaceStructure {
   return {
     teams: [],
-    groups: [],
   };
 }

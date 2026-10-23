@@ -2,14 +2,12 @@
 
 import type { UserType } from "@wodge/domain/user/models";
 
-import { useCurrentUser } from "@/features/account/hooks/use-current-user";
-import { useQueryClient } from "@tanstack/react-query";
-import { createContext, useContext, useEffect, useTransition } from "react";
+import { createContext, useContext, useState } from "react";
 
 interface ContextValues {
   user: UserType;
   isPending: boolean;
-  startTransition: React.TransitionStartFunction;
+  setIsPending: (pending: boolean) => void;
 }
 
 const Context = createContext<ContextValues | null>(null);
@@ -21,22 +19,14 @@ export function OnboardingProvider({
   children: React.ReactNode;
   user: UserType;
 }) {
-  const [isPending, startTransition] = useTransition();
-
-  const queryClient = useQueryClient();
-
-  // useEffect(() => {
-  //   queryClient.invalidateQueries({
-  //     queryKey: ["user"],
-  //   });
-  // }, []);
+  const [isPending, setIsPending] = useState(false);
 
   return (
     <Context.Provider
       value={{
         user,
         isPending,
-        startTransition,
+        setIsPending,
       }}
     >
       {children}

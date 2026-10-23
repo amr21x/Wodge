@@ -3,12 +3,12 @@
 import { useFeatureFlags } from "@/components/feature-flags-provider";
 
 import { EditorContent } from "@tiptap/react";
-import React, { memo, useEffect, useMemo, useRef } from "react";
+import React, { memo, useEffect, useRef } from "react";
 import { TiptapProps } from "./types";
 import type { UserType } from "@wodge/domain/user/models";
 import { useBlockEditor } from "@/features/editor/hooks/use-block-editor";
 import { useCanEdit } from "@/features/workspace/hooks/use-can-edit";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 import { ContentItemMenu } from "../content-item-menu/content-item-menu";
 import { LinkMenu } from "../link-menu/link-menu";
 import { TextMenu } from "../text-menu/text-menu";
@@ -31,7 +31,7 @@ export const BlockEditor = ({
   const menuContainerRef = useRef(null);
   const editorRef = useRef<HTMLDivElement | null>(null);
 
-  const { editor, users, characterCount } = useBlockEditor({
+  const { editor, users } = useBlockEditor({
     ydoc,
     provider,
     user,
@@ -53,7 +53,7 @@ export const BlockEditor = ({
 
   useEffect(() => {
     setUserEditors(displayedUsers);
-  }, [displayedUsers]);
+  }, [displayedUsers, setUserEditors]);
 
   if (!editor) {
     return null;

@@ -1,6 +1,5 @@
+import { WorkspaceAuthorization } from "@wodge/auth/authorization/service";
 import {
-  canEdit,
-  canView,
   isAdmin,
   isOwner,
   isTeamMember,
@@ -8,13 +7,16 @@ import {
 } from "@wodge/auth/authorization/access";
 import { authorizeWorkspaceChannel } from "@wodge/auth/authorization/channel-access";
 import { WorkspaceLifecycleRepository } from "@wodge/core/workspace/repositories/lifecycle";
-import type { ChannelsTypes } from "@wodge/domain/channels/index";
+import type {
+  AuthChannelResponse,
+  ChannelsTypes,
+} from "@wodge/domain/channels/index";
 import type { WorkspaceState } from "@wodge/domain/workspace/models";
 import { inject, injectable } from "tsyringe";
 
 type ChannelAccess = {
   userId?: string;
-  teamId: string;
+  teamId?: string;
   channelId: string;
   channelType: ChannelsTypes;
   folderId?: string;
@@ -81,73 +83,6 @@ function canModerateWorkspaceTeam(
   return true;
 }
 
-function canEditWorkspaceChannel(
-  state: WorkspaceState,
-  { userId, teamId, channelId, channelType, folderId }: ChannelAccess,
-) {
-  if (
-    !canEdit({
-      structure: state.structure,
-      teamId,
-      userId,
-      channelId,
-      channelType,
-      members: state.members,
-      folderId,
-    }) &&
-    !isAdmin({
-      members: state.members,
-      userId,
-    }) &&
-    !isOwner({
-      members: state.members,
-      userId,
-    })
-  ) {
-    return false;
-  }
-
-  return true;
-}
-
-function canViewWorkspaceChannel(
-  state: WorkspaceState,
-  { userId, teamId, channelId, channelType, folderId }: ChannelAccess,
-) {
-  if (
-    !canEdit({
-      structure: state.structure,
-      teamId,
-      userId,
-      channelId,
-      channelType,
-      members: state.members,
-      folderId,
-    }) &&
-    !canView({
-      structure: state.structure,
-      teamId,
-      userId,
-      channelId,
-      channelType,
-      members: state.members,
-      folderId,
-    }) &&
-    !isAdmin({
-      members: state.members,
-      userId,
-    }) &&
-    !isOwner({
-      members: state.members,
-      userId,
-    })
-  ) {
-    return false;
-  }
-
-  return true;
-}
-
 function hasWorkspaceMembership(state: WorkspaceState, userId?: string) {
   return (
     state.members.createdBy === userId ||
@@ -160,6 +95,8 @@ export class WorkspaceAccess {
   constructor(
     @inject(WorkspaceLifecycleRepository)
     private readonly workspace: WorkspaceState,
+    @inject(WorkspaceAuthorization)
+    private readonly authorization: WorkspaceAuthorization,
   ) {}
 
   hasMember(userId?: string) {
@@ -178,15 +115,55 @@ export class WorkspaceAccess {
     return canModerateWorkspaceTeam(this.workspace, userId, teamId);
   }
 
-  canEdit(input: Parameters<typeof canEditWorkspaceChannel>[1]) {
-    return canEditWorkspaceChannel(this.workspace, input);
+  async canEdit(input: ChannelAccess) {
+    return (
+      (await this.authorize({ ...input, userId: input.userId ?? "" }))
+        .canEdit === true
+    );
   }
-
-  canView(input: Parameters<typeof canViewWorkspaceChannel>[1]) {
-    return canViewWorkspaceChannel(this.workspace, input);
+  async canView(input: ChannelAccess) {
+    return (
+      (await this.authorize({ ...input, userId: input.userId ?? "" }))
+        .canView === true
+    );
   }
-
-  authorize(input: Parameters<typeof authorizeWorkspaceChannel>[1]) {
-    return authorizeWorkspaceChannel(this.workspace, input);
+  async authorize(
+    input: ChannelAccess & { userId: string },
+  ): Promise<AuthChannelResponse> {
+    if (input.channelType === "resources") return { success: false };
+    const team = this.workspace.structure.teams.find(
+      (t) => t.id === input.teamId,
+    );
+    const exists =
+      input.channelType === "room"
+        ? team?.rooms.some((r) => r.id === input.channelId)
+        : input.channelType === "thread"
+          ? team?.threads.some((r) => r.id === input.channelId)
+          : team?.folders.some(
+              (f) =>
+                (!input.folderId || f.id === input.folderId) &&
+                f.channels.some((p) => p.id === input.channelId),
+            );
+    if (!exists) return { success: false };
+    const result = authorizeWorkspaceChannel(
+      await this.authorization.permissionsForUser(input.userId, {
+        type: input.channelType,
+        id: input.channelId,
+      }),
+      input.channelType,
+    );
+    return {
+      ...result,
+      isOwner:
+        result.success &&
+        isOwner({ members: this.workspace.members, userId: input.userId }),
+      isAdmin:
+        result.success &&
+        isAdmin({ members: this.workspace.members, userId: input.userId }),
+      isTeamModerator:
+        result.success &&
+        result.canEdit === true &&
+        team?.moderators.includes(input.userId),
+    };
   }
 }

@@ -38,8 +38,8 @@ export function requireWorkspaceAccess(
         };
         allowed =
           permission === "channel-write"
-            ? access.canEdit(scope)
-            : access.canView(scope);
+            ? await access.canEdit(scope)
+            : await access.canView(scope);
       } else {
         allowed =
           access.canJoinTeam(userId, teamId) &&

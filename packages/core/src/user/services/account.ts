@@ -26,7 +26,7 @@ export class AccountService {
     try {
       const user = await this.users.getUserByUsername(username);
       if (!user) return undefined;
-      const { id, ...profile } = toUserProfile(user);
+      const { id: _id, ...profile } = toUserProfile(user);
       return profile;
     } catch {
       return null;
@@ -36,7 +36,11 @@ export class AccountService {
   async getUserInfoById(ids: string[]) {
     try {
       return (await this.users.getUserInfoById(ids)).map((user) => {
-        const { createdAt, updatedAt, ...profile } = toUserProfile(user);
+        const {
+          createdAt: _createdAt,
+          updatedAt: _updatedAt,
+          ...profile
+        } = toUserProfile(user);
         return profile;
       });
     } catch {

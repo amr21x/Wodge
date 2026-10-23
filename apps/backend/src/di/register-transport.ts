@@ -1,4 +1,6 @@
-import { FeatureHandlers } from "../handlers/features";
+import { UserSync } from "../lib/sync/user";
+import { PageCollaborationHandlers } from "../handlers/pages/collaboration";
+import { FeatureFlagHandlers } from "../handlers/feature-flags";
 import { BackendApplication } from "../application";
 import { RoomGateway } from "../gateways/room";
 import { UserNotifications } from "../gateways/user-notifications";
@@ -10,6 +12,7 @@ import { WorkspaceGateway } from "../gateways/workspace";
 import { AccountHandlers } from "../handlers/api/account";
 import { AvatarHandlers } from "../handlers/api/avatar";
 import { BillingHandlers } from "../handlers/api/billing";
+import { BillingWebhookHandlers } from "../handlers/billing-webhooks";
 import { ScopedHandlers } from "../handlers/api/scoped";
 import { WorkspaceHandlers } from "../handlers/api/workspace";
 import { AssignmentHandlers } from "../handlers/authorization/assignments";
@@ -43,8 +46,18 @@ import { Lifecycle, type DependencyContainer } from "tsyringe";
 // Lifetimes are declared here, never as module-import side effects in the classes.
 export function registerTransport(container: DependencyContainer) {
   container.register(
-    FeatureHandlers,
-    { useClass: FeatureHandlers },
+    UserSync,
+    { useClass: UserSync },
+    { lifecycle: Lifecycle.ContainerScoped },
+  );
+  container.register(
+    PageCollaborationHandlers,
+    { useClass: PageCollaborationHandlers },
+    { lifecycle: Lifecycle.ContainerScoped },
+  );
+  container.register(
+    FeatureFlagHandlers,
+    { useClass: FeatureFlagHandlers },
     { lifecycle: Lifecycle.ContainerScoped },
   );
   container.register(
@@ -100,6 +113,11 @@ export function registerTransport(container: DependencyContainer) {
   container.register(
     BillingHandlers,
     { useClass: BillingHandlers },
+    { lifecycle: Lifecycle.ContainerScoped },
+  );
+  container.register(
+    BillingWebhookHandlers,
+    { useClass: BillingWebhookHandlers },
     { lifecycle: Lifecycle.ContainerScoped },
   );
   container.register(

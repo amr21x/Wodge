@@ -1,4 +1,3 @@
-import { createHmac } from "node:crypto";
 import assert from "node:assert/strict";
 import { builtinModules, createRequire } from "node:module";
 import { mkdtemp, readFile, readdir, realpath, rm } from "node:fs/promises";
@@ -10,7 +9,7 @@ const root = fileURLToPath(new URL("../../../../", import.meta.url));
 
 const require = createRequire(
   await realpath(
-    path.join(root, "config/workers/node_modules/wrangler/package.json"),
+    path.join(root, "apps/backend/node_modules/wrangler/package.json"),
   ),
 );
 
@@ -20,8 +19,14 @@ const { Miniflare, convertV4MiniflareOptions } = require("miniflare");
 
 const output = await mkdtemp(path.join(tmpdir(), "wodge-runtime-"));
 
-const emails = new Map();
-const stripeSubscriptions = new Map();
+/** Mocked Polar sandbox API state and captured requests. */
+const polar = {
+  subscriptions: new Map(),
+  /** @type {any[]} */
+  checkouts: [],
+  /** @type {any[]} */
+  portals: [],
+};
 
 /** @type {string[]} */
 const failures = [];
@@ -95,6 +100,42 @@ const json = (body) => ({
   body: JSON.stringify(body),
 });
 
+/**
+ * Exercise real Better Auth OAuth state/callback handling against the provider network fixture.
+ * @param {string} email
+ */
+async function signIn(email) {
+  const start = await request(
+    "/api/auth/sign-in/social",
+    json({ provider: "github", callbackURL: "/" }),
+    false,
+  );
+  assert.equal(start.status, 200, await start.clone().text());
+  const authorization = new URL((await start.json()).url);
+  const stateCookie = start.headers
+    .getSetCookie()
+    .map((/** @type {string} */ value) => value.split(";")[0])
+    .join("; ");
+  const callback = await request(
+    `/api/auth/callback/github?code=${encodeURIComponent(email)}&state=${encodeURIComponent(authorization.searchParams.get("state") ?? "")}`,
+    { headers: { cookie: stateCookie }, redirect: "manual" },
+    false,
+  );
+  assert.equal(callback.status, 302, await callback.clone().text());
+  const sessionCookie = callback.headers
+    .getSetCookie()
+    .map((/** @type {string} */ value) => value.split(";")[0])
+    .join("; ");
+  assert.ok(sessionCookie.includes("session_token"));
+  const profile = await request(
+    "/api/users/me",
+    { headers: { cookie: sessionCookie } },
+    false,
+  );
+  assert.equal(profile.status, 200, await profile.clone().text());
+  return { cookie: sessionCookie, user: await profile.json() };
+}
+
 try {
   const worker = path.join(output, "worker.mjs");
 
@@ -133,43 +174,82 @@ try {
       AVATARS_URL: "https://avatars.example.test",
       BETTER_AUTH_SECRET: "test-only-auth-secret-with-more-than-32-characters",
       SECRET_KEY: "test-only-internal-and-ticket-secret",
-      RESEND_API_KEY: "test",
-      RESEND_EMAIL_FROM: "auth@example.test",
       R2_ENDPOINT: "https://objects.example.test",
       R2_ACCESS_KEY: "test",
       R2_SECRET_KEY: "test",
-      STRIPE_SECRET_KEY: "sk_test_runtime",
-      STRIPE_WH_SECRET: "whsec_runtime",
+      POLAR_ACCESS_TOKEN: "polar_oat_runtime",
+      POLAR_WEBHOOK_SECRET: "polar_whs_runtime",
+      POLAR_PRODUCT_ID: "product_runtime",
       LIVEKIT_API_KEY: "must-not-enable-calls",
       LIVEKIT_API_SECRET: "must-not-enable-calls-even-with-credentials",
+      GOOGLE_CLIENT_ID: "test-google",
+      GOOGLE_CLIENT_SECRET: "test-google-secret",
       GITHUB_CLIENT_ID: "test-github",
       GITHUB_CLIENT_SECRET: "test-github-secret",
     },
     outboundService: async (/** @type {Request} */ req) => {
-      if (new URL(req.url).hostname === "api.resend.com") {
-        const body = await req.json();
-
-        emails.set(body.to[0], body.text.match(/\b\d{6}\b/)[0]);
-
-        return Response.json({ id: "test-email" });
+      const url = new URL(req.url);
+      if (
+        url.hostname === "github.com" &&
+        url.pathname === "/login/oauth/access_token"
+      ) {
+        const body = await req.text();
+        const code = req.headers.get("content-type")?.includes("json")
+          ? JSON.parse(body).code
+          : new URLSearchParams(body).get("code");
+        return Response.json({
+          access_token: code,
+          token_type: "bearer",
+          scope: "read:user,user:email",
+        });
+      }
+      if (url.hostname === "api.github.com") {
+        const email = req.headers
+          .get("authorization")
+          ?.replace(/^Bearer /i, "");
+        assert.ok(
+          email &&
+            ["owner@example.test", "viewer@example.test"].includes(email),
+        );
+        if (url.pathname === "/user/emails")
+          return Response.json([{ email, primary: true, verified: true }]);
+        return Response.json({
+          id: email === "owner@example.test" ? 1 : 2,
+          email,
+          login: email.split("@")[0],
+          name: email.split("@")[0],
+          avatar_url: null,
+        });
       }
 
-      if (new URL(req.url).hostname === "api.stripe.com") {
-        const id = new URL(req.url).pathname.split("/").pop();
-        const value = stripeSubscriptions.get(id);
+      if (url.hostname === "sandbox-api.polar.sh") {
+        assert.equal(
+          req.headers.get("authorization"),
+          "Bearer polar_oat_runtime",
+        );
+        if (req.method === "POST" && url.pathname === "/v1/checkouts/") {
+          polar.checkouts.push(await req.json());
+          return Response.json({
+            url: "https://sandbox.polar.sh/checkout",
+            client_secret: "checkout_secret",
+          });
+        }
+        if (
+          req.method === "POST" &&
+          url.pathname === "/v1/customer-sessions/"
+        ) {
+          polar.portals.push(await req.json());
+          return Response.json({
+            customer_portal_url: "https://sandbox.polar.sh/portal",
+          });
+        }
+        const id = url.pathname.match(/^\/v1\/subscriptions\/([^/]+)$/)?.[1];
+        const value = id && polar.subscriptions.get(id);
         const subscription =
           typeof value === "function" ? await value() : value;
         return subscription
           ? Response.json(subscription)
-          : Response.json(
-              {
-                error: {
-                  message: "Unknown subscription",
-                  type: "invalid_request_error",
-                },
-              },
-              { status: 404 },
-            );
+          : Response.json({ error: "ResourceNotFound" }, { status: 404 });
       }
       if (new URL(req.url).hostname.endsWith("objects.example.test")) {
         await req.arrayBuffer();
@@ -187,6 +267,8 @@ try {
   runtime = new Miniflare(convertV4MiniflareOptions(runtimeOptions));
 
   let database = await runtime.getD1Database("DB");
+  /** @type {any} */
+  let billingBeforeReset;
 
   for (const migration of (
     await readdir(path.join(root, "packages/domain/migrations"))
@@ -198,15 +280,19 @@ try {
       "utf8",
     );
     if (migration === "0005_canonical_organizations.sql") {
-      const { seedOrganizationMigration } = await import(
-        "./organization-migration.mjs"
-      );
+      const { seedOrganizationMigration } =
+        await import("./organization-migration.mjs");
       await seedOrganizationMigration(database, sql);
     }
 
     if (migration === "0006_canonical_users.sql") {
       const { seedUserMigration } = await import("./user-migration.mjs");
       await seedUserMigration(database, sql);
+    }
+
+    if (migration === "0009_polar_billing_reset.sql") {
+      const { seedBillingReset } = await import("./organization-migration.mjs");
+      billingBeforeReset = await seedBillingReset(database);
     }
 
     for (const statement of sql
@@ -218,6 +304,28 @@ try {
     }
   }
 
+  // Storage-backed features start disabled; this runtime configures object storage.
+  const storageFlags = await database
+    .prepare(
+      "SELECT key, enabled FROM feature_flags WHERE key IN ('attachments','avatars') ORDER BY key",
+    )
+    .all();
+  assert.deepEqual(
+    storageFlags.results.map((/** @type {any} */ row) => [
+      row.key,
+      row.enabled,
+    ]),
+    [
+      ["attachments", 0],
+      ["avatars", 0],
+    ],
+  );
+  await database
+    .prepare(
+      "UPDATE feature_flags SET enabled=1 WHERE key IN ('attachments','avatars')",
+    )
+    .run();
+
   await check(
     "canonical user migration preserves profiles and sessions and removes duplicate storage",
     async () => {
@@ -227,12 +335,11 @@ try {
   );
 
   await check(
-    "canonical organization migration preserves workspace IDs, memberships, invitations and billing state",
+    "canonical organization migration preserves workspace IDs, memberships, invitations and billing state until the Polar reset",
     async () => {
-      const { verifyOrganizationMigration } = await import(
-        "./organization-migration.mjs"
-      );
-      await verifyOrganizationMigration(database);
+      const { verifyOrganizationMigration } =
+        await import("./organization-migration.mjs");
+      await verifyOrganizationMigration(database, billingBeforeReset);
     },
   );
 
@@ -265,30 +372,10 @@ try {
   );
 
   await check(
-    "email OTP creates a UUIDv7 auth identity and session cookie",
+    "GitHub OAuth callback creates a UUIDv7 auth identity and session cookie",
     async () => {
-      const sent = await request(
-        "/api/auth/email-otp/send-verification-otp",
-        json({ email: "owner@example.test", type: "sign-in" }),
-      );
-
-      assert.equal(sent.status, 200, await sent.clone().text());
-      const otp = emails.get("owner@example.test");
-
-      assert.match(otp, /^\d{6}$/);
-      const response = await request(
-        "/api/auth/sign-in/email-otp",
-        json({ email: "owner@example.test", otp }),
-      );
-
-      assert.equal(response.status, 200, await response.clone().text());
-      cookie = response.headers
-        .getSetCookie()
-        .map((/** @type {string} */ value) => value.split(";")[0])
-        .join("; ");
-      assert.ok(cookie.includes("session_token"));
-      const result = await response.json();
-
+      const result = await signIn("owner@example.test");
+      cookie = result.cookie;
       assert.match(
         result.user.id,
         /^[\da-f]{8}-[\da-f]{4}-7[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/i,
@@ -296,40 +383,25 @@ try {
     },
   );
 
-  await check(
-    "OTP cannot be reused and session lookup returns the canonical user",
-    async () => {
-      assert.equal(
-        (
-          await request(
-            "/api/auth/sign-in/email-otp",
-            json({
-              email: "owner@example.test",
-              otp: emails.get("owner@example.test"),
-            }),
-          )
-        ).status,
-        400,
-      );
-      const first = await request("/api/users/me");
+  await check("OAuth session lookup returns the canonical user", async () => {
+    const first = await request("/api/users/me");
 
-      assert.equal(first.status, 200, await first.clone().text());
-      user = await first.json();
-      assert.equal((await request("/api/users/me")).status, 200);
-      const count = await database
-        .prepare("SELECT COUNT(*) AS count FROM auth_users WHERE id = ?")
-        .bind(user.id)
-        .first();
+    assert.equal(first.status, 200, await first.clone().text());
+    user = await first.json();
+    assert.equal((await request("/api/users/me")).status, 200);
+    const count = await database
+      .prepare("SELECT COUNT(*) AS count FROM auth_users WHERE id = ?")
+      .bind(user.id)
+      .first();
 
-      assert.equal(count.count, 1);
-      const stored = await database
-        .prepare("SELECT id FROM auth_users WHERE id = ?")
-        .bind(user.id)
-        .first();
+    assert.equal(count.count, 1);
+    const stored = await database
+      .prepare("SELECT id FROM auth_users WHERE id = ?")
+      .bind(user.id)
+      .first();
 
-      assert.equal(stored.id, user.id);
-    },
-  );
+    assert.equal(stored.id, user.id);
+  });
 
   await check(
     "profile update uses verified identity and updates a real user Durable Object",
@@ -488,8 +560,22 @@ try {
     },
   );
 
+  let restartCount = 0;
+  async function restart() {
+    await runtime.setOptions(
+      convertV4MiniflareOptions({
+        ...runtimeOptions,
+        bindings: {
+          ...runtimeOptions.bindings,
+          RESTART_MARKER: String(++restartCount),
+        },
+      }),
+    );
+    database = await runtime.getD1Database("DB");
+  }
+
   await check(
-    "page collaboration synchronizes two clients and persists its snapshot",
+    "page collaboration synchronizes two clients and restores its SQLite snapshot/update journal",
     async () => {
       const { verifyCollaboration } = await import("./collaboration.mjs");
 
@@ -500,21 +586,26 @@ try {
         database,
         workspace,
         structure,
-        emails,
-        restart: async () => {
-          await runtime.setOptions(
-            convertV4MiniflareOptions({
-              ...runtimeOptions,
-              bindings: {
-                ...runtimeOptions.bindings,
-                RESTART_MARKER: "restart",
-              },
-            }),
-          );
-          database = await runtime.getD1Database("DB");
-        },
+        signIn,
+        restart,
       });
       authorizationMemberCookie = collaboration.viewerCookie;
+    },
+  );
+
+  await check(
+    "relational structural state and sync acknowledgements survive restart and retries",
+    async () => {
+      const { verifyStructuralPersistence } =
+        await import("./structural-persistence.mjs");
+      await verifyStructuralPersistence({
+        root,
+        request,
+        json,
+        workspace,
+        structure,
+        restart,
+      });
     },
   );
 
@@ -567,30 +658,23 @@ try {
   );
 
   await check(
-    "expired OTP codes and untrusted authentication origins are rejected",
+    "email sign-in endpoints are absent and untrusted authentication origins are rejected",
     async () => {
-      const sent = await request(
+      for (const path of [
         "/api/auth/email-otp/send-verification-otp",
-        json({ email: "expired@example.test", type: "sign-in" }),
-      );
-
-      assert.equal(sent.status, 200, await sent.text());
-
-      await database
-        .prepare(
-          "UPDATE auth_verifications SET expires_at = 0 WHERE identifier LIKE ?",
-        )
-        .bind("%expired@example.test%")
-        .run();
-      const expired = await request(
         "/api/auth/sign-in/email-otp",
-        json({
-          email: "expired@example.test",
-          otp: emails.get("expired@example.test"),
-        }),
-      );
-
-      assert.ok(expired.status >= 400 && expired.status < 500);
+      ]) {
+        const disabled = await request(
+          path,
+          json({
+            email: "disabled@example.test",
+            otp: "123456",
+            type: "sign-in",
+          }),
+          false,
+        );
+        assert.equal(disabled.status, 404, await disabled.clone().text());
+      }
       const untrusted = await runtime.dispatchFetch(
         origin + "/api/auth/sign-out",
         {
@@ -617,8 +701,9 @@ try {
         database,
         workspace,
         structure,
+        ownerId: user.id,
         memberCookie: authorizationMemberCookie,
-        stripeSubscriptions,
+        polar,
       });
     },
   );
@@ -654,7 +739,7 @@ try {
   );
 
   await check(
-    "partial configuration keeps collaboration available without external providers",
+    "partial configuration keeps collaboration available with OAuth configured and other providers absent",
     async () => {
       const {
         APP_DOMAIN,
@@ -662,6 +747,10 @@ try {
         AVATARS_URL,
         BETTER_AUTH_SECRET,
         SECRET_KEY,
+        GOOGLE_CLIENT_ID,
+        GOOGLE_CLIENT_SECRET,
+        GITHUB_CLIENT_ID,
+        GITHUB_CLIENT_SECRET,
       } = runtimeOptions.bindings;
       await runtime.setOptions(
         convertV4MiniflareOptions({
@@ -672,6 +761,10 @@ try {
             AVATARS_URL,
             BETTER_AUTH_SECRET,
             SECRET_KEY,
+            GOOGLE_CLIENT_ID,
+            GOOGLE_CLIENT_SECRET,
+            GITHUB_CLIENT_ID,
+            GITHUB_CLIENT_SECRET,
           },
           outboundService: async () => {
             throw new Error(
@@ -694,7 +787,7 @@ try {
           (await request(`/api/workspaces/${created.id}/members`)).status,
           200,
         );
-        // Earlier negative OTP checks share a rate-limit bucket in this local runtime.
+        // Earlier authentication checks share a rate-limit bucket in this local runtime.
         const partialDatabase = await runtime.getD1Database("DB");
         await partialDatabase.prepare("DELETE FROM auth_rate_limits").run();
         const otp = await request(
@@ -702,14 +795,18 @@ try {
           json({ email: "unconfigured@example.test", type: "sign-in" }),
           false,
         );
-        assert.equal(otp.status, 503, await otp.clone().text());
-        const webhook = await request("/api/billing/webhook", {
-          ...json({}),
-          headers: {
-            "content-type": "application/json",
-            "stripe-signature": "unconfigured",
+        assert.equal(otp.status, 404, await otp.clone().text());
+        const webhook = await request(
+          "/api/auth/polar/webhooks",
+          {
+            ...json({}),
+            headers: {
+              "content-type": "application/json",
+              "webhook-signature": "unconfigured",
+            },
           },
-        });
+          false,
+        );
         assert.equal(webhook.status, 503, await webhook.clone().text());
       } finally {
         await runtime.setOptions(convertV4MiniflareOptions(runtimeOptions));

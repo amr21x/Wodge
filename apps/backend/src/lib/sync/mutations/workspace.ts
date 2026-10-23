@@ -35,13 +35,6 @@ export async function dispatchWorkspaceMutation(
           params.nextVersion,
         );
         break;
-      case "deleteGroup":
-        await service.deleteGroup(
-          schemas.deleteGroup.parse(params.mutation.args),
-          actor,
-          params.nextVersion,
-        );
-        break;
       case "deleteTeam":
         await service.deleteTeam(
           schemas.deleteTeam.parse(params.mutation.args),
@@ -66,20 +59,6 @@ export async function dispatchWorkspaceMutation(
       case "deleteChannel":
         await service.deleteChannel(
           schemas.deleteChannel.parse(params.mutation.args),
-          actor,
-          params.nextVersion,
-        );
-        break;
-      case "createGroup":
-        await service.createGroup(
-          schemas.createGroup.parse(params.mutation.args),
-          actor,
-          params.nextVersion,
-        );
-        break;
-      case "updateGroup":
-        await service.updateGroup(
-          schemas.updateGroup.parse(params.mutation.args),
           actor,
           params.nextVersion,
         );

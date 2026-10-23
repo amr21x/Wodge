@@ -4,7 +4,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
 
 import { useParams } from "next/navigation";
-import { useMemo } from "react";
 
 import { PostsList } from "../../../../../../../features/discussions/components/posts-list";
 import { QAsList } from "../../../../../../../features/discussions/components/qas-list";
@@ -17,14 +16,9 @@ import { useUpdateRecentlyVisited } from "@/features/workspace/hooks/use-recentl
 function ThreadsPage() {
   useUpdateRecentlyVisited("thread");
 
-  const { structure } = useCurrentWorkspace();
+  useCurrentWorkspace();
 
-  const { teamId } = useParams<{ teamId: string }>();
-
-  const team = useMemo(
-    () => structure.teams?.find((t) => t.id === teamId),
-    [structure.teams, teamId],
-  );
+  useParams<{ teamId: string }>();
 
   const rep = useCurrentThreadRep();
 

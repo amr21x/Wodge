@@ -5,11 +5,10 @@ import { DataTableActions } from "@/components/data-table/data-table-action";
 import { Header } from "@/components/data-table/header";
 
 import { buttonVariants } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -17,7 +16,7 @@ import {
 import { useMember } from "@/features/workspace/hooks/use-member";
 import { cn } from "@/lib/utils/index";
 import { ColumnDef } from "@tanstack/react-table";
-import { useMemo, useState } from "react";
+
 import { DeepReadonly } from "replicache";
 import { SafeAvatar } from "@/components/safe-avatar";
 
@@ -32,7 +31,6 @@ export function membersColumns({
   removeMember,
   changeMemberRole,
   workspaceId,
-  inviters,
 }: MembersColumnsProps): ColumnDef<DeepReadonly<Member>>[] {
   return [
     // {
@@ -78,7 +76,7 @@ export function membersColumns({
       },
       header: () => <Header>Member</Header>,
 
-      cell: ({ row }) => {
+      cell: function Cell({ row }) {
         const { member, isMembersPending } = useMember(row.original.id);
 
         if (isMembersPending) {
@@ -110,7 +108,7 @@ export function membersColumns({
 
       header: () => <Header>Username</Header>,
 
-      cell: ({ row }) => {
+      cell: function Cell({ row }) {
         const { member, isMembersPending } = useMember(row.original.id);
 
         if (isMembersPending) {

@@ -55,6 +55,7 @@ export function CommentEditor({
     <div className="flex w-full items-center gap-2 rounded-md border border-border/50 bg-secondary/40 px-1.5 py-1.5">
       {!isResolved && (
         <>
+          {/* oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- Keyboard shortcuts bubble from the nested editor, which owns focus and textbox semantics. */}
           <div
             className="flex h-full w-full items-center"
             onKeyDown={(e) => {

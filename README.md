@@ -116,7 +116,7 @@ Wodge separates synchronized state by domain rather than treating the whole prod
 ### Prerequisites
 
 - Node.js 22.19 or newer (`.node-version` selects 24.19.0)
-- pnpm 9
+- pnpm 12 (`packageManager` pins 12.15.0)
 - A Linux-based development environment is recommended
 - LiveKit Server for local audio/video development
 - Accounts or local substitutes for the external services configured in `.env.example`
@@ -129,16 +129,31 @@ cd Wodge
 pnpm install
 ```
 
-Create the application environment files:
+Create the public web configuration:
 
 ```bash
 cp .env.example apps/web/.env.local
-cp apps/backend/.dev.vars.example apps/backend/.dev.vars
 ```
 
+Backend secrets come from Bitwarden Secrets Manager rather than a `.dev.vars`
+file. Create a Bitwarden project for the application containing the keys listed
+in `apps/backend/.dev.vars.example`, plus a read-only machine account with access
+to that project only. Then, once per machine:
+
+```bash
+pnpm secrets setup   # prompts for the project ID and access token, then downloads
+pnpm secrets list    # shows the stored secret names
+```
+
+The script stores the token and the downloaded secrets in the operating system
+credential store (macOS Keychain, Windows Credential Manager for WSL and Git
+Bash, or a Linux Secret Service keyring). All clones and worktrees share those
+entries. Commands read secrets from that store only, so they start offline. See
+[local secrets](#local-secrets).
+
 Backend owns the D1 binding in `apps/backend/wrangler.jsonc`. Web has public
-configuration only; backend secrets live in its ignored `.dev.vars` file. Better
-Auth supports email OTP, Google and GitHub. The web dev server forwards API calls
+configuration only; backend secrets are injected by `pnpm secrets run`. Better
+Auth supports Google and GitHub sign-in; email sign-in is disabled. The web dev server forwards API calls
 to the backend Worker. See [backend setup](apps/backend/README.md).
 
 Production uses manually triggered Wrangler deployment. Namespace/data cutover,
@@ -156,25 +171,65 @@ Start LiveKit in a separate terminal when testing calls:
 pnpm livekit
 ```
 
-Start the monorepo:
+Start the monorepo with backend secrets injected:
 
 ```bash
-pnpm dev
+pnpm secrets run -- pnpm dev
 ```
 
 You can also run an individual workspace through Turborepo filtering:
 
 ```bash
 pnpm dev --filter web
-pnpm dev --filter backend
+pnpm secrets run -- pnpm dev --filter backend
 ```
+
+### Local secrets
+
+`scripts/secrets.sh` is self-contained and application-neutral:
+
+| Command                         | Purpose                                                        |
+| ------------------------------- | -------------------------------------------------------------- |
+| `pnpm secrets setup`            | Store or replace the project ID and token, then refresh        |
+| `pnpm secrets refresh`          | Download the current secrets from Bitwarden into the store     |
+| `pnpm secrets list`             | List stored secret names, never values                         |
+| `pnpm secrets run -- <command>` | Run a command with the stored secrets as environment variables |
+| `pnpm secrets forget`           | Delete the stored token and secrets                            |
+
+Only `setup` and `refresh` contact Bitwarden; they install a checksum-pinned
+`bws` CLI when it is missing. `run` needs neither `bws` nor network access. After
+changing a secret in Bitwarden, run `pnpm secrets refresh` and restart the
+command. Secrets are base64-encoded `KEY=VALUE` records inside the credential
+store and are never written to files.
+
+Entries are named `bws/<package.json name>/token` and `.../secrets`, with
+numbered `#n` continuation entries for large values; set `BWS_APP` to choose
+another name, `BWS_CREDENTIAL_STORE` (`macos`, `windows` or `secret-service`) to
+override detection, `BWS_INSTALL_DIR` to change where `bws` is installed
+(default `~/.local/bin`), and `BWS_SERVER_URL` for EU or self-hosted Bitwarden.
+
+`run` sets `CLOUDFLARE_INCLUDE_PROCESS_ENV=true` so Wrangler reads the secrets
+from the environment, and refuses to start while a `.dev.vars` file exists
+because Wrangler would silently prefer it. Wrangler then exposes the whole local
+process environment to the Worker in local development only; deployments are
+unaffected. The access token is removed from the launched process environment.
+
+Machine-account access tokens are valid until they expire or are revoked. An
+expired token only affects `refresh`, which stops with an explanation: create a
+new token for the machine account, then run `pnpm secrets setup`. Failed
+refreshes, including network or server errors, leave the stored secrets
+unchanged, so `run` keeps working.
 
 ## Useful Commands
 
 ```bash
 pnpm dev             # Start development services
+pnpm secrets         # Manage local Bitwarden secrets
 pnpm build           # Build all workspaces
 pnpm lint            # Run linting across the monorepo
+pnpm lint:fix        # Apply safe lint fixes
+pnpm format          # Format the monorepo
+pnpm format:check    # Check formatting without writing files
 pnpm generate        # Generate database artifacts
 pnpm migrate:local   # Apply local database migrations
 pnpm studio          # Open the database studio
@@ -185,7 +240,7 @@ pnpm reset:app       # Reset local generated Wrangler state
 
 The public repository contains the capstone version of Wodge and is suitable for architecture review and local exploration. The codebase includes deployment automation for Cloudflare Pages and Workers, but a complete turnkey self-hosting guide is still being consolidated.
 
-Some integrations require third-party credentials, including Better Auth OAuth providers, Resend, LiveKit, Cloudflare, and other optional services represented in `.env.example`.
+Some integrations require third-party credentials, including Google/GitHub OAuth providers, LiveKit, Cloudflare, and other optional services represented in `.env.example`.
 
 ## Team and Contribution
 

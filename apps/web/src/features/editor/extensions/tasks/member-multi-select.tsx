@@ -1,5 +1,5 @@
 import { SafeAvatar } from "@/components/safe-avatar";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -16,12 +16,12 @@ import { useMember } from "@/features/workspace/hooks/use-member";
 import { cn } from "@/lib/utils/index";
 import { Check, Users2 } from "lucide-react";
 import { useParams } from "next/navigation";
-import { forwardRef, useEffect, useMemo, useState } from "react";
+import { forwardRef, useMemo, useState } from "react";
 
-import { canView } from "@wodge/auth/authorization/access";
+import { api } from "@/client/api";
+import { useQuery } from "@tanstack/react-query";
 import { Member } from "@wodge/domain/workspace/models";
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
-import { isEditing } from "@/features/rooms/state/atoms";
 
 interface MemberMultiSelectProps {
   onChange?: (...event: any[]) => void;
@@ -45,27 +45,30 @@ export function MemberMultiSelect({
   // const [value, setValue] = useState<string[]>(preset || []);
   const [open, setOpen] = useState(false);
 
-  const { channelId, teamId, folderId } = useParams<{
+  const { channelId } = useParams<{
     channelId: string;
     teamId: string;
     folderId: string;
   }>();
-  const { structure, members: membersArr } = useCurrentWorkspace();
-
+  const { workspaceId, members: membersArr } = useCurrentWorkspace();
+  const { data: eligible = [] } = useQuery({
+    queryKey: ["page-members", workspaceId, channelId],
+    enabled: !!workspaceId && !!channelId,
+    refetchInterval: 10_000,
+    queryFn: async () => {
+      if (!workspaceId || !channelId) return [];
+      const response = await api.api.workspaces[
+        ":workspaceId"
+      ].authorization.pages[":pageId"].members.$get({
+        param: { workspaceId, pageId: channelId },
+      });
+      if (!response.ok) return [];
+      return response.json();
+    },
+  });
   const members = useMemo(
-    () =>
-      membersArr.members.filter((m) =>
-        canView({
-          channelId,
-          teamId,
-          structure,
-          members: membersArr,
-          channelType: "page",
-          folderId,
-          userId: m.id,
-        }),
-      ),
-    [teamId, channelId, structure, membersArr],
+    () => membersArr.members.filter((member) => eligible.includes(member.id)),
+    [membersArr, eligible],
   );
 
   function onSelect(m: Member) {

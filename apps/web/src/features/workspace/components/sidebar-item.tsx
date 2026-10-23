@@ -37,10 +37,11 @@ const SidebarItem = forwardRef<HTMLDivElement, SidebarItemProps>(
     }
 
     let jsx = (
+      /* oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- The role and tab order depend on whether the parent Link handles navigation. */
       <div
         ref={ref}
-        tabIndex={0}
-        role="button"
+        tabIndex={href ? -1 : 0}
+        role={href ? undefined : "button"}
         className={cn(
           buttonVariants({
             variant: "ghost",
@@ -52,12 +53,22 @@ const SidebarItem = forwardRef<HTMLDivElement, SidebarItemProps>(
           className,
         )}
         onClick={handler}
+        onKeyDown={(event) => {
+          if (
+            !href &&
+            event.target === event.currentTarget &&
+            (event.key === "Enter" || event.key === " ")
+          ) {
+            event.preventDefault();
+            handler?.();
+          }
+        }}
         {...props}
       >
         {collapsible && (
           <div className="relative -ml-0.5 mr-2 h-4 w-4">
             <ChevronRight className="invisible absolute left-0 top-0 mr-1 h-4 w-4 shrink-0 transition-transform group-hover:visible group-data-[state=open]/collapsible:rotate-90" />
-            <Icon className=" absolute left-0 top-0 h-4 w-4 shrink-0 group-hover:invisible" />
+            <Icon className="absolute left-0 top-0 h-4 w-4 shrink-0 group-hover:invisible" />
           </div>
         )}
 

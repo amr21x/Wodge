@@ -1,3 +1,4 @@
+import { ObjectSyncRepository } from "@wodge/core/sync/repositories/state";
 import { PageService } from "@wodge/core/pages/services/page";
 import { inject, injectable } from "tsyringe";
 import { WorkspaceGateway } from "../../gateways/workspace";
@@ -10,13 +11,15 @@ import type { RunnerParams } from "./replicache";
 @injectable()
 export class PageSync {
   constructor(
+    @inject(ObjectSyncRepository)
+    private readonly syncRecords: ObjectSyncRepository,
     @inject("page") private readonly party: PageServer,
     @inject(PageService) private readonly service: PageService,
     @inject(WorkspaceGateway)
     private readonly workspaceGateway: WorkspaceGateway,
   ) {}
   get storage() {
-    return this.party.ctx.storage;
+    return this.syncRecords;
   }
   get versions() {
     return this.party.versions;

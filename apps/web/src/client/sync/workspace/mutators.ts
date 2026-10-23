@@ -1,6 +1,5 @@
 import type {
   TeamUpdateArgs,
-  GroupUpdateArgs,
   NewPageArgs,
   NewRoomArgs,
   NewFolderArgs,
@@ -11,31 +10,27 @@ import { WriteTransaction } from "replicache";
 import {
   WorkspaceMembers,
   WorkspaceStructure,
-  Group,
 } from "@wodge/domain/workspace/models";
 import {
   makeWorkspaceMembersKey,
   makeWorkspaceStructureKey,
 } from "@wodge/domain/sync/index";
 
-import { teamUpdateRunner } from "@wodge/core/workspace/mutations/team-update-runner";
-import { createTeamMutation } from "@wodge/core/workspace/mutations/create-team";
-import { deleteTeamMutation } from "@wodge/core/workspace/mutations/delete-team";
-import { createGroupMutation } from "@wodge/core/workspace/mutations/create-group";
-import { groupUpdateRunner } from "@wodge/core/workspace/mutations/group-update-runner";
-import { deleteGroupMutation } from "@wodge/core/workspace/mutations/delete-group";
-import { createPageMutation } from "@wodge/core/workspace/mutations/create-page";
-import { createRoomMutation } from "@wodge/core/workspace/mutations/create-room";
-import { createThreadMutation } from "@wodge/core/workspace/mutations/create-thread";
+import { teamUpdateRunner } from "./mutations/team-update-runner";
+import { createTeamMutation } from "./mutations/create-team";
+import { deleteTeamMutation } from "./mutations/delete-team";
+import { createPageMutation } from "./mutations/create-page";
+import { createRoomMutation } from "./mutations/create-room";
+import { createThreadMutation } from "./mutations/create-thread";
 
 import { Team } from "@wodge/domain/workspace/models";
 
-import { deleteChannelMutation } from "@wodge/core/workspace/mutations/delete-channel";
-import { updatePageMutation } from "@wodge/core/workspace/mutations/update-page";
-import { updateRoomMutation } from "@wodge/core/workspace/mutations/update-room";
-import { updateThreadMutation } from "@wodge/core/workspace/mutations/update-thread";
-import { updateFolderMutation } from "@wodge/core/workspace/mutations/update-folder";
-import { deleteFolderMutation } from "@wodge/core/workspace/mutations/delete-folder";
+import { deleteChannelMutation } from "./mutations/delete-channel";
+import { updatePageMutation } from "./mutations/update-page";
+import { updateRoomMutation } from "./mutations/update-room";
+import { updateThreadMutation } from "./mutations/update-thread";
+import { updateFolderMutation } from "./mutations/update-folder";
+import { deleteFolderMutation } from "./mutations/delete-folder";
 
 export type WorkspaceMutators = ReturnType<typeof createWorkspaceMutators>;
 
@@ -109,78 +104,6 @@ export function createWorkspaceMutators(userId: string) {
       const newStructure = deleteTeamMutation({
         structure,
         teamId,
-      });
-
-      await tx.set(makeWorkspaceStructureKey(), newStructure);
-    },
-
-    async createGroup(
-      tx: WriteTransaction,
-      data: Omit<Group, "members" | "createdBy">,
-    ) {
-      // 1. Create the group
-
-      const structure = await tx.get<WorkspaceStructure>(
-        makeWorkspaceStructureKey(),
-      );
-
-      if (!structure) {
-        throw new Error("Bad data");
-      }
-
-      const newStructure = createGroupMutation({
-        group: data,
-        structure,
-        currentUserId: userId,
-      });
-
-      // 2. Persist the mutation
-
-      await tx.set(makeWorkspaceStructureKey(), newStructure);
-    },
-
-    async updateGroup(tx: WriteTransaction, update: GroupUpdateArgs) {
-      const structure = (await tx.get<WorkspaceStructure>(
-        makeWorkspaceStructureKey(),
-      ))!;
-
-      const members = await tx.get<WorkspaceMembers>(makeWorkspaceMembersKey());
-
-      if (!members) {
-        throw new Error("Bad data");
-      }
-
-      if (!structure) {
-        throw new Error("Bad data");
-      }
-
-      const { groupId, groupUpdate } = update;
-      const curMembers = members.members.map((m) => m.id);
-
-      const newStructure = groupUpdateRunner({
-        structure,
-        groupUpdate,
-        groupId,
-        curMembers,
-      });
-
-      // 3. Persist the mutation
-
-      await tx.set(makeWorkspaceStructureKey(), newStructure);
-    },
-
-    async deleteGroup(tx: WriteTransaction, groupId: string) {
-      const structure = (await tx.get<WorkspaceStructure>(
-        makeWorkspaceStructureKey(),
-      )) as WorkspaceStructure;
-
-      if (!structure) {
-        throw new Error("Bad data");
-      }
-
-      const newStructure = deleteGroupMutation({
-        structure,
-        groupId,
       });
 
       await tx.set(makeWorkspaceStructureKey(), newStructure);

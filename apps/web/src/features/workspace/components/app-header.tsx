@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { useParams, useRouter } from "next/navigation";
 import { useChannelPath } from "@/features/workspace/hooks/use-channel-path";
-import { useAppStore } from "@/client/state/store";
+
 import { editorUsersAtoms } from "@/features/editor/block-editor/atoms";
 import { EditorInfo } from "@/features/editor/block-editor/editor-info";
 import { roomAtom } from "../../rooms/state/atoms";
@@ -44,7 +44,7 @@ export function AppHeader() {
   return (
     <div
       className={
-        "mt-1.5 flex h-12 w-full items-center  bg-background py-2.5 pl-2 pr-4  transition-all"
+        "mt-1.5 flex h-12 w-full items-center bg-background py-2.5 pl-2 pr-4 transition-all"
       }
     >
       <div className="flex w-full items-center">
@@ -108,7 +108,7 @@ export function AppHeader() {
             Icon={Video}
             title="Calls are disabled; room messaging remains available"
             className={cn(
-              "hidden ",
+              "hidden",
               !path?.page && "ml-auto",
               path?.room && "block",
               lk_room && "animate-pulse duration-1000 hover:animate-none",

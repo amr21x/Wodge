@@ -30,8 +30,7 @@ export const applicationErrorStatus = {
   BILLING_WORKSPACE_NOT_FOUND: 404,
   BILLING_ALREADY_PREMIUM: 400,
   BILLING_NOT_PREMIUM: 400,
-  BILLING_PRICE_NOT_FOUND: 404,
-  BILLING_CHECKOUT_URL_MISSING: 400,
+  BILLING_PORTAL_PURCHASER_ONLY: 409,
 } satisfies Record<
   | AuthorizationErrorCode
   | WorkspaceErrorCode

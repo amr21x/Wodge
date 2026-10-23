@@ -1,3 +1,6 @@
+# Secret names for the Bitwarden Secrets Manager project used by
+# `pnpm secrets run`. Keep values in Bitwarden, not in a .dev.vars file.
+
 # Required: signs and protects Better Auth sessions and authentication data.
 # Use a strong random value, different from SECRET_KEY.
 BETTER_AUTH_SECRET=
@@ -5,24 +8,22 @@ BETTER_AUTH_SECRET=
 # Use a separate strong random value; this is not a provider API key.
 SECRET_KEY=
 
-# partial allows unavailable integrations locally; ready requires email, storage and Stripe test settings.
+# partial allows unavailable storage/billing locally; ready requires storage and Polar sandbox settings.
+# Google and GitHub OAuth credentials are required in both modes. Email sign-in is disabled.
 INTEGRATION_MODE=partial
 
-# Provider credentials are temporarily optional for partial local development.
+# Storage and billing credentials are optional in partial local development.
 # Missing configuration makes the corresponding operations unavailable.
 
-# Authorizes Resend to deliver email sign-in codes. Required for email OTP sign-in.
-RESEND_API_KEY=
-# Verified Resend sender address used for sign-in emails; configuration, not a secret.
-RESEND_EMAIL_FROM=
-
-# Identifies the Google OAuth application. Optional; configure with its client secret.
+# Required: identifies the Google OAuth application.
+# Callback URL: <APP_DOMAIN>/api/auth/callback/google
 GOOGLE_CLIENT_ID=
-# Authenticates the backend when exchanging Google OAuth codes for tokens.
+# Required: authenticates Google OAuth code exchange.
 GOOGLE_CLIENT_SECRET=
-# Identifies the GitHub OAuth application. Optional; configure with its client secret.
+# Required: identifies the GitHub OAuth application.
+# Callback URL: <APP_DOMAIN>/api/auth/callback/github
 GITHUB_CLIENT_ID=
-# Authenticates the backend when exchanging GitHub OAuth codes for tokens.
+# Required: authenticates GitHub OAuth code exchange.
 GITHUB_CLIENT_SECRET=
 
 # S3-compatible storage endpoint for workspace files and avatars; not a secret.
@@ -37,9 +38,12 @@ LIVEKIT_API_KEY=
 # Signs LiveKit room access tokens. Leave unset while calls are unavailable locally.
 LIVEKIT_API_SECRET=
 
-# Authorizes Stripe Checkout, billing portal and price API requests. Use a test-mode key locally.
-STRIPE_SECRET_KEY=
-# Verifies incoming Stripe webhook signatures before subscription state is changed.
-STRIPE_WH_SECRET=
-# Selects the Stripe subscription price for Checkout by lookup key; not a secret.
-STRIPE_LOOKUP_KEY=
+# Polar organization access token (polar_oat_...) for checkout, customer portal and
+# subscription reads. The showcase always uses the Polar sandbox; create the token there.
+# Required scopes: checkouts:write, customer_sessions:write, subscriptions:read.
+POLAR_ACCESS_TOKEN=
+# Verifies Polar webhook signatures before subscription state is changed. Use the secret of the
+# sandbox webhook endpoint <backend>/api/auth/polar/webhooks (Raw format, subscription.* events).
+POLAR_WEBHOOK_SECRET=
+# ID of the Polar sandbox product sold as the Pro plan; not a secret.
+POLAR_PRODUCT_ID=

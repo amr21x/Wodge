@@ -1,6 +1,7 @@
+import { failureMessage, requireOk } from "@/client/errors";
 import { env } from "@wodge/env/client";
 import { useState } from "react";
-import { Check, Copy, RefreshCcw, Repeat } from "lucide-react";
+import { Check, Copy, RefreshCcw } from "lucide-react";
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
 import { useInvites } from "./use-invites";
 import { TooltipWrapper } from "@/components/tooltip-wrapper";
@@ -14,7 +15,7 @@ function makeLink(token?: string, wid?: string) {
 }
 
 export function InviteLink() {
-  const { invites, isLinkLoading } = useInvites();
+  const { invites, isLinkLoading, error } = useInvites();
 
   const { workspaceId, workspace } = useCurrentWorkspace();
   const [copied, setCopied] = useState(false);
@@ -22,10 +23,12 @@ export function InviteLink() {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async () => {
-      await fetch(`/api/workspaces/${workspaceId}/invite`, {
+      const response = await fetch(`/api/workspaces/${workspaceId}/invite`, {
         method: "POST",
       });
+      await requireOk(response);
     },
+    onError: (error) => toast.error(failureMessage(error)),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["invites", workspaceId],
@@ -42,16 +45,22 @@ export function InviteLink() {
     return null;
   }
 
+  if (error) return <p role="alert">{failureMessage(error)}</p>;
+
   const inviteLink = invites?.find((i) => !i.emails);
 
   return (
     <div className="flex w-full items-center justify-between gap-6 overflow-hidden rounded-md bg-accent p-3">
-      <div className=" truncate text-sm">
+      <div className="truncate text-sm">
         {isLinkLoading ? (
           <Skeleton className="h-4 w-11/12 max-w-lg" />
         ) : (
           <div className="flex">
-            <p>{makeLink(inviteLink?.token, inviteLink?.workspaceId)}</p>
+            <p>
+              {inviteLink
+                ? makeLink(inviteLink.token, inviteLink.workspaceId)
+                : "No invite link available"}
+            </p>
           </div>
         )}
       </div>
@@ -67,14 +76,20 @@ export function InviteLink() {
         <TooltipWrapper content="Copy invite link">
           <SidebarItemBtn
             Icon={copied ? Check : Copy}
-            disabled={copied}
-            onClick={() => {
-              navigator.clipboard.writeText(
-                makeLink(inviteLink?.token, inviteLink?.workspaceId) || "",
-              );
-              toast.success("Invite link copied to clipboard");
-              setCopied(true);
-              setTimeout(() => setCopied(false), 1000);
+            disabled={copied || !inviteLink?.token}
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(
+                  makeLink(inviteLink?.token, inviteLink?.workspaceId) || "",
+                );
+                toast.success("Invite link copied to clipboard");
+                setCopied(true);
+                setTimeout(() => setCopied(false), 1000);
+              } catch {
+                toast.error(
+                  "Could not copy the invite link. Please copy it manually.",
+                );
+              }
             }}
           />
         </TooltipWrapper>

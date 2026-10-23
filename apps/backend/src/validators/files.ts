@@ -4,7 +4,10 @@ const identifier = z
   .string()
   .min(1)
   .max(256)
-  .refine((value) => !/[\x00/\\]/.test(value), "Invalid identifier");
+  .refine(
+    (value) => !value.includes("\0") && !/[/\\]/.test(value),
+    "Invalid identifier",
+  );
 export const FileParams = z.object({
   teamId: identifier,
   channelId: identifier.optional(),
@@ -18,7 +21,8 @@ export const StoragePath = z
   .max(1024)
   .refine(
     (value) =>
-      !/[\x00\\]/.test(value) &&
+      !value.includes("\0") &&
+      !value.includes("\\") &&
       value
         .split("/")
         .every(

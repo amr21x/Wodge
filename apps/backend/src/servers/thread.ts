@@ -1,5 +1,5 @@
 import { mutationRecordId } from "@wodge/core/features/policy";
-import type { FeatureHandlers } from "../handlers/features";
+import type { FeatureFlagHandlers } from "../handlers/feature-flags";
 import type {
   ServerThreadMessages,
   ThreadPartyInterface,
@@ -15,7 +15,7 @@ export default class ThreadServer
   extends Server<WorkerEnvironment>
   implements ThreadPartyInterface
 {
-  private features!: FeatureHandlers;
+  private features!: FeatureFlagHandlers;
   private router!: DiscussionRoutes["router"];
 
   static options = {

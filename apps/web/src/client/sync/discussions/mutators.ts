@@ -4,15 +4,15 @@ import type {
 } from "@wodge/domain/discussions/dto";
 import { WriteTransaction } from "replicache";
 import { ThreadMessage, ThreadPost } from "@wodge/domain/discussions/models";
-import { deleteCommentMutation } from "@wodge/core/discussions/mutations/delete-comment";
-import { editCommentMutation } from "@wodge/core/discussions/mutations/edit-comment";
-import { createCommentMutation } from "@wodge/core/discussions/mutations/create-comment";
-import { createPostMutation } from "@wodge/core/discussions/mutations/create-post";
-import { deletePostMutation } from "@wodge/core/discussions/mutations/delete-post";
-import { editPostMutation } from "@wodge/core/discussions/mutations/edit-post";
-import { togglePostMutation } from "@wodge/core/discussions/mutations/toggle-post";
-import { postVoteMutation } from "@wodge/core/discussions/mutations/vote";
-import { removePostVoteMutation } from "@wodge/core/discussions/mutations/remove-vote";
+import { deleteCommentMutation } from "./mutations/delete-comment";
+import { editCommentMutation } from "./mutations/edit-comment";
+import { createCommentMutation } from "./mutations/create-comment";
+import { createPostMutation } from "./mutations/create-post";
+import { deletePostMutation } from "./mutations/delete-post";
+import { editPostMutation } from "./mutations/edit-post";
+import { togglePostMutation } from "./mutations/toggle-post";
+import { postVoteMutation } from "./mutations/vote";
+import { removePostVoteMutation } from "./mutations/remove-vote";
 
 export type ThreadMutators = ReturnType<typeof createThreadMutators>;
 

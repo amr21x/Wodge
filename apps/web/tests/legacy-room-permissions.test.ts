@@ -4,7 +4,6 @@ import { createRoot, type Root } from "react-dom/client";
 import { act } from "react-dom/test-utils";
 import { Dialog } from "../src/components/ui/dialog";
 import { AddRoomForm } from "../src/features/workspace/components/add-room-form";
-import { GroupSettings } from "../src/features/workspace/settings/groups/group-settings";
 import { createEntityId } from "@wodge/domain/identifiers";
 
 const { updateRoom, createRoom } = vi.hoisted(() => ({
@@ -18,12 +17,6 @@ vi.mock("@/features/workspace/state/workspace-provider", () => ({
 }));
 vi.mock("@/features/workspace/hooks/use-member", () => ({
   useMember: () => ({ member: { email: "owner@example.com" } }),
-}));
-vi.mock("@/features/workspace/settings/groups/group-general-form", () => ({
-  GroupGeneralForm: () => null,
-}));
-vi.mock("@/features/workspace/settings/groups/group-members-settings", () => ({
-  GroupMembersSettings: () => null,
 }));
 vi.mock("@/features/workspace/settings/settings", () => ({
   SettingsContentHeader: () => null,
@@ -53,8 +46,6 @@ test.each([false, true])(
       id: createEntityId(),
       name: "Private room",
       avatar: "",
-      viewGroups: [createEntityId()],
-      editGroups: [createEntityId()],
     };
     const teamId = createEntityId();
     await mount(
@@ -85,23 +76,3 @@ test.each([false, true])(
     }
   },
 );
-
-test("group settings explicitly explain that group operations cannot revoke room grants", async () => {
-  await mount(
-    createElement(GroupSettings, {
-      group: {
-        id: createEntityId(),
-        name: "Legacy",
-        color: "#112233",
-        members: [],
-        createdBy: "owner",
-      },
-    }),
-  );
-  expect(document.querySelector('[role="note"]')?.textContent).toMatch(
-    /does not grant or revoke room access/,
-  );
-  expect(document.querySelector('[role="note"]')?.textContent).toMatch(
-    /remove role assignments to revoke existing access/,
-  );
-});

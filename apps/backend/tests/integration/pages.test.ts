@@ -1,10 +1,14 @@
+import { ObjectSyncRepository } from "@wodge/core/sync/repositories/state";
+import { createObjectDatabase } from "@wodge/infra/database/object-database";
+import { attachSql } from "../helpers/sqlite";
+import { PageRecordRepository } from "@wodge/core/pages/repositories/records";
 // @vitest-environment jsdom
 
 import type { PageActor, PageInputs } from "@wodge/domain/pages/dto";
 import type { Db } from "@wodge/domain/pages/models";
 import { TaskSchema } from "@wodge/domain/pages/validation";
 import { IDBKeyRange, indexedDB } from "fake-indexeddb";
-import { Replicache, TEST_LICENSE_KEY } from "replicache";
+import { Replicache } from "replicache";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { pageMutators } from "../../../web/src/client/sync/pages/mutators";
 import type PageParty from "../../src/servers/page";
@@ -22,7 +26,6 @@ function createClient() {
   vi.stubGlobal("IDBKeyRange", IDBKeyRange);
   const client = new Replicache({
     name: `page-integration-${crypto.randomUUID()}`,
-    licenseKey: TEST_LICENSE_KEY,
     mutators: pageMutators,
     pullInterval: null,
     logLevel: "error",
@@ -35,6 +38,12 @@ function createClient() {
 
 function createParty() {
   const records = new Map<string, unknown>();
+  const store = attachSql({
+    get: vi.fn(async (key: string) => records.get(key)),
+    put: vi.fn(async (key: string, value: unknown) => {
+      records.set(key, structuredClone(value));
+    }),
+  });
   const party = {
     state: {
       record: {
@@ -45,11 +54,7 @@ function createParty() {
     },
     name: "fixture",
     ctx: {
-      storage: {
-        put: vi.fn(async (key: string, value: unknown) => {
-          records.set(key, structuredClone(value));
-        }),
-      },
+      storage: store,
     },
     env: {},
   };
@@ -84,7 +89,7 @@ function execute(party: PageParty, operation: ReturnType<typeof mutation>) {
 describe("page client and backend integration", () => {
   test("create, edit and cascading deletion agree across the extracted boundary", async () => {
     const client = createClient();
-    const { party, records } = createParty();
+    const { party } = createParty();
     const column = { id: "todo", title: "Todo" };
     const task = TaskSchema.parse({
       id: "first",
@@ -113,7 +118,19 @@ describe("page client and backend integration", () => {
     await execute(party, mutation("deleteColumn", column, 4));
     expect(await client.query((tx) => tx.get("tasks"))).toEqual([]);
     expect(await client.query((tx) => tx.get("columns"))).toEqual([]);
-    expect(records.get("db")).toEqual({
+    expect(
+      (
+        await new PageRecordRepository(
+          party.ctx.storage,
+          createObjectDatabase(party.ctx.storage),
+          new ObjectSyncRepository(
+            party.ctx.storage,
+            createObjectDatabase(party.ctx.storage),
+            "page",
+          ),
+        ).loadPage()
+      ).state.record,
+    ).toEqual({
       data: { tasks: [], columns: [] },
       lastModifiedVersion: 4,
       deleted: false,
@@ -122,7 +139,7 @@ describe("page client and backend integration", () => {
 
   test("creating a task in a missing column inserts nothing on either side", async () => {
     const client = createClient();
-    const { party, records } = createParty();
+    const { party } = createParty();
     const args = {
       col: "missing",
       task: TaskSchema.parse({ id: "first", columnId: "missing" }),
@@ -132,15 +149,27 @@ describe("page client and backend integration", () => {
     await execute(party, mutation("createTask", args, 1));
     expect(await client.query((tx) => tx.get("tasks"))).toEqual([]);
     expect(party.state.record.data.tasks).toEqual([]);
-    expect(records.get("db")).toEqual(party.state.record);
+    expect(
+      (
+        await new PageRecordRepository(
+          party.ctx.storage,
+          createObjectDatabase(party.ctx.storage),
+          new ObjectSyncRepository(
+            party.ctx.storage,
+            createObjectDatabase(party.ctx.storage),
+            "page",
+          ),
+        ).loadPage()
+      ).state.record,
+    ).toEqual(party.state.record);
   });
 
   test("backend storage failures propagate instead of returning false success", async () => {
     const { party } = createParty();
 
-    vi.mocked(party.ctx.storage.put).mockRejectedValueOnce(
-      new Error("storage unavailable"),
-    );
+    vi.mocked(party.ctx.storage.sql.exec).mockImplementationOnce(() => {
+      throw new Error("storage unavailable");
+    });
 
     await expect(
       execute(party, mutation("createColumn", { id: "todo" }, 1)),

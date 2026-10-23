@@ -13,8 +13,7 @@ import {
 } from "lucide-react";
 
 /** @public */
-export interface TrackMutedIndicatorProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+export interface TrackMutedIndicatorProps extends React.HTMLAttributes<HTMLDivElement> {
   trackRef: TrackReferenceOrPlaceholder;
   show?: "always" | "muted" | "unmuted";
 }

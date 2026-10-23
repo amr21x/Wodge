@@ -1,3 +1,6 @@
+import { ObjectSyncRepository } from "@wodge/core/sync/repositories/state";
+import { createObjectDatabase } from "@wodge/infra/database/object-database";
+import { attachSql } from "../helpers/sqlite";
 import { roomAuthorizationFixture } from "../helpers/authorization";
 // @vitest-environment node
 import { ThreadPostSchema } from "@wodge/domain/discussions/validation";
@@ -86,7 +89,7 @@ function fixture(scenario: (typeof scenarios)[number]) {
       deleted: false,
     },
     workspaceStructure: {
-      data: { teams: [], groups: [] },
+      data: { teams: [] },
       lastModifiedVersion: 0,
       deleted: false,
     },
@@ -96,19 +99,35 @@ function fixture(scenario: (typeof scenarios)[number]) {
     poke,
     name: "resource",
     ctx: {
-      storage: {
-        get: async (key: string) => structuredClone(records.get(key)),
+      storage: attachSql({
+        get: (async (key: string) =>
+          structuredClone(records.get(key))) as DurableObjectStorage["get"],
         put,
-      },
+      }),
     },
     env: {
-      ...{ SECRET_KEY: "local-only" },
+      SECRET_KEY: "local-only",
       Workspace: {
         idFromName: (id: string) => id,
-        get: () => ({ setName: async () => {}, fetch: poke }),
+        get: () => ({
+          setName: async () => {},
+          fetch: poke,
+        }),
       },
     },
   };
+  const exec = vi.mocked(party.ctx.storage.sql.exec).getMockImplementation()!;
+  vi.mocked(party.ctx.storage.sql.exec).mockImplementation(
+    (query: string, ...bindings: SqlStorageValue[]) => {
+      if (
+        /^(insert into|delete from) "?(workspace_teams|room_messages|thread_posts)/i.test(
+          query,
+        )
+      )
+        throw new Error("write failed");
+      return exec(query, ...bindings);
+    },
+  );
   const request = (init: RequestInit) =>
     scenario.feature === "workspace"
       ? workspaceRoutes.request(
@@ -154,7 +173,17 @@ test.each(scenarios)(
     expect((await f.push()).status).toBe(200);
     expect(f.records.has(scenario.key)).toBe(false);
     expect(
-      f.records.get(makeClientKey("client", makeClientGroupKey("group"))),
+      await new ObjectSyncRepository(
+        f.party.ctx.storage,
+        createObjectDatabase(
+          f.party.ctx.storage as unknown as DurableObjectStorage,
+        ),
+        scenario.feature === "workspace"
+          ? "workspace"
+          : scenario.feature === "rooms"
+            ? "room"
+            : "thread",
+      ).client(makeClientKey("client", makeClientGroupKey("group"))),
     ).toMatchObject({ lastMutationID: 1 });
     expect(f.party.versions.get("globalVersion")).toBe(1);
     expect(f.poke).toHaveBeenCalledOnce();
@@ -165,7 +194,7 @@ test.each(scenarios)(
           ? f.party.messages
           : f.party.threadPosts;
 
-    expect(state.lastModifiedVersion).toBe(1);
+    expect(state.lastModifiedVersion).toBe(0);
   },
 );
 

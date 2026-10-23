@@ -45,13 +45,14 @@ export function UserCard() {
   return (
     <div
       className={cn(
-        "flex max-h-12 min-h-7 w-60 items-center overflow-hidden  border-r  border-t border-border/50 bg-background px-1.5 py-2 transition-all",
-        !isSidebarOpen && " w-0 px-0",
+        "flex max-h-12 min-h-7 w-60 items-center overflow-hidden border-r border-t border-border/50 bg-background px-1.5 py-2 transition-all",
+        !isSidebarOpen && "w-0 px-0",
       )}
     >
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <div
+          <button
+            type="button"
             className={cn(
               buttonVariants({
                 size: "fit",
@@ -59,7 +60,7 @@ export function UserCard() {
               }),
               "group/card relative w-full select-none justify-start gap-3 overflow-hidden",
             )}
-            role="button"
+
             aria-label={user?.displayName || "User card"}
           >
             <SafeAvatar
@@ -80,7 +81,7 @@ export function UserCard() {
             <p className="absolute left-9 top-1/2 -translate-y-1/2 text-sm transition-all group-hover/card:top-0 group-hover/card:-translate-y-full">
               {user?.displayName}
             </p>
-          </div>
+          </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
           <DropdownMenuItem
@@ -116,7 +117,7 @@ export function UserCard() {
         <SidebarItemBtn
           Icon={micStatus ? Mic : MicOff}
           className={cn(
-            "ml-auto ",
+            "ml-auto",
             !micStatus && "text-destructive hover:text-destructive",
           )}
           onClick={() => {

@@ -1,7 +1,8 @@
 import { FeatureGate } from "@/components/feature-flags-provider";
 import { Editor, NodeViewWrapper } from "@tiptap/react";
-import { memo, useCallback } from "react";
+import { useCallback } from "react";
 
+import { UPLOADS_DISABLED } from "@/features/files/components/uploads-disabled-button";
 import { ImageUploader } from "./image-uploader";
 
 export const ImageUploadComp = ({
@@ -28,7 +29,12 @@ export const ImageUploadComp = ({
   return (
     <NodeViewWrapper>
       <div className="m-0 p-0" data-drag-handle>
-        <FeatureGate feature="attachments">
+        <FeatureGate
+          feature="attachments"
+          fallback={
+            <p className="text-sm text-muted-foreground">{UPLOADS_DISABLED}</p>
+          }
+        >
           <ImageUploader onUpload={onUpload} />
         </FeatureGate>
       </div>

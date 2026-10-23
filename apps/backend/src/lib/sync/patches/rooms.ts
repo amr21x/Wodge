@@ -9,7 +9,7 @@ export function createRoomPatch(
   userId: string,
   readFlags: () => Promise<FlagSnapshot>,
 ) {
-  return async function ({ fromVersion }: PatcherParams) {
+  return async function (_input: PatcherParams) {
     const patch: PatchOperation[] = [];
 
     const { flags } = await readFlags();

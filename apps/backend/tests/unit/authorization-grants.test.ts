@@ -1,3 +1,6 @@
+import { ObjectSyncRepository } from "@wodge/core/sync/repositories/state";
+import { createObjectDatabase } from "@wodge/infra/database/object-database";
+import { attachSql } from "../helpers/sqlite";
 import { ResourceGrantCache } from "@wodge/auth/authorization/grants";
 import { AuthorizationPolicies } from "@wodge/auth/authorization/policies";
 import { RoomScope } from "@wodge/auth/authorization/room-scope";
@@ -10,7 +13,7 @@ const scope = { workspaceId: "workspace", teamId: "team", roomId: "room" };
 
 function fixture() {
   const record = new Map<string, unknown>();
-  const persistence = new RoomRecordRepository({
+  const storage = attachSql({
     async get(key: string) {
       return structuredClone(record.get(key));
     },
@@ -18,18 +21,24 @@ function fixture() {
       record.set(key, structuredClone(value));
     },
   } as unknown as DurableObjectStorage);
+  const persistence = new RoomRecordRepository(
+    storage,
+    createObjectDatabase(storage),
+    new ObjectSyncRepository(storage, createObjectDatabase(storage), "room"),
+  );
   const gateway = {
-    resolve: vi.fn(
-      async (_scope, subject): Promise<ResourceGrant> => ({
+    resolve: vi.fn(async (_scope, subject): Promise<ResourceGrant> => {
+      const issuedAt = Date.now();
+      return {
         principal: subject,
         workspaceId: "workspace",
         scope: { type: "room", id: "room" },
         permissions: { room: ["read"], message: ["send"] },
-        issuedAt: Date.now(),
-        expiresAt: Date.now() + 30_000,
+        issuedAt,
+        expiresAt: issuedAt + 30_000,
         policyRevision: 1,
-      }),
-    ),
+      };
+    }),
   };
   return {
     gateway,
@@ -135,7 +144,7 @@ test("an unbound room with existing records cannot be claimed by a workspace", a
   const records = new Map<string, unknown>([
     ["messages", { data: [{ id: "private-message" }] }],
   ]);
-  const persistence = new RoomRecordRepository({
+  const storage = attachSql({
     async get(key: string) {
       return records.get(key);
     },
@@ -143,6 +152,11 @@ test("an unbound room with existing records cannot be claimed by a workspace", a
       records.set(key, value);
     },
   } as unknown as DurableObjectStorage);
+  const persistence = new RoomRecordRepository(
+    storage,
+    createObjectDatabase(storage),
+    new ObjectSyncRepository(storage, createObjectDatabase(storage), "room"),
+  );
   await expect(
     new RoomScope(persistence).bindRoomScope(scope),
   ).rejects.toMatchObject({
@@ -152,12 +166,10 @@ test("an unbound room with existing records cannot be claimed by a workspace", a
 });
 
 test("failed invalidation remains durable and is acknowledged only after delivery succeeds", async () => {
-  const { AuthorizationRepository } = await import(
-    "@wodge/core/authorization/repositories/policy"
-  );
-  const { AuthorizationInvalidations } = await import(
-    "../../src/lib/authorization/invalidation"
-  );
+  const { AuthorizationRepository } =
+    await import("@wodge/core/authorization/repositories/policy");
+  const { AuthorizationInvalidations } =
+    await import("../../src/lib/authorization/invalidation");
   const records = new Map<string, unknown>();
   const query = new AuthorizationRepository(
     {
@@ -169,6 +181,16 @@ test("failed invalidation remains durable and is acknowledged only after deliver
       },
     } as unknown as DurableObjectStorage,
     "workspace",
+    createObjectDatabase(
+      attachSql({
+        async get(key: string) {
+          return structuredClone(records.get(key));
+        },
+        async put(key: string, value: unknown) {
+          records.set(key, structuredClone(value));
+        },
+      } as unknown as DurableObjectStorage),
+    ),
   );
   const repository = new AuthorizationPolicies(query);
   await repository.commit(0, {

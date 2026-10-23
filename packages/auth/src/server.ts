@@ -1,5 +1,9 @@
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
-import { IntegrationUnavailableError } from "@wodge/infra/integration-unavailable";
+import { checkout, polar, portal, webhooks } from "@polar-sh/better-auth";
+import type {
+  PolarCore,
+  webhooks as polarWebhooks,
+} from "@polar-sh/sdk/2026-10";
 import { workspaceMemberLimit } from "@wodge/core/workspace/policy";
 import {
   authAccounts,
@@ -16,16 +20,24 @@ import { NewWorkspaceSchema } from "@wodge/domain/workspace/validation";
 import type { ServerEnvironment } from "@wodge/env/server";
 import type { Database } from "@wodge/infra/database/types";
 import { betterAuth } from "better-auth";
-import { APIError, createAuthMiddleware } from "better-auth/api";
-import { emailOTP, organization } from "better-auth/plugins";
+import { APIError } from "better-auth/api";
+import { organization } from "better-auth/plugins";
+
+/** Polar billing dependencies; omitted when billing is not configured. */
+export interface AuthBilling {
+  client: PolarCore;
+  /** Receives verified, untrusted subscription payloads; the backend re-reads Polar. */
+  onSubscriptionChanged(subscription: {
+    id: string;
+    metadata: Record<string, unknown>;
+  }): Promise<void>;
+}
 
 /** Configure Better Auth here; the backend supplies environment and dependencies only. */
 export function createAuth(
   environment: ServerEnvironment,
   database: Database,
-  emailSender: {
-    send(message: { to: string; subject: string; text: string }): Promise<void>;
-  },
+  billing?: AuthBilling,
 ) {
   return betterAuth({
     appName: "Wodge",
@@ -62,33 +74,14 @@ export function createAuth(
     session: { expiresIn: 60 * 60 * 24 * 7, updateAge: 60 * 60 * 24 },
     rateLimit: { enabled: true, storage: "database" },
     socialProviders: {
-      ...(environment.GOOGLE_CLIENT_ID &&
-        environment.GOOGLE_CLIENT_SECRET && {
-          google: {
-            clientId: environment.GOOGLE_CLIENT_ID,
-            clientSecret: environment.GOOGLE_CLIENT_SECRET,
-          },
-        }),
-      ...(environment.GITHUB_CLIENT_ID &&
-        environment.GITHUB_CLIENT_SECRET && {
-          github: {
-            clientId: environment.GITHUB_CLIENT_ID,
-            clientSecret: environment.GITHUB_CLIENT_SECRET,
-          },
-        }),
-    },
-    hooks: {
-      // Better Auth can mask delivery errors in background tasks. Reject an unavailable
-      // email capability before it creates a code or reports that a message was sent.
-      before: createAuthMiddleware(async (context) => {
-        if (
-          context.path.startsWith("/email-otp/") &&
-          (!environment.RESEND_API_KEY || !environment.RESEND_EMAIL_FROM)
-        )
-          throw new APIError("SERVICE_UNAVAILABLE", {
-            message: "Sign-in email is not configured",
-          });
-      }),
+      google: {
+        clientId: environment.GOOGLE_CLIENT_ID,
+        clientSecret: environment.GOOGLE_CLIENT_SECRET,
+      },
+      github: {
+        clientId: environment.GITHUB_CLIENT_ID,
+        clientSecret: environment.GITHUB_CLIENT_SECRET,
+      },
     },
     plugins: [
       organization({
@@ -131,25 +124,31 @@ export function createAuth(
           },
         },
       }),
-      emailOTP({
-        otpLength: 6,
-        expiresIn: 300,
-        allowedAttempts: 5,
-        storeOTP: "hashed",
-        sendVerificationOTP: async ({ email, otp }) => {
-          try {
-            await emailSender.send({
-              to: email,
-              subject: "Your Wodge sign-in code",
-              text: `Your Wodge sign-in code is ${otp}. It expires in 5 minutes.`,
-            });
-          } catch (error) {
-            if (error instanceof IntegrationUnavailableError)
-              throw new APIError("SERVICE_UNAVAILABLE", {
-                message: error.message,
-              });
-            throw error;
-          }
+      ...(billing ? [billingPlugin(environment, billing)] : []),
+    ],
+  });
+}
+
+/**
+ * Workspace billing uses metadata-based `reference_id` checkouts on the purchasing admin's
+ * personal Polar customer. Checkout and portal are only called server-side by the workspace
+ * billing API, which authorizes the workspace first; the backend blocks direct browser calls.
+ * Customers are created by checkout, so sign-up never depends on Polar.
+ */
+function billingPlugin(environment: ServerEnvironment, billing: AuthBilling) {
+  return polar({
+    client: billing.client,
+    createCustomerOnSignUp: false,
+    use: [
+      checkout({ authenticatedUsersOnly: true }),
+      portal(),
+      webhooks({
+        // A missing secret makes the plugin reject every delivery as unconfigured.
+        secret: environment.POLAR_WEBHOOK_SECRET ?? "",
+        // Every subscription event triggers the same authoritative re-read.
+        onPayload: async (payload) => {
+          if (isSubscriptionPayload(payload))
+            await billing.onSubscriptionChanged(payload.data);
         },
       }),
     ],
@@ -157,3 +156,10 @@ export function createAuth(
 }
 
 export type AuthInstance = ReturnType<typeof createAuth>;
+
+type WebhookPayload = polarWebhooks.WebhookPayload;
+function isSubscriptionPayload(
+  payload: WebhookPayload,
+): payload is Extract<WebhookPayload, { type: `subscription.${string}` }> {
+  return payload.type.startsWith("subscription.");
+}

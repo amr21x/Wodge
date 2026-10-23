@@ -16,20 +16,11 @@ import {
 } from "@wodge/domain/sync/index";
 
 import type { WorkspaceMutators } from "@/client/sync/workspace/mutators";
-import { useParams, usePathname, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 
 export function useWorkspaceSubscription() {
   const [workspaceRep, setWorkspaceRep] =
     useState<Replicache<WorkspaceMutators> | null>(null);
-  const router = useRouter();
-
-  const pathname = usePathname();
-
-  const isNotConcerned =
-    pathname.startsWith("/login") ||
-    pathname.startsWith("/onboarding") ||
-    pathname.startsWith("/settings") ||
-    pathname.split("/").at(2) === "join";
 
   const { workspaceSlug } = useParams() as { workspaceSlug: string };
 
@@ -47,23 +38,8 @@ export function useWorkspaceSubscription() {
   const isPending = isUserPending || isUserWorkspacesPending;
 
   useEffect(() => {
-    if (isPending) {
-      return;
-    }
-
-    let timerId: any;
-    // if (!workspace && !isNotConcerned) {
-    //   timerId = setTimeout(() => {
-    //     router.push("/");
-    //   }, 3000);
-    // }
-    // return;
-
-    // if (workspaceRep && workspaceRep.name.includes(workspaceId)) return;
-
-    if (!user || !workspaceId) {
-      return;
-    }
+    setWorkspaceRep(null);
+    if (isPending || !user || !workspaceId) return;
 
     const workspaceStore = getWorkspace(workspaceId, user.id);
 
@@ -72,28 +48,27 @@ export function useWorkspaceSubscription() {
     }
 
     setWorkspaceRep(workspaceStore);
+  }, [user, workspaceSlug, workspace, isPending, getWorkspace, workspaceId]);
 
-    return () => {
-      if (timerId) {
-        clearTimeout(timerId);
-      }
-    };
-  }, [user, workspaceSlug, workspace, isPending]);
+  const currentRep =
+    user && workspaceId && workspaceRep?.name === `${user.id}-${workspaceId}`
+      ? workspaceRep
+      : null;
 
   const { snapshot: structure, isPending: isStructurePending } = useSubscribe(
-    workspaceRep,
+    currentRep,
     (tx: ReadTransaction) => {
       // console.log("will sub 1");
 
       return tx.get<WorkspaceStructure>(makeWorkspaceStructureKey());
     },
     {
-      default: { teams: [], groups: [] },
+      default: { teams: [] },
     },
   );
 
   const { snapshot: members, isPending: isMembersPending } = useSubscribe(
-    workspaceRep,
+    currentRep,
     (tx: ReadTransaction) => {
       // console.log("will sub 2");
 
@@ -105,11 +80,11 @@ export function useWorkspaceSubscription() {
   );
 
   return {
-    workspaceRep,
-    structure,
+    workspaceRep: currentRep,
+    structure: currentRep ? structure : { teams: [] },
     workspace,
     isStructurePending,
-    members,
+    members: currentRep ? members : { createdBy: "", members: [] },
     isMembersPending,
     workspaceId,
     workspaceSlug,

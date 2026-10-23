@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+
 import { Sheet, SheetTrigger } from "@/components/ui/sheet";
 import { Column, Task } from "@wodge/domain/pages/models";
 import { pageMutators } from "@/client/sync/pages/mutators";
 import { Replicache } from "replicache";
-import { DateRange } from "react-day-picker";
+
 import { Editor } from "@tiptap/react";
 import { TaskItem } from "./task-item";
 import { TaskSheet } from "./task-sheet";
@@ -48,8 +48,6 @@ export function TaskCardCore({
     setNodeRef,
     attributes,
     listeners,
-    transform,
-    transition,
     over,
     index: curIndex,
     activeIndex,
@@ -71,11 +69,6 @@ export function TaskCardCore({
 
   const isAbove = isTaskOver && activeIndex > curIndex;
   const isBelow = isTaskOver && activeIndex < curIndex;
-
-  const style = {
-    transition,
-    transform: CSS.Transform.toString(transform),
-  };
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>

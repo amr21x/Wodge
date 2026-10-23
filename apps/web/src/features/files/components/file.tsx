@@ -5,10 +5,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 
 import { Download, File as FileIcon, Trash2 } from "lucide-react";
-import { env } from "@wodge/env/client";
+
 import { SidebarItemBtn } from "../../workspace/components/sidebar-item-btn";
 import { toast } from "@/components/ui/toast";
-import { Checkbox } from "@/components/ui/checkbox";
 
 export function File({
   name,
@@ -30,7 +29,7 @@ export function File({
           variant: "ghost",
           size: "sm",
         }),
-        "group items-center justify-start gap-2 rounded-none py-4 ",
+        "group items-center justify-start gap-2 rounded-none py-4",
       )}
     >
       {/* <Checkbox className="mr-1.5" /> */}
@@ -66,7 +65,7 @@ export function File({
             }
 
             toast.success("File deleted successfully");
-          } catch (e) {
+          } catch {
             toast.error("Failed to delete file");
           }
 

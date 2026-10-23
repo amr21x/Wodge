@@ -4,8 +4,6 @@ import { TooltipWrapper } from "@/components/tooltip-wrapper";
 import { Button } from "@/components/ui/button";
 import {
   Component,
-  FileStack,
-  FileText,
   Home,
   LucideIcon,
   MessageCircle,
@@ -13,7 +11,7 @@ import {
   Notebook,
   Settings,
 } from "lucide-react";
-import { WorkspaceSwitcher } from "./workspace-switcher";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils/index";

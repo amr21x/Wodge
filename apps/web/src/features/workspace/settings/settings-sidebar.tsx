@@ -1,37 +1,35 @@
 "use client";
 
 import { cn } from "@/lib/utils/index";
-import { SidebarItemBtn } from "../components/sidebar-item-btn";
-import {
-  Building2,
-  PanelLeft,
-  RefreshCcw,
-  User2,
-  UserCircle,
-} from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
+import { Building2, RefreshCcw, User2 } from "lucide-react";
+
 import {
   SettingsSidebarCollapsibleItem,
   SettingsSidebarHeader,
   SettingsSidebarItem,
   SettingsSidebarList,
 } from "./settings";
-import { GroupsSidebar } from "./groups/groups-sidebar";
 import { TeamsSidebar } from "./teams/teams-sidebar";
 import { useIsDesktop } from "@/hooks/use-is-desktop";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { SheetContent } from "@/components/ui/sheet";
 import { useIsOwnerOrAdmin } from "@/features/workspace/hooks/use-is-owner-or-admin";
 import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
+import { usePermission } from "../hooks/use-permission";
 import { useQueryClient } from "@tanstack/react-query";
 
 export function SettingsSidebar() {
   const isDesktop = useIsDesktop();
   const isManger = useIsOwnerOrAdmin();
   const { workspaceSlug } = useParams<{ workspaceSlug?: string }>();
-  const { workspaceRep } = useCurrentWorkspace();
+  const { workspaceRep, workspaceId } = useCurrentWorkspace();
   const queryClient = useQueryClient();
+  const canReadRoles = usePermission(
+    workspaceId ? { type: "workspace", id: workspaceId } : undefined,
+    { role: ["read"] },
+  );
 
   const jsx = (
     <div className="flex h-full flex-col">
@@ -47,13 +45,11 @@ export function SettingsSidebar() {
             </SettingsSidebarHeader>
             <SettingsSidebarList>
               <SettingsSidebarItem label="general" href="/" isDefault />
+              {canReadRoles && <SettingsSidebarItem label="roles" />}
               {isManger && (
                 <>
                   <SettingsSidebarItem label="members" />
 
-                  <SettingsSidebarCollapsibleItem label="groups">
-                    <GroupsSidebar />
-                  </SettingsSidebarCollapsibleItem>
                   <SettingsSidebarCollapsibleItem label="teams">
                     <TeamsSidebar />
                   </SettingsSidebarCollapsibleItem>
@@ -75,7 +71,7 @@ export function SettingsSidebar() {
           <SettingsSidebarItem
             label="account"
             href={workspaceSlug ? "/account" : "/"}
-            isDefault={!!!workspaceSlug}
+            isDefault={!workspaceSlug}
           />
         </SettingsSidebarList>
       </div>

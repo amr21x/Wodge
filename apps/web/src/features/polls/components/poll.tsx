@@ -9,12 +9,13 @@ export type Poll = {
   options: string[];
   votes?: number[];
 };
-import usePartySocket from "partysocket/react";
-import { useEffect, useMemo, useState } from "react";
+
+import { useRoomAction } from "@/features/workspace/hooks/use-room-action";
+import { useMemo } from "react";
 import { PollOptions } from "./poll-options";
 import { useParams } from "next/navigation";
 import { useCurrentWorkspace } from "@/features/workspace/state/workspace-provider";
-import { Thread, ThreadPost } from "@wodge/domain/discussions/models";
+import { ThreadPost } from "@wodge/domain/discussions/models";
 import { useCurrentUser } from "@/features/account/hooks/use-current-user";
 import { useCurrentRoomRep } from "@/features/rooms/hooks/use-room-rep";
 import { useCurrentThreadRep } from "@/features/discussions/hooks/use-thread-rep";
@@ -33,25 +34,32 @@ function PollUIContent({
   pollVoters?: ThreadPost["pollVoters"];
   isRoom: boolean;
 }) {
-  const { teamId } = useParams<{ teamId: string }>();
-  const { workspaceRep } = useCurrentWorkspace();
+  useParams<{
+    teamId: string;
+  }>();
+  useCurrentWorkspace();
   const { user } = useCurrentUser();
   const vote = useMemo(
     () => pollVoters?.find((p) => p.voter === user?.id)?.option,
     [pollVoters, user],
   );
 
+  const roomVoteAllowed = useRoomAction("vote", isRoom);
+  const canVote = !isRoom || roomVoteAllowed;
   const rep = useCurrentRoomRep();
   const tRep = useCurrentThreadRep();
   const sendVote = async (option: number) => {
+    if (!canVote) return;
     try {
-      if (!vote) {
-        isRoom
-          ? await rep?.mutate.vote({ msgId: id, option })
-          : await tRep?.mutate.vote({
-              postId: id,
-              option,
-            });
+      if (vote === undefined) {
+        if (isRoom) {
+          await rep?.mutate.vote({ msgId: id, option });
+        } else {
+          await tRep?.mutate.vote({
+            postId: id,
+            option,
+          });
+        }
       }
     } catch {
       toast.error("Failed to vote");
@@ -59,14 +67,17 @@ function PollUIContent({
   };
 
   const removeVote = async () => {
+    if (!canVote) return;
     try {
       if (vote !== undefined) {
-        isRoom
-          ? await rep?.mutate.removeVote({ msgId: id, option: vote })
-          : await tRep?.mutate.removeVote({
-              postId: id,
-              option: vote,
-            });
+        if (isRoom) {
+          await rep?.mutate.removeVote({ msgId: id, option: vote });
+        } else {
+          await tRep?.mutate.removeVote({
+            postId: id,
+            option: vote,
+          });
+        }
       }
     } catch {
       toast.error("Failed to remove vote");
@@ -75,6 +86,7 @@ function PollUIContent({
 
   return (
     <PollOptions
+      disabled={!canVote}
       options={options}
       votes={votes}
       vote={vote}

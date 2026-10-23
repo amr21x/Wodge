@@ -14,8 +14,8 @@ import {
   closedFlags,
   createFlagReader,
   disabledFeature,
-} from "@wodge/core/features/flags";
-import { pageFeatures } from "@wodge/core/features/policy";
+} from "@/client/features/flags";
+import { pageFeatures } from "@/client/features/pages";
 
 const FeatureFlagsContext = createContext<FeatureFlags>(closedFlags());
 
@@ -83,15 +83,18 @@ export function useFeatureFlags() {
   return useContext(FeatureFlagsContext);
 }
 
+/** Renders children when the feature is enabled; `fallback` can explain a disabled control. */
 export function FeatureGate({
   feature,
   children,
+  fallback = null,
 }: {
   feature: Feature;
   children: ReactNode;
+  fallback?: ReactNode;
 }) {
   const flags = useFeatureFlags();
-  return flags[feature] ? <>{children}</> : null;
+  return <>{flags[feature] ? children : fallback}</>;
 }
 
 export function FeatureRouteGate({ children }: { children: ReactNode }) {
@@ -106,11 +109,8 @@ export function FeatureRouteGate({ children }: { children: ReactNode }) {
   return (
     <>
       {disabled && (
-        <main
-          className="flex h-dvh flex-col items-center justify-center gap-4"
-          role="status"
-        >
-          <p>This feature is currently unavailable.</p>
+        <main className="flex h-dvh flex-col items-center justify-center gap-4">
+          <output>This feature is currently unavailable.</output>
           <Link href="/">Back to workspaces</Link>
         </main>
       )}

@@ -1,0 +1,1 @@
+ALTER TABLE `sync_import` ADD `legacy_versions` integer DEFAULT 0 NOT NULL;

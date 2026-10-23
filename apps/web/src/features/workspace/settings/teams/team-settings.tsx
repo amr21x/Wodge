@@ -1,5 +1,6 @@
 "use client";
 
+import { refreshPermissions } from "@/client/permissions";
 import { useMemo } from "react";
 import { SettingsContentHeader, SettingsContentSection } from "../settings";
 import { DrObj } from "@wodge/domain/types";
@@ -20,14 +21,13 @@ export function TeamSettings({
   team?: DrObj<Team>;
   isAddition?: boolean;
 }) {
-  const { structure, members, workspaceRep, workspaceId } =
-    useCurrentWorkspace();
+  const { members, workspaceRep, workspaceId } = useCurrentWorkspace();
 
   const nonTeamMembers = useMemo(() => {
     return members.members.filter(
       (member) => !team?.members.includes(member.id),
     );
-  }, [members, structure, team]);
+  }, [members, team]);
 
   const teamMembers = useMemo(() => team?.members || [], [team]) as string[];
 
@@ -57,6 +57,7 @@ export function TeamSettings({
           },
         },
       });
+      refreshPermissions({ revoke: true });
     } catch {
       toast.error("Add member failed");
     }
@@ -77,6 +78,7 @@ export function TeamSettings({
           },
         },
       });
+      refreshPermissions({ revoke: true });
     } catch {
       toast.error("Remove member failed");
     }
@@ -101,6 +103,7 @@ export function TeamSettings({
           },
         },
       });
+      refreshPermissions({ revoke: true });
     } catch {
       toast.error("Change member role failed");
     }

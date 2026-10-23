@@ -1,0 +1,1 @@
+ALTER TABLE `room_scope` ADD `legacy_records` integer DEFAULT 0 NOT NULL;

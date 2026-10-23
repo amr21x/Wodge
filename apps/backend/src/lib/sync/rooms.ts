@@ -1,3 +1,4 @@
+import { ObjectSyncRepository } from "@wodge/core/sync/repositories/state";
 import { FeatureFlagService } from "@wodge/core/features/services/flags";
 import { RoomService } from "@wodge/core/rooms/services/messages";
 import { inject, injectable } from "tsyringe";
@@ -11,6 +12,8 @@ import type { RunnerParams } from "./replicache";
 @injectable()
 export class RoomSync {
   constructor(
+    @inject(ObjectSyncRepository)
+    private readonly syncRecords: ObjectSyncRepository,
     @inject(FeatureFlagService) private readonly flags: FeatureFlagService,
     @inject("room") private readonly party: RoomServer,
     @inject(RoomService) private readonly service: RoomService,
@@ -18,7 +21,7 @@ export class RoomSync {
     private readonly workspaceGateway: WorkspaceGateway,
   ) {}
   get storage() {
-    return this.party.ctx.storage;
+    return this.syncRecords;
   }
   get versions() {
     return this.party.versions;

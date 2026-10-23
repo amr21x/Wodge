@@ -1,7 +1,7 @@
 import { Workspace } from "@wodge/domain/workspace/models";
-import { ChevronRight, Cloud, Laptop } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { SafeAvatar } from "@/components/safe-avatar";
 

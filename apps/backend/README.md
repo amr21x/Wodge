@@ -14,20 +14,26 @@ There is no default Party or separate PartyKit deployment.
 - `types/` defines Worker environment bindings, Hono context variables, actors and the explicit object-kind union. Identity, headers and mutation revisions are operation arguments, not DI registrations.
 - `gateways/` handles communication between objects through the infrastructure HTTP client. `/parties/:namespace/:id/*` is the PartyServer routing prefix. Internal stub requests use a synthetic `https://internal` URL; the selected Durable Object stub determines the destination.
 - Core feature `services/` owns business operations; `repositories/` owns data access. Infrastructure configures SDKs, database clients and storage primitives. Repository instances receive their database/storage dependency once.
-- Domain owns declarative models, schemas and DTOs. Core `mutations/` contains pure transformations also used by web optimistic updates; browser checks exclude services, repositories and provider SDKs.
+- Domain owns declarative models, schemas and DTOs. Backend services execute relational operations through repositories. Web owns its optimistic transformations and cannot import or depend on core.
 - Auth owns Better Auth configuration, identity/session helpers and workspace authorization. Generic email delivery belongs to infrastructure. Better Auth owns the canonical D1 user, organization and membership records; workspace collaboration state and resource policies remain in its Durable Object.
 - Organization lifecycle synchronization is coordinated by backend handlers. Direct Better Auth mutations that would bypass coordination are blocked; ordinary authentication and organization reads remain available.
 
 [Authorization rollout](../../docs/features/team-roles-access/authorization/design.md#implemented-first-slice)
-records remaining page/thread permission work. D1 and Durable Object updates are
+records the authorization rollout. Access groups are removed; room/page/thread access
+uses scoped custom roles. D1 and Durable Object updates are
 separate transactions; durable reconciliation and queues remain follow-up work.
-The current SQLite-backed objects still use the storage KV API, rather than relational tables.
+Structural records and binary Yjs snapshots/update journals use Drizzle in each SQLite-backed
+object, with a connection and migrations separate from D1. Replicache metadata, presence,
+authorization policies/outbox records and room bindings also use relational tables.
+KV reads only import legacy records once; normal operations never write them.
+[Persistence boundaries](../../docs/architecture/data-model.md) describes table migrations and the one-time structural import.
 
 ## Typed frontend API
 
-The source contract is [src/types/api-types.ts](src/types/api-types.ts). Run
-`pnpm --filter backend build:api` to generate the declaration-only `backend/api`
-entry. The frontend client lives in `apps/web/src/client/api.ts`:
+[src/types/api-types.ts](src/types/api-types.ts) exports the inferred Hono route
+schema as `backend/api`. The frontend imports it with `import type`, so backend
+implementation code is erased from browser bundles. No generated contract or
+watcher is needed. The frontend client lives in `apps/web/src/client/api.ts`:
 
 ```ts
 const response = await api.api.users.me.$get();
@@ -37,13 +43,10 @@ const user = await response.json();
 DI still constructs route classes and handlers. Each route class retains the
 inferred return type of its static route definition; parent mounts retain their
 returned types too. JSON validators expose wire inputs and parsed handler inputs.
-The contract generator resolves the HTTP schema and strips Worker environments
-and implementation imports. It never constructs services or executes backend code.
-
-Frontend dev/build/typecheck scripts generate the contract first. Root `pnpm dev`
-also watches backend types; for a standalone watcher, run
-`pnpm --filter backend dev:api`. Verify consumer compile checks with
-`pnpm --filter backend test:api`.
+The exported Hono schema omits Worker environment bindings. TypeScript follows
+backend source dependencies when checking the frontend; its configuration enables
+the backend's decorator syntax. No backend modules execute through a type import.
+Verify consumer compile checks with `pnpm --filter backend test:api`.
 
 Workspace authorization and room-token forwarding derive contracts from the owning
 object routes, with public path parameters applied at the Worker boundary. Binary
@@ -53,17 +56,24 @@ RPC. Better Auth's own client remains the authentication client.
 
 ## Development
 
-Copy `.dev.vars.example` to `.dev.vars` and provide local secrets. Set the public web
-environment from the root `.env.example`. Start backend with `pnpm --filter backend dev`
-and web with `pnpm --filter web dev`. Next forwards `/api/*` to the local Worker.
+Store the keys listed in `.dev.vars.example` in the application's Bitwarden
+Secrets Manager project and run `pnpm secrets setup` once per machine (`pnpm secrets refresh` after changes); see
+[local secrets](../../README.md#local-secrets). Set the public web environment from
+the root `.env.example`. Start backend with
+`pnpm secrets run -- pnpm --filter backend dev` and web with `pnpm --filter web dev`. Next forwards `/api/*` to the local Worker.
 
-For partial local development, only `BETTER_AUTH_SECRET` and `SECRET_KEY` are mandatory
-secrets. Each must contain at least 32 characters and differ from the other; origins and
-D1/DO bindings still come from Wrangler. `INTEGRATION_MODE=partial` is the local default.
-Provider credentials are temporarily optional. Missing storage, billing or call configuration
+Google and GitHub are the supported sign-in methods. `GOOGLE_CLIENT_ID`,
+`GOOGLE_CLIENT_SECRET`, `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` are mandatory
+in both integration modes. Configure provider callbacks as
+`<APP_DOMAIN>/api/auth/callback/google` and `<APP_DOMAIN>/api/auth/callback/github`.
+Email/OTP sign-in is disabled and does not require Resend.
+
+`BETTER_AUTH_SECRET` and `SECRET_KEY` must each contain at least 32 characters and
+differ from one another; origins and D1/DO bindings come from Wrangler.
+`INTEGRATION_MODE=partial` is the local default. Storage and billing credentials
+remain optional in partial mode. Missing storage, billing or call configuration
 returns HTTP 503 when those operations are attempted; calls always return HTTP 403 with
-`CALLS_DISABLED`, regardless of credentials or plan. Email OTP returns unavailable when
-Resend is missing. Authentication is never bypassed: sign-in needs Resend or configured OAuth.
+`CALLS_DISABLED`, regardless of credentials or plan. Authentication is never bypassed: sign-in requires a configured Google or GitHub OAuth provider.
 Workspace synchronization skips bucket creation without storage credentials, so collaboration
 can run after authentication. Workspaces created this way need their buckets provisioned before
 enabling uploads later. Provider verification and required deployment configuration remain
@@ -74,45 +84,63 @@ no Supabase accounts, passwords or sessions are imported. Existing application d
 is not deleted or linked to newly authenticated accounts automatically.
 
 - `pnpm --filter backend test`: domain/application/transport regression tests.
-- `pnpm --filter backend test:runtime`: production Worker, real D1/DOs and Better Auth checks in Miniflare. Email and object storage are mocked at the network boundary.
+- `pnpm --filter backend test:runtime`: production Worker, real D1/DOs and Better Auth checks in Miniflare. OAuth providers, the Polar sandbox API and object storage are mocked at the network boundary.
 - `pnpm --filter backend test:foundation`: retained package and database compatibility checks.
 - `pnpm --filter backend build`: Wrangler dry-run bundle.
 
 ## Billing event processing
 
-The signed webhook accepts subscription created/updated/deleted events and validates their
-identity, timestamps and workspace metadata. It reads the current Stripe subscription rather
-than treating delivery order or event timestamps as authoritative. Core services decide
-entitlement transitions; a repository conditionally writes the subscription cursor and
-organization plan in one D1 batch. The database change token is captured before the provider
-read, so concurrent updates require a complete retry with a fresh Stripe snapshot. Duplicate
-deliveries preserve entitlement and retry the idempotent object notification. An old subscription
-cannot downgrade its replacement. Different replacement subscriptions created in the same
-second return 503 for explicit reconciliation rather than guessing their order; no automated
-reconciliation queue exists yet. Live Checkout/portal behavior and full storage quotas remain
-unverified/incomplete.
+Billing uses Polar through Better Auth's Polar plugin (`@polar-sh/better-auth`), always against
+the Polar sandbox. A workspace subscription belongs to the purchasing administrator's personal
+Polar customer and carries the workspace ID as `metadata.referenceId`; Polar organization
+synchronization is not enabled. The workspace billing API authorizes administrators and calls the
+plugin's checkout and portal server API. Browser calls to the plugin's `/api/auth/checkout`,
+`/api/auth/customer/*` and `/api/auth/usage/*` endpoints are rejected. Only the purchasing
+administrator can open the customer portal; other administrators receive
+`BILLING_PORTAL_PURCHASER_ONLY`. Checkout redirects are not payment evidence.
+
+The plugin verifies webhook signatures at `/api/auth/polar/webhooks`. Every `subscription.*`
+event only identifies the subscription: the backend re-reads it from Polar and ignores other
+products and mismatched workspace references. Core services decide entitlement transitions; a
+repository conditionally writes the subscription cursor and organization plan in one D1 batch.
+The database change token is captured before the provider read, so concurrent updates require a
+complete retry with a fresh Polar snapshot. Duplicate deliveries preserve entitlement and retry
+the idempotent object notification. Scheduled cancellations keep access until Polar reports the
+subscription as canceled. An old subscription cannot downgrade its replacement, and a canceled
+subscription is never restored. Conflicts return 500 so Polar retries the delivery. Different
+replacement subscriptions created in the same millisecond need explicit reconciliation; no
+automated reconciliation queue exists yet. Full storage quotas remain incomplete.
+
+Configure the sandbox webhook endpoint with the Raw format and all `subscription.*` events. Local
+delivery needs a public tunnel to the backend, for example
+`cloudflared tunnel --url http://localhost:8787`.
 
 ## Deployment
 
 The deployment workflow offers `partial` (the temporary default) and `ready` integration modes.
-Partial deployments need only the two signing secrets plus origins and D1/DO bindings;
-sign-in remains unavailable without email or OAuth. Ready mode requires complete Resend,
-storage and Stripe test settings before serving requests; LiveKit and OAuth remain optional.
-Both modes validate signing secrets, HTTP origins and paired OAuth configuration. Live Stripe
-keys are rejected because this is a test-billing showcase. Configuration errors list field
-names without printing values. The generated billing migration must be applied before webhook use.
+Both modes require the two signing secrets, Google and GitHub OAuth credentials,
+origins and D1/DO bindings. Ready mode additionally requires complete storage and
+Polar sandbox settings before serving requests. Email sign-in is disabled; Resend
+and LiveKit are not prerequisites. Both modes validate signing secrets, HTTP
+origins and all four OAuth settings. Billing always uses the Polar
+sandbox because this is a test-billing showcase; live payments need separate authorization. Configuration errors list field
+names without printing values. The billing migrations, including the Polar cutover reset, must be applied before webhook use.
 
 The checked-in Worker configuration bootstraps new SQLite-backed Durable Object
-classes. It does not migrate deployed PartyKit namespaces or old Yjs snapshots.
-Before a production cutover, inspect the deployed namespace/class mappings, preserve
-or transfer their records, and verify the Yjs document export/import. Existing SQL
+classes. It does not transfer deployed PartyKit namespaces.
+Within these SQLite-backed namespaces, awaited startup applies versioned table migrations
+and imports existing structural, synchronization, authorization, presence and room-binding
+KV records and Yjs snapshots once. This does not transfer data from another
+namespace or from a legacy KV-backed Durable Object. Before a production cutover, inspect
+the deployed namespace/class mappings, preserve or transfer their records, and verify the
+Yjs document export/import. Existing SQL
 migration statements are preserved; Drizzle metadata is upgraded and a new auth
 migration is added.
 
 Production `/api/*` paths on the web hostname must route to this Worker. Keep the
 backend hostname available for existing PartySocket clients. Better Auth's public
 base URL is `APP_DOMAIN`; register Google/GitHub callbacks under
-`<APP_DOMAIN>/api/auth/callback/<provider>`. Configure Resend delivery and the Worker
+`<APP_DOMAIN>/api/auth/callback/<provider>`. Configure the Worker
 secrets listed in `.dev.vars.example`.
 
 The deployment workflow is manually triggered while namespace cutover remains

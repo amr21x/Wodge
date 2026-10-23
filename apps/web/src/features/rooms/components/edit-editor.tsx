@@ -8,10 +8,12 @@ import OfflineEditor from "@/features/editor/block-editor/offline-editor";
 
 export function EditEditor({
   content,
+  canEdit,
   onSuccessEdit,
   onCancelEdit,
 }: {
   content: Message;
+  canEdit: boolean;
   onSuccessEdit?: (text: string) => void;
   onCancelEdit?: () => void;
 }) {
@@ -24,12 +26,16 @@ export function EditEditor({
   async function editMessage() {
     const text = editor?.getHTML();
 
-    if (!text || !user) {
+    if (!text || !user || !canEdit) {
       return;
     }
 
     onSuccessEdit?.(text);
   }
+
+  useEffect(() => {
+    editor?.setEditable(canEdit);
+  }, [editor, canEdit]);
 
   useEffect(() => {
     if (editor && !editor.isFocused) {
@@ -39,6 +45,7 @@ export function EditEditor({
 
   return (
     <div className="flex flex-col overflow-hidden bg-transparent p-0">
+      {/* oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- Keyboard shortcuts bubble from the nested editor, which owns focus and textbox semantics. */}
       <div
         onKeyDown={(e) => {
           if (e.key === "Enter") {
@@ -64,7 +71,7 @@ export function EditEditor({
         <Button
           size="fit"
           className="w-20"
-          disabled={editor?.isEmpty}
+          disabled={!canEdit || editor?.isEmpty}
           onClick={editMessage}
         >
           Save

@@ -24,7 +24,7 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+
 import { useMemo } from "react";
 
 import { cn } from "@/lib/utils/index";
@@ -39,16 +39,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useCanView } from "@/features/workspace/hooks/use-can-view";
 import { AddPageForm } from "./add-page-form";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { AddRoomForm } from "./add-room-form";
-import {
-  isSidebarOpenAtom,
-  recentlyVisitedAtom,
-} from "@/client/state/global-atoms";
+import { isSidebarOpenAtom } from "@/client/state/global-atoms";
 import { useSetAtom } from "jotai";
-import { produce } from "immer";
+
 import { useIsTeamModerator } from "@/features/workspace/hooks/use-is-team-moderator";
-import { Button } from "@/components/ui/button";
+
 import { AddThreadForm } from "./add-thread-form";
 import { toast } from "sonner";
 import { useIsDesktop } from "@/hooks/use-is-desktop";
@@ -110,8 +107,6 @@ function SortableChannel({
     attributes,
     listeners,
     setNodeRef,
-    transform,
-    transition,
     isDragging,
     activeIndex,
     index,
@@ -133,11 +128,6 @@ function SortableChannel({
 
   const isAbove = activeIndex > overIndex;
   const isBelow = activeIndex < overIndex;
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
 
   const canView = useCanView({
     type,
@@ -193,12 +183,12 @@ export const Channel = React.forwardRef<
   (
     {
       channel,
-      activeIndex,
       isMod = false,
       folderId,
       teamId,
       isDragging,
       type,
+      activeIndex: _activeIndex,
       ...props
     },
     ref,
@@ -245,6 +235,7 @@ export const Channel = React.forwardRef<
         >
           <span className="select-none truncate">{channel.name}</span>
           {isMod && (
+            /* oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- This wrapper only stops events from child controls; it has no independent action. */
             <div className="ml-auto" onClick={(e) => e.stopPropagation()}>
               <Dialog>
                 <DropdownMenu>
@@ -257,7 +248,7 @@ export const Channel = React.forwardRef<
                   <DropdownMenuContent>
                     <DialogTrigger asChild>
                       <DropdownMenuItem className="">
-                        <Pencil className="h-4 w-4 " />
+                        <Pencil className="h-4 w-4" />
                         Edit {type}
                       </DropdownMenuItem>
                     </DialogTrigger>

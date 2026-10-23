@@ -83,13 +83,14 @@ export const LinkEditorPanel = ({
         </Button>
       </form>
       <div className="mt-3">
-        <label className="flex cursor-pointer select-none items-center justify-start gap-2 text-sm font-semibold text-neutral-500 dark:text-neutral-400">
+        <div className="flex cursor-pointer select-none items-center justify-start gap-2 text-sm font-semibold text-neutral-500 dark:text-neutral-400">
           Open in new tab
           <Toggle
+            label="Open in new tab"
             active={state.openInNewTab}
             onChange={state.setOpenInNewTab}
           />
-        </label>
+        </div>
       </div>
     </Surface>
   );

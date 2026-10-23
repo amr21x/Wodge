@@ -42,6 +42,8 @@ function fixtureRouter(
       const environment = createTestEnvironment() as WorkerEnvironment;
       const container =
         resources?.container ?? createRuntimeContainer(environment);
+      if (!container.isRegistered("objectKind"))
+        container.registerInstance("objectKind", kind);
       if (!container.isRegistered("objectId"))
         container.registerInstance("objectId", resources?.workspaceId ?? "one");
       if (!container.isRegistered(kind))
@@ -54,7 +56,7 @@ function fixtureRouter(
           poke: resources?.notify ?? (() => {}),
           workspacesStore: new Set(),
           workspaceMembers: { data: { createdBy: "owner", members: [] } },
-          workspaceStructure: { data: { teams: [], groups: [] } },
+          workspaceStructure: { data: { teams: [] } },
         });
       if (!container.isRegistered("storage"))
         container.registerInstance("storage", resources?.sync?.storage ?? {});

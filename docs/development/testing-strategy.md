@@ -54,7 +54,7 @@ revoked sessions, malformed claims, invalid signatures and expiry.
 
 `application-errors.test.ts` has 8 tests: a transport-free core page call and denied
 write; serializable error code/message/details; room author rejection and unchanged
-dependency-error identity; and all six billing-code mappings to existing HTTP
+dependency-error identity; and all five billing-code mappings to existing HTTP
 responses. Application failures contain no HTTP status.
 
 `dependency-lifetimes.test.ts` has 11 tests:
@@ -103,11 +103,11 @@ Files are in `apps/backend/tests/integration`.
 | `pages.test.ts`               |     3 | Real browser Replicache transactions agree with backend create/edit/cascading delete; missing column inserts nothing; storage failures propagate.                                                                                   |
 | `shared-state.test.ts`        |     3 | Workspace optimistic/backend parity and authorization; room/discussion parity; sender impersonation rejected on client and backend.                                                                                                 |
 | `sync-failures.test.ts`       |     6 | Production workspace, room and discussion route registration and acknowledgement behavior after storage failure and unknown operations.                                                                                             |
-| `provider-boundaries.test.ts` |     4 | Actual JWT claims/key/expiry; local LiveKit grant/identity/TTL; S3 key/endpoint/signed expiry; Stripe raw webhook signature verification. No live providers.                                                                        |
+| `provider-boundaries.test.ts` |     4 | Actual JWT claims/key/expiry; local LiveKit grant/identity/TTL; S3 key/endpoint/signed expiry; Polar sandbox subscription reads and normalization. No live providers.                                                               |
 | `router-errors.test.ts`       |    33 | Application error mappings; unexpected-error sanitization/logging; malformed JSON on all routers; validation fields; ingress mapping; awaited/failing startup; object isolation; explicit administrative guards.                    |
-| `feature-services.test.ts`    |    15 | Cases listed below.                                                                                                                                                                                                                 |
+| `feature-services.test.ts`    |    17 | Cases listed below.                                                                                                                                                                                                                 |
 
-The 15 feature-service cases cover:
+The 17 feature-service cases cover:
 
 1. Workspace owner/default team creation, default-team join, persist-before-notify.
 2. Remote provisioning failure and partial state after bucket failure.
@@ -120,10 +120,12 @@ The 15 feature-service cases cover:
 9. User workspace persistence before notifications, including write failure.
 10. Private file keys, signed expiry, pagination/size and write notifications.
 11. Missing file deletion does not persist or notify.
-12. Billing authorization/plan checks, checkout metadata/URLs and portal eligibility.
-13. Billing verified events, missing metadata, updates and notifications.
-14. Directory compensates failed provisioning/joining.
-15. Invite operations require the authoritative administrative check.
+12. Billing authorization/plan checks, Polar checkout reference/URLs and purchaser-only portal.
+13. Unconfigured billing fails before reaching the Polar plugin.
+14. Verified Polar events re-read the subscription, ignore foreign products/references and notify.
+15. Events for deleted workspaces are acknowledged without provider reads.
+16. Directory compensates failed provisioning/joining.
+17. Invite operations require the authoritative administrative check.
 
 ## Local Worker and database checks
 

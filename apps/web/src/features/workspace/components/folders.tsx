@@ -71,19 +71,7 @@ function SortableDirectory({
   folders: readonly DrObj<FolderType>[];
   override: boolean;
 }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-    activeIndex,
-    isOver,
-    active,
-    index,
-    overIndex,
-  } = useSortable({
+  const { setNodeRef, isDragging, active, index, overIndex } = useSortable({
     id: folder.id,
     data: {
       type: "folder",
@@ -101,16 +89,11 @@ function SortableDirectory({
     active?.data?.current?.type === "channel" &&
     active?.data?.current?.folderId !== folder.id;
 
-  const isFolderOver = active?.data?.current?.type === "folder";
-
-  const isAbove = activeIndex > overIndex;
-  const isBelow = activeIndex < overIndex;
-
   const isTeamMod = useIsTeamModerator();
 
   const childFolders = useMemo(
     () => folders.filter((f) => f.parentFolder === folder.id),
-    [folders],
+    [folders, folder.id],
   );
 
   if (!override && folder.parentFolder) {
@@ -148,7 +131,7 @@ function SortableDirectory({
         )}
       </CollapsibleTrigger>
       <CollapsibleContent
-        className={cn("transition-all ", !isRoot && "py-1 pl-3.5")}
+        className={cn("transition-all", !isRoot && "py-1 pl-3.5")}
       >
         <div
           className={cn(
@@ -213,6 +196,7 @@ export const Folder = React.forwardRef<
           <span className="select-none truncate">{folder.name}</span>
 
           {isMod && (
+            /* oxlint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- This wrapper only stops events from child controls; it has no independent action. */
             <div
               className="ml-auto"
               onClick={(e) => {

@@ -1,4 +1,4 @@
-import type { FeatureHandlers } from "../handlers/features";
+import type { FeatureFlagHandlers } from "../handlers/feature-flags";
 import type { PokeMessage } from "@wodge/domain/sync/index";
 import type { UserPartyInterface, Versions } from "@wodge/domain/sync/state";
 import { Server, type Connection, type ConnectionContext } from "partyserver";
@@ -12,7 +12,7 @@ export default class UserServer
   extends Server<WorkerEnvironment>
   implements UserPartyInterface
 {
-  private features!: FeatureHandlers;
+  private features!: FeatureFlagHandlers;
   private router!: UserRoutes["router"];
   private workspaceGateway!: WorkspaceGateway;
 
@@ -36,7 +36,7 @@ export default class UserServer
     });
   }
 
-  async onConnect(connection: Connection, ctx: ConnectionContext) {
+  async onConnect(connection: Connection, _ctx: ConnectionContext) {
     await this.ensurePresence();
     connection.send(
       JSON.stringify({

@@ -30,7 +30,7 @@ export function MessageEditor({ rep }: { rep?: Replicache<RoomMutators> }) {
   });
 
   async function onSubmit() {
-    if (editor) {
+    if (editor && canEdit && rep) {
       if (editor.isEmpty) {
         return;
       }
@@ -61,10 +61,10 @@ export function MessageEditor({ rep }: { rep?: Replicache<RoomMutators> }) {
   }
 
   return (
-    <div className=" flex h-12 shrink-0 items-end  overflow-hidden border-t border-border/50 bg-dim px-3.5 pb-2.5 pt-2">
+    <div className="flex h-12 shrink-0 items-end overflow-hidden border-t border-border/50 bg-dim px-3.5 pb-2.5 pt-2">
       {!canEdit && (
         <p className="text-muted-foreground">
-          Your are not allowed to send messages in this room.
+          You are not allowed to send messages in this room.
         </p>
       )}
       {canEdit && (
@@ -89,8 +89,9 @@ export function MessageEditor({ rep }: { rep?: Replicache<RoomMutators> }) {
               </DialogContent>
             </Dialog>
           </FeatureGate>
+          {/* oxlint-disable-next-line jsx-a11y/no-static-element-interactions -- Keyboard shortcuts bubble from the nested editor, which owns focus and textbox semantics. */}
           <div
-            className="flex  w-full items-center overflow-hidden"
+            className="flex w-full items-center overflow-hidden"
             onKeyDown={(e) => {
               if (e.code === "Enter" && !e.shiftKey && !e.ctrlKey) {
                 onSubmit();
@@ -99,6 +100,7 @@ export function MessageEditor({ rep }: { rep?: Replicache<RoomMutators> }) {
           >
             <OfflineEditor editor={editor} />
           </div>
+
           <SidebarItemBtn
             Icon={SendHorizonal}
             className="ml-2"

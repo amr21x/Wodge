@@ -50,8 +50,6 @@ const comment = ThreadMessageSchema.parse({
 const page = {
   id: "123456789012345678901",
   name: "Page",
-  viewGroups: [],
-  editGroups: [],
   teamId: id,
   folderId: id,
 };
@@ -59,8 +57,6 @@ const page = {
 const room = {
   id: "123456789012345678901",
   name: "Room",
-  viewGroups: [],
-  editGroups: [],
   teamId: id,
 };
 
@@ -104,12 +100,6 @@ const workspace = {
     teamId: id,
     teamUpdate: { action: "addMembers", update: { members: ["owner"] } },
   },
-  createGroup: { id, name: "Group", color: "blue" },
-  updateGroup: {
-    groupId: id,
-    groupUpdate: { action: "removeMembers", update: { members: ["owner"] } },
-  },
-  deleteGroup: id,
   createPage: page,
   updatePage: page,
   createRoom: room,

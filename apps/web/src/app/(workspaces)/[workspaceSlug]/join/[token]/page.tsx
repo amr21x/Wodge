@@ -1,6 +1,6 @@
 import type { JoinPreviewDto } from "@wodge/domain/workspace/dto";
 import { SafeAvatar } from "@/components/safe-avatar";
-import { Button } from "@/components/ui/button";
+
 import {
   Card,
   CardContent,
@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { cookies } from "next/headers";
 import { env } from "@wodge/env/client";
+import { loginPath } from "@/features/auth/redirect";
 
 import { AcceptButton } from "../../../../../features/workspace/components/accept-button";
 import { redirect } from "next/navigation";
@@ -27,9 +28,7 @@ async function JoinWorkspacePage({
   );
 
   if (response.status === 401) {
-    return redirect(
-      `/login?redirect=${encodeURIComponent(`/${params.workspaceSlug}/join/${params.token}`)}`,
-    );
+    return redirect(loginPath(`/${params.workspaceSlug}/join/${params.token}`));
   }
 
   if (!response.ok) {
@@ -77,7 +76,7 @@ async function JoinWorkspacePage({
             {user.displayName} has invited you to join {workspace.name}
           </p>
 
-          <p className=" text-center">
+          <p className="text-center">
             You are invited to join Wodge workspace{" "}
             <strong>{workspace.name}</strong>.
           </p>

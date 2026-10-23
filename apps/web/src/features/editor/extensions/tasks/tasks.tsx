@@ -39,7 +39,7 @@ import { DbProvider } from "./db-provider";
 import { useParams } from "next/navigation";
 import { TableView } from "./table-view";
 
-function TasksContent({ editor, node, getPos }: NodeViewWrapperProps) {
+function TasksContent({ editor }: NodeViewWrapperProps) {
   return (
     <NodeViewWrapper className="select-none">
       <DbProvider>
@@ -78,10 +78,20 @@ function TasksHeader() {
           }
           type="single"
         >
-          <ToggleGroupItem variant="outline" size="sm" value="kanban">
+          <ToggleGroupItem
+            variant="outline"
+            size="sm"
+            value="kanban"
+            aria-label="Kanban view"
+          >
             <KanbanIcon className="size-4" />
           </ToggleGroupItem>
-          <ToggleGroupItem value="table" size="sm" variant="outline">
+          <ToggleGroupItem
+            value="table"
+            size="sm"
+            variant="outline"
+            aria-label="Table view"
+          >
             <Table className="size-4" />
           </ToggleGroupItem>
         </ToggleGroup>
@@ -97,6 +107,7 @@ function TasksHeader() {
           variant="outline"
           pressed={isFilterOpen}
           onPressedChange={setIsFilterOpen}
+          aria-label="Filter tasks"
         >
           <ListFilter
             className={cn(

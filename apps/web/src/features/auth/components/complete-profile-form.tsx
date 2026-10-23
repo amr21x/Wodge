@@ -1,7 +1,8 @@
 "use client";
 
+import { failureMessage, requireOk } from "@/client/errors";
 import { api } from "@/client/api";
-import { useRef, useState } from "react";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -16,7 +17,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { PublicUserType } from "@wodge/domain/user/models";
+
 import { UpdateUserSchema } from "@wodge/domain/user/validation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AvatarBtn } from "../../../components/avatar-btn";
@@ -26,28 +27,19 @@ import { useOnboarding } from "./onboarding-context";
 import { toast } from "sonner";
 
 export function CompleteProfileForm() {
-  const { user, startTransition } = useOnboarding();
+  const { user, setIsPending, isPending } = useOnboarding();
   const { nextStep } = useStepper();
 
   const { mutateAsync } = useMutation({
     mutationFn: async (data: z.infer<typeof UpdateUserSchema>) => {
       const res = await api.api.users.update.$post({ json: data });
 
-      if (!res.ok) {
-        // const error = await res.json<error>();
-        const text = await res.text();
-
-        if (text === "Dup username") {
-          toast.warning("Username Already Taken");
-        }
-
-        return false;
-      }
+      await requireOk(res);
 
       return true;
     },
-    onError() {
-      toast.error("Something went wrong");
+    onError(error) {
+      toast.error(failureMessage(error));
     },
   });
 
@@ -81,17 +73,17 @@ export function CompleteProfileForm() {
   }
 
   async function onSubmit(data: z.infer<typeof UpdateUserSchema>) {
-    startTransition(async () => {
-      const ok = await mutateAsync(data);
-
-      if (ok) {
-        queryClient.invalidateQueries({
-          queryKey: ["user"],
-        });
-
-        nextStep();
-      }
-    });
+    if (isPending) return;
+    setIsPending(true);
+    try {
+      await mutateAsync(data);
+      void queryClient.invalidateQueries({ queryKey: ["user"] });
+      nextStep();
+    } catch {
+      // The mutation displays a safe error; keep the form and its input intact.
+    } finally {
+      setIsPending(false);
+    }
   }
 
   return (

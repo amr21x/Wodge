@@ -14,7 +14,7 @@ export type EditorInfoProps = {
   maxLength?: number;
 };
 
-export const EditorInfo = memo(({ users, maxLength = 5 }: EditorInfoProps) => {
+export const EditorInfo = memo(({ users }: EditorInfoProps) => {
   const usersSet = useMemo(() => {
     const set = new Set();
 
@@ -36,7 +36,7 @@ export const EditorInfo = memo(({ users, maxLength = 5 }: EditorInfoProps) => {
       <div className="flex items-center py-2">
         <div className="flex flex-row items-center">
           <div className="relative ml-3 flex flex-row items-center">
-            {usersSet?.map((user, i) => {
+            {usersSet?.map((user, _i) => {
               return (
                 <div key={user?.clientId} className="-ml-2">
                   <TooltipWrapper content={user?.username}>
@@ -54,7 +54,7 @@ export const EditorInfo = memo(({ users, maxLength = 5 }: EditorInfoProps) => {
             {usersSet.length > 5 && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <div className="z-50 -ml-2 flex h-6 w-6 cursor-pointer select-none items-center justify-center rounded-full bg-secondary text-xs text-muted-foreground ring-[1.5px] ring-secondary ">
+                  <div className="z-50 -ml-2 flex h-6 w-6 cursor-pointer select-none items-center justify-center rounded-full bg-secondary text-xs text-muted-foreground ring-[1.5px] ring-secondary">
                     <span className="hidden md:inline">+</span>
                     {usersSet.length - 5}
                   </div>

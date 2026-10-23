@@ -1,108 +1,19 @@
-import {
-  canEdit,
-  canView,
-  isAdmin,
-  isTeamMember,
-  isTeamModerator,
-} from "@wodge/auth/authorization/access";
+import { containsPermissions } from "@wodge/auth/authorization/policy";
 import type {
   AuthChannelResponse,
   ChannelsTypes,
 } from "@wodge/domain/channels/index";
-import type { WorkspaceState } from "@wodge/domain/workspace/models";
+import type { Permissions } from "@wodge/domain/authorization/permissions";
 
 export function authorizeWorkspaceChannel(
-  state: WorkspaceState,
-  {
-    userId,
-    teamId,
-    folderId,
-    channelId,
-    channelType,
-  }: {
-    userId: string;
-    teamId?: string;
-    folderId?: string;
-    channelId: string;
-    channelType: ChannelsTypes;
-  },
+  permissions: Permissions,
+  type: ChannelsTypes,
 ): AuthChannelResponse {
-  if (state.members.createdBy === userId) {
-    return {
-      success: true,
-      isOwner: true,
-    };
-  }
-
-  if (!state.members.members.some((member) => member.id === userId)) {
-    return {
-      success: false,
-    };
-  }
-
-  if (isAdmin({ members: state.members, userId })) {
-    return {
-      success: true,
-      isAdmin: true,
-      canEdit: true,
-      canView: true,
-    };
-  }
-
-  if (
-    isTeamModerator({
-      structure: state.structure,
-      teamId,
-      userId,
-    })
-  ) {
-    return {
-      success: true,
-      isTeamModerator: true,
-    };
-  }
-
-  if (!isTeamMember({ structure: state.structure, userId, teamId })) {
-    return { success: false };
-  }
-
-  if (
-    canEdit({
-      members: state.members,
-      userId,
-      channelId,
-      structure: state.structure,
-      channelType,
-      folderId,
-      teamId,
-    })
-  ) {
-    return {
-      success: true,
-      canEdit: true,
-      canView: true,
-    };
-  }
-
-  if (
-    canView({
-      members: state.members,
-      userId,
-      channelId,
-      structure: state.structure,
-      channelType,
-      folderId,
-      teamId,
-    })
-  ) {
-    return {
-      success: true,
-      canEdit: false,
-      canView: true,
-    };
-  }
-
-  return {
-    success: false,
-  };
+  if (type === "resources") return { success: false };
+  const canView = containsPermissions(permissions, { [type]: ["read"] });
+  const canEdit =
+    type === "room"
+      ? containsPermissions(permissions, { message: ["send"] })
+      : containsPermissions(permissions, { [type]: ["update"] });
+  return { success: canView, canView, canEdit: canView && canEdit };
 }

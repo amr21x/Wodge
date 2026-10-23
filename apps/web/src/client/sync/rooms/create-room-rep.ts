@@ -1,12 +1,5 @@
-import {
-  PullerResult,
-  PullRequest,
-  PusherResult,
-  PushRequest,
-  Replicache,
-} from "replicache";
+import { Replicache } from "replicache";
 import { createRoomMutators, type RoomMutators } from "./mutators";
-import { env } from "@wodge/env/client";
 import { replicacheWrapper } from "../transport";
 
 export function createRoomRep({
@@ -22,28 +15,17 @@ export function createRoomRep({
 }) {
   return new Replicache<RoomMutators>({
     name: `${userId}-${channelId}`,
-    licenseKey: env.NEXT_PUBLIC_REPLICACHE_KEY,
     mutators: createRoomMutators(userId),
     pullInterval: null,
     pushURL: undefined,
     pullURL: undefined,
-    puller: replicacheWrapper<PullRequest, PullerResult>(
-      "pull",
-      "room",
-      channelId,
-      {
-        "x-workspace-id": workspaceId,
-        "x-team-id": teamId,
-      },
-    ),
-    pusher: replicacheWrapper<PushRequest, PusherResult>(
-      "push",
-      "room",
-      channelId,
-      {
-        "x-workspace-id": workspaceId,
-        "x-team-id": teamId,
-      },
-    ),
+    puller: replicacheWrapper("pull", "room", channelId, {
+      "x-workspace-id": workspaceId,
+      "x-team-id": teamId,
+    }),
+    pusher: replicacheWrapper("push", "room", channelId, {
+      "x-workspace-id": workspaceId,
+      "x-team-id": teamId,
+    }),
   });
 }
