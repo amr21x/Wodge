@@ -2,7 +2,7 @@
 
 [Docs home](../README.md) · [Develop Wodge](README.md)
 
-Use Node >=22.19 and pnpm 9.4.0. The backend runs a Hono Worker and five PartyServer
+Use Node >=22.19 and pnpm 12.15.0. The backend runs a Hono Worker and five PartyServer
 Durable Objects; web remains Next-on-Pages and calls backend APIs. Authentication
 uses the separate `@wodge/auth` package with Better Auth, D1, Google and GitHub OAuth. Email sign-in is disabled. Editor extensions use the public Tiptap v2 packages.
 

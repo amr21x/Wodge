@@ -17,7 +17,8 @@ export function httpFeatures(
     ].includes(path)
   )
     return [];
-  if (/^\/api\/users\/(?:[^/]+\/)?avatar$/.test(path)) return ["profiles"];
+  if (/^\/api\/users\/(?:[^/]+\/)?avatar$/.test(path))
+    return ["profiles", "avatars"];
   if (/^\/api\/rooms\/[^/]+\/token$/.test(path)) return [];
   if (/^\/api\/mcp(?:\/|$)/.test(path)) return ["agentAccess"];
   if (path === "/api/workspaces/new") return ["workspaceCreation"];
@@ -35,7 +36,8 @@ export function httpFeatures(
   if (tail!.startsWith("/files/")) return ["resources"];
   // This legacy route accesses the standalone team bucket, not page attachments.
   if (tail!.startsWith("/file/")) return ["resources"];
-  if (tail === "/update" || tail === "/avatar") return ["workspaceSettings"];
+  if (tail === "/avatar") return ["workspaceSettings", "avatars"];
+  if (tail === "/update") return ["workspaceSettings"];
   if (tail === "" || tail === "/")
     return method === "GET" ? [] : ["workspaceSettings"];
   return undefined;
@@ -138,7 +140,7 @@ export function partyFeatures(
   if (domain === "room")
     return path === "/token" ? ["messaging", "calls"] : ["messaging"];
   if (domain === "user") {
-    if (path === "/avatar") return ["profiles"];
+    if (path === "/avatar") return ["profiles", "avatars"];
     if (path === "/update") return []; // profile change notification, not a profile write
     if (path.startsWith("/replicache-") || path.startsWith("/service/"))
       return [];
@@ -149,8 +151,8 @@ export function partyFeatures(
       return [];
     if (path === "/create") return ["workspaceCreation"];
     if (["/join", "/leave"].includes(path)) return ["membership"];
-    if (["/update", "/avatar", "/"].includes(path))
-      return ["workspaceSettings"];
+    if (path === "/avatar") return ["workspaceSettings", "avatars"];
+    if (["/update", "/"].includes(path)) return ["workspaceSettings"];
     if (path.startsWith("/files/")) return ["resources"];
     if (path.startsWith("/file/")) {
       // Channel file routes have team/channel/path; legacy team files have team/path.

@@ -12,7 +12,7 @@ const root = fileURLToPath(new URL("../../../../", import.meta.url));
 
 const toolRequire = createRequire(
   await realpath(
-    path.join(root, "config/workers/node_modules/wrangler/package.json"),
+    path.join(root, "apps/backend/node_modules/wrangler/package.json"),
   ),
 );
 

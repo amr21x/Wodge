@@ -9,8 +9,9 @@ dependency choices retain the foundation described in the
 ## Runtime and package manager
 
 Node.js must be >=22.19.0; `.node-version` selects 24.19.0. The package-manager pin
-is pnpm 9.4.0. The host's inherited pnpm launcher failed during verification;
-checks invoked an existing pinned CLI directly. This is not a global launcher repair.
+is pnpm 12.15.0; CI reads it from `packageManager`. pnpm settings live in
+`pnpm-workspace.yaml`: `allowBuilds` lists the dependencies whose install scripts
+may run, and `peerDependencyRules` waives optional peers whose features are unused.
 
 ## Tools
 
@@ -67,9 +68,13 @@ dry run. `pnpm --filter backend test:foundation` builds and runs the retained
 compatibility fixture, import-boundary checks and local Worker/D1 checks. These do not deploy or validate all product journeys.
 The evidence records explicit backend, protocol, and shared-data type commands.
 
-Worker tooling is isolated in `config/workers`: Wrangler 4.148.0 uses Workers v5
-types, while backend/shared code uses the compatible v4 types. The retained web
-adapter keeps Wrangler 3.50.0 until its separately scoped migration.
+The backend owns its Wrangler 4.148.0 dependency, so its scripts run `wrangler`
+directly. Backend/shared code uses Workers v4 types because `y-partyserver` and
+`hono-party` require them. Wrangler's optional v5 types peer only feeds
+`wrangler types`, which the backend does not use, so the root `package.json`
+allows v4 for that single peer in `pnpm-workspace.yaml`. Remove the rule when
+the PartyServer libraries accept v5. The retained web adapter keeps Wrangler 3.50.0
+until its separately scoped migration.
 
 ## Configuration and secrets
 

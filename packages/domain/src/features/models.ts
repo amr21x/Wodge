@@ -9,7 +9,9 @@ export const FEATURE_REGISTRY = {
   polls: { default: true, available: true },
   pages: { default: true, available: true },
   tasks: { default: true, available: true },
-  attachments: { default: true, available: true },
+  // Object storage is not provisioned yet; enable after configuring R2.
+  attachments: { default: false, available: true },
+  avatars: { default: false, available: true },
   profiles: { default: true, available: true },
   billing: { default: true, available: true },
   // The selected Calls/SFU replacement and MCP transport are not implemented.

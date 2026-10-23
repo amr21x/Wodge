@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/popover";
 import { SidebarItemBtn } from "../../workspace/components/sidebar-item-btn";
 import { Plus } from "lucide-react";
+import { UploadsDisabledButton } from "@/features/files/components/uploads-disabled-button";
 import Uppy from "@uppy/core";
 import { useState, useCallback, useRef, useEffect } from "react";
 import XHRUpload from "@uppy/xhr-upload";
@@ -176,7 +177,10 @@ export function UploadButton(
   props: ComponentProps<typeof UploadButtonContent>,
 ) {
   return (
-    <FeatureGate feature="attachments">
+    <FeatureGate
+      feature="attachments"
+      fallback={<UploadsDisabledButton Icon={Plus} />}
+    >
       <UploadButtonContent {...props} />
     </FeatureGate>
   );

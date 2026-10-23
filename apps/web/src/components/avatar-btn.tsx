@@ -1,6 +1,7 @@
 import { X } from "lucide-react";
 import { useRef, useState } from "react";
 import { TooltipWrapper } from "./tooltip-wrapper";
+import { useFeatureFlags } from "./feature-flags-provider";
 import { cn } from "@/lib/utils";
 import { SafeAvatar } from "./safe-avatar";
 import { Button } from "./ui/button";
@@ -29,6 +30,16 @@ export function AvatarBtn({
   const inputRef = useRef<HTMLInputElement>(null);
   const [blobUrl, setBlobUrl] = useState<string | undefined>();
   const [content, setContent] = useState<string | null>(null);
+  // Uploads need object storage; while the avatars flag is off the avatar is display-only.
+  const uploadsEnabled = useFeatureFlags().avatars;
+  const label = !uploadsEnabled
+    ? "Avatar uploads are disabled"
+    : avatar
+      ? "Replace avatar"
+      : "Add avatar";
+  const openPicker = () => {
+    if (uploadsEnabled) inputRef.current?.click();
+  };
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -40,32 +51,28 @@ export function AvatarBtn({
   }
 
   return (
-    <TooltipWrapper
-      sideOffset={3}
-      content={content || (avatar ? "Replace avatar" : "Add avatar")}
-    >
+    <TooltipWrapper sideOffset={3} content={content || label}>
       {/* oxlint-disable jsx-a11y/prefer-tag-over-role -- This composite control contains child controls, so it cannot be a native button. */}
       <div
         role="button"
         tabIndex={0}
-        aria-label={avatar ? "Replace avatar" : "Add avatar"}
-        aria-disabled={isUploading || isDeleting}
+        aria-label={label}
+        aria-disabled={!uploadsEnabled || isUploading || isDeleting}
         onKeyDown={(event) => {
           if (
             event.target === event.currentTarget &&
             (event.key === "Enter" || event.key === " ")
           ) {
             event.preventDefault();
-            inputRef.current?.click();
+            openPicker();
           }
         }}
         className={cn(
-          "group relative w-fit cursor-pointer",
+          "group relative w-fit",
+          uploadsEnabled ? "cursor-pointer" : "cursor-not-allowed",
           (isUploading || isDeleting) && "animate-pulse",
         )}
-        onClick={() => {
-          inputRef.current?.click();
-        }}
+        onClick={openPicker}
       >
         <input
           onChange={handleFileChange}
@@ -73,7 +80,7 @@ export function AvatarBtn({
           accept="image/*"
           ref={inputRef}
           className="absolute hidden"
-          disabled={isUploading || isDeleting}
+          disabled={!uploadsEnabled || isUploading || isDeleting}
         />
 
         <SafeAvatar
@@ -87,7 +94,7 @@ export function AvatarBtn({
           fallback={fallback}
         />
 
-        {avatar && (
+        {avatar && uploadsEnabled && (
           <Button
             className={cn(
               "invisible absolute aspect-square rounded-full p-0.5 transition-all duration-100 group-hover:visible",

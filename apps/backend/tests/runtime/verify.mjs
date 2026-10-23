@@ -9,7 +9,7 @@ const root = fileURLToPath(new URL("../../../../", import.meta.url));
 
 const require = createRequire(
   await realpath(
-    path.join(root, "config/workers/node_modules/wrangler/package.json"),
+    path.join(root, "apps/backend/node_modules/wrangler/package.json"),
   ),
 );
 
@@ -100,7 +100,10 @@ const json = (body) => ({
   body: JSON.stringify(body),
 });
 
-/** Exercise real Better Auth OAuth state/callback handling against the provider network fixture. */
+/**
+ * Exercise real Better Auth OAuth state/callback handling against the provider network fixture.
+ * @param {string} email
+ */
 async function signIn(email) {
   const start = await request(
     "/api/auth/sign-in/social",
@@ -111,17 +114,17 @@ async function signIn(email) {
   const authorization = new URL((await start.json()).url);
   const stateCookie = start.headers
     .getSetCookie()
-    .map((value) => value.split(";")[0])
+    .map((/** @type {string} */ value) => value.split(";")[0])
     .join("; ");
   const callback = await request(
-    `/api/auth/callback/github?code=${encodeURIComponent(email)}&state=${encodeURIComponent(authorization.searchParams.get("state"))}`,
+    `/api/auth/callback/github?code=${encodeURIComponent(email)}&state=${encodeURIComponent(authorization.searchParams.get("state") ?? "")}`,
     { headers: { cookie: stateCookie }, redirect: "manual" },
     false,
   );
   assert.equal(callback.status, 302, await callback.clone().text());
   const sessionCookie = callback.headers
     .getSetCookie()
-    .map((value) => value.split(";")[0])
+    .map((/** @type {string} */ value) => value.split(";")[0])
     .join("; ");
   assert.ok(sessionCookie.includes("session_token"));
   const profile = await request(
@@ -205,7 +208,8 @@ try {
           .get("authorization")
           ?.replace(/^Bearer /i, "");
         assert.ok(
-          ["owner@example.test", "viewer@example.test"].includes(email),
+          email &&
+            ["owner@example.test", "viewer@example.test"].includes(email),
         );
         if (url.pathname === "/user/emails")
           return Response.json([{ email, primary: true, verified: true }]);
@@ -299,6 +303,28 @@ try {
       await database.prepare(statement).run();
     }
   }
+
+  // Storage-backed features start disabled; this runtime configures object storage.
+  const storageFlags = await database
+    .prepare(
+      "SELECT key, enabled FROM feature_flags WHERE key IN ('attachments','avatars') ORDER BY key",
+    )
+    .all();
+  assert.deepEqual(
+    storageFlags.results.map((/** @type {any} */ row) => [
+      row.key,
+      row.enabled,
+    ]),
+    [
+      ["attachments", 0],
+      ["avatars", 0],
+    ],
+  );
+  await database
+    .prepare(
+      "UPDATE feature_flags SET enabled=1 WHERE key IN ('attachments','avatars')",
+    )
+    .run();
 
   await check(
     "canonical user migration preserves profiles and sessions and removes duplicate storage",
