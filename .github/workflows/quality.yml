@@ -3,10 +3,13 @@ name: Code Quality
 on:
   push:
     branches:
-      - main
       - dev
   pull_request:
   workflow_call:
+    outputs:
+      application:
+        description: Whether the change needs application checks and deployment
+        value: ${{ jobs.validate.outputs.application }}
 
 jobs:
   validate:
@@ -31,7 +34,7 @@ jobs:
           fi
           # Without rename detection a move lists both paths, so moves in or out of docs/ count.
           changed=$(git diff --no-renames --name-only "$BASE...$HEAD")
-          if [ -n "$changed" ] && ! printf '%s\n' "$changed" | grep -qv '^docs/'; then
+          if [ -n "$changed" ] && ! printf '%s\n' "$changed" | grep -qvE '(^docs/|\.md$)'; then
             echo "Documentation-only change; skipping application gates."
             echo "application=false" >> "$GITHUB_OUTPUT"
           else

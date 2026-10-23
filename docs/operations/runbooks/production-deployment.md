@@ -2,8 +2,7 @@
 
 [Docs home](../../README.md) · [Operate Wodge](../README.md)
 
-The showcase runs on Cloudflare under the `amr21.dev` zone. Every deployment still
-needs owner approval for the exact reviewed commit; see
+The showcase runs on Cloudflare under the `amr21.dev` zone. Merges into `main` authorize automatic deployment after CI passes; see
 [deployment authorization](revival-deployment.md). Calls stay disabled and do not
 need LiveKit settings.
 
@@ -84,8 +83,8 @@ value returns errors naming the setting, never its value.
 ### GitHub Actions
 
 `Production Deploy` (`.github/workflows/deploy.yml`) runs from the `production`
-environment for deployment credentials. Configure required reviewers on it so each
-run waits for approval before builds, migrations or deployment. Public origin variables
+environment for deployment credentials. Leave required reviewers unset for automatic
+deployment. Public origin variables
 may be set at repository scope for CI and in the production environment for deployment.
 If unset, the workflows use the production URLs listed above.
 
@@ -93,13 +92,12 @@ If unset, the workflows use the production URLs listed above.
 | -------- | --------------------------------------------- | -------------------------------------------------------- |
 | Secret   | `CLOUDFLARE_ACCOUNT_ID`                       | Cloudflare account ID                                    |
 | Secret   | `CLOUDFLARE_API_TOKEN`                        | Workers Scripts/Routes, D1: Edit; Account Settings: Read |
-| Secret   | `BACKEND_SECRETS`                             | JSON object holding the Worker secrets listed above      |
 | Variable | `APP_DOMAIN`, `BACKEND_DOMAIN`, `AVATARS_URL` | Production values above                                  |
 
 ## Continuous integration
 
 `Code Quality` (`.github/workflows/quality.yml`) runs on pull requests and pushes to
-`main`/`dev`:
+`dev`, and is reused by `Production Deploy` on pushes to `main`:
 
 - `validate`: detects documentation-only changes and always runs lint and formatting.
   For application changes it also runs boundaries, type checks, API contract tests,
@@ -109,21 +107,28 @@ If unset, the workflows use the production URLs listed above.
 - `quality` (job ID `result`): preserves the existing required check name. Validation must pass; builds must
   pass for application changes and be skipped for documentation-only changes.
 
-A documentation-only change means every changed path is under `docs/`, including
-both sides of renames. Root Markdown, workflow changes and moves out of `docs/`
-still run the full checks. Detection is a step in `validate`, not a separate job.
+A documentation-only change means every changed path is under `docs/` or ends in
+`.md`, including both sides of renames. Such changes still run lint and formatting,
+but skip application checks, builds and deployment. Mixed code and documentation
+changes deploy normally. Detection lives in `validate` and is shared with deployment.
 
-The manual deploy workflow calls these same jobs for the selected ref, always
-running full validation and builds even if that ref only changes documentation.
-After production approval, deployment builds the frontend Worker using the production variables,
-applies D1 migrations, configures Worker secrets, builds and deploys the Worker
-through Wrangler, deploys the frontend Worker, then checks `/health` and `/login`. Deployment
-repeats builds deliberately so there are no artifact archives, transfers or workflow
-outputs to coordinate.
+Every push to `main` runs `Production Deploy`, which calls the quality workflow and
+only deploys application changes after all checks pass. Manual dispatch is restricted
+to `main` and forces full validation, builds and deployment, even for documentation-only
+commits. The production environment must have no required reviewers for unattended CD.
+Deployment builds the frontend with production variables, applies D1 migrations,
+deploys the backend, then the frontend, and checks `/health` and `/login`. Existing
+Cloudflare Worker secrets are preserved; manage them through Cloudflare or Wrangler,
+not a duplicate GitHub secret bundle. Builds repeat deliberately without artifact transfers.
+`INTEGRATION_MODE` defaults to `partial`; a production environment variable can change
+that default, and a manual dispatch can override it.
+
+Do not enable Cloudflare Git builds alongside this workflow: GitHub Actions owns
+automatic deployment. The dashboard instructions below are an alternative setup.
 
 ## Cloudflare Git integration (dashboard)
 
-The owner-preferred setup builds both units in Cloudflare from the production branch.
+As an alternative to GitHub Actions, Cloudflare can build both units from the production branch.
 
 **Frontend Worker** (`Workers & Pages → Create → Import a repository`): name
 `wodge-web`, repository `amr21x/Wodge`, production branch `main`, root directory
