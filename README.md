@@ -35,6 +35,8 @@ Follow [local setup and secrets](docs/development/setup.md) for configuration, c
 
 ## Architecture and technology
 
+The independent [documentation project](apps/docs/README.md) publishes the existing Markdown at `wodge.amr21.dev/docs/`.
+
 See the [architecture and diagram](docs/architecture/overview.md), [persistence boundaries](docs/architecture/data-model.md) and [verified technology inventory](docs/architecture/tech-stack.md).
 
 ```text

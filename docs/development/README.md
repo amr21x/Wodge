@@ -26,6 +26,8 @@ Begin with local setup and the current source verification record. Use the engin
 - [Showcase walkthrough](showcase-walkthrough.md) — manual journeys and expected recovery behavior.
 - [Current source verification](documentation-verification.md) — checked revision, actual results and publication limits.
 
+- [Documentation site](docs-site.md) — the independent VitePress/Cloudflare project, publication and recovery.
+
 ## Evidence and history
 
 - [Security evidence](security-evidence.md) — recorded security findings and verification limits.

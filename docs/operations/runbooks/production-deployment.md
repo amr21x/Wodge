@@ -11,13 +11,14 @@ need LiveKit settings.
 
 ## Topology
 
-One public origin, `https://wodge.amr21.dev`, serves both applications:
+One public origin, `https://wodge.amr21.dev`, serves the application and independent docs site:
 
-| Path                   | Served by                                                              |
-| ---------------------- | ---------------------------------------------------------------------- |
-| `/api/*`, `/parties/*` | Worker `wodge-backend` through routes in `apps/backend/wrangler.jsonc` |
-| `/health`              | Worker `wodge-backend` (JSON liveness check)                           |
-| Everything else        | Worker `wodge-web` (OpenNext build of `apps/web`)                      |
+| Path                   | Served by                                                                          |
+| ---------------------- | ---------------------------------------------------------------------------------- |
+| `/api/*`, `/parties/*` | Worker `wodge-backend` through routes in `apps/backend/wrangler.jsonc`             |
+| `/health`              | Worker `wodge-backend` (JSON liveness check)                                       |
+| `/docs`, `/docs/*`     | Static Worker `wodge-docs`; see [docs publication](../../development/docs-site.md) |
+| Everything else        | Worker `wodge-web` (OpenNext build of `apps/web`)                                  |
 
 Backend routes run before the frontend Worker custom domain, so auth cookies, OAuth callbacks
 and WebSockets stay first-party. The web middleware fetches `/api/users/me` on the

@@ -2,7 +2,7 @@
 
 [Docs home](../README.md) · [Develop Wodge](README.md)
 
-Read and edit the Markdown directly in GitHub. Repository files own product and engineering knowledge; Linear owns issue status, assignments, dependencies, detailed execution work, and evidence.
+Read the published site under `wodge.amr21.dev/docs/` or edit the Markdown directly in GitHub. Repository files own product and engineering knowledge; Linear owns issue status, assignments, dependencies, detailed execution work, and evidence.
 
 ## Find what you need
 
@@ -22,7 +22,7 @@ Start from the [documentation home and feature index](../README.md). Explore exp
 
 Open the page on GitHub, use the pencil button, and preview the Markdown. Propose changes through the repository's branch and review process. Editing requires repository permission; no separate documentation account is required.
 
-Use ordinary headings, lists, tables, relative links, images, fenced code, and Mermaid. Keep navigation in README files. Do not add publishing metadata, duplicate summary files, or tool-specific card markup. This repository currently needs no documentation package, site build, or hosting setup to read its docs.
+Use ordinary headings, lists, tables, relative links, images, fenced code, and Mermaid. Keep navigation in README files. Do not add publishing metadata, duplicate summary files, or tool-specific card markup. The `apps/docs` project renders these same files with VitePress; see [site development and publishing](docs-site.md).
 
 Keep feature behavior in spec.md and feature design in design.md. Retain plan.md only for a substantial delivery approach; additional rollout coordination belongs in deployment.md or an applicable shared runbook. Detailed implementation, deployment, and maintenance work stays in existing Linear issues.
 
@@ -32,11 +32,11 @@ Preserve stable acceptance IDs, source references, decisions, and approval evide
 
 Preview changed pages in GitHub or a Markdown viewer. Check relative links and section anchors, confirm that indexes reach every page, and check diagrams and referenced assets. Compare feature acceptance criteria and source evidence when reorganizing content. Follow the [CI/CD policy](../operations/ci-cd.md) for documentation-only versus mixed changes; the approved policy is not yet fully enforced by the checked-in application workflow.
 
-## Source and integration state — 2026-10-16
+## Historical source and integration state — 2026-10-16
 
 The source is AMR-21/Wodge, with documentation rooted at docs/. This cleanup is prepared on dev after integrating the incoming backend foundation commits; it has not been pushed. Read access follows repository visibility and permissions; this cleanup does not change either.
 
-GitBook is no longer part of the repository documentation workflow. Its local configuration, duplicate summaries, and presentation metadata have been removed. No replacement renderer or hosting service has been configured.
+GitBook is no longer part of the repository documentation workflow. Its local configuration, duplicate summaries, and presentation metadata have been removed. No replacement renderer or hosting service had been configured at that time. The current `apps/docs` VitePress project supersedes that rendering status; the historical GitBook integration remains separate.
 
 The previously verified GitBook integration read main and served an existing public Wodge site. Its live sync and old published copy have not been disconnected or changed by this cleanup. Removing local files does not disable that integration. The owner must separately authorize live disconnection and decide the old site's visibility before a publishing cutover. See the [historical connection record](documentation-history.md#verified-connection).
 

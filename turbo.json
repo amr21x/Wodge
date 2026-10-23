@@ -38,6 +38,9 @@
     "workers:build": {
       "dependsOn": ["^build"],
       "outputs": [".open-next/**", ".next/**", "!.next/cache/**"]
+    },
+    "docs#build": {
+      "outputs": ["dist/**"]
     }
   }
 }
