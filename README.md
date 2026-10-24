@@ -1,5 +1,6 @@
 ![Wodge — your team's workspace for communication, knowledge and tasks](apps/web/public/wodge-readme-banner.svg)
 
+
 # Wodge
 
 **A local-first collaborative workspace for team communication, knowledge management, and task coordination.**
