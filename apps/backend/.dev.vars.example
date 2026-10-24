@@ -9,7 +9,7 @@ BETTER_AUTH_SECRET=
 SECRET_KEY=
 
 # partial allows unavailable storage/billing locally; ready requires storage and Polar sandbox settings.
-# Google and GitHub OAuth credentials are required in both modes. Email sign-in is disabled.
+# Google and GitHub OAuth credentials are required in both modes. Email sign-in is disabled
 INTEGRATION_MODE=partial
 
 # Storage and billing credentials are optional in partial local development.
