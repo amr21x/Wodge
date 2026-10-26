@@ -69,3 +69,6 @@ next-env.d.ts
 
 # OpenNext Workers build output
 .open-next/
+
+# Agent chat attachments
+.codex-remote-attachments/
